@@ -1,0 +1,20 @@
+project:
+  name: NapasLoka
+  timezone: Asia/Jakarta
+  random_seed: 42
+  forecast_horizon_hours: 1
+  history_hours: 3
+
+pollutants:
+  co:
+    column: carbon_monoxide
+    label: Carbon Monoxide (CO)
+    unit: "µg/m³"
+  co2:
+    column: carbon_dioxide
+    label: Carbon Dioxide (CO2)
+    unit: ppm
+
+algorithms:
+  - xgboost
+  - lightgbm

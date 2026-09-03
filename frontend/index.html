@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#176b5b">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <title>Beranda — NapasLoka</title>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/index.html">NapasLoka</a>
+    <nav class="nav" aria-label="Navigasi utama">
+      <a href="/index.html" aria-current="page">Beranda</a>
+      <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
+      <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+      <a href="/pages/interpretation.html">Interpretasi</a>
+      <a href="/pages/information.html">Informasi</a>
+    </nav>
+  </header>
+  <main>
+    <h1>Prediksi CO dan CO2 berbasis data historis</h1>
+    <p class="lead">Skeleton PWA untuk menyajikan hasil penelitian XGBoost dan LightGBM pada lokasi penelitian yang telah dikonfigurasi. Phase 0 belum memuat hasil model.</p>
+    <section class="grid" aria-label="Area aplikasi">
+      <article class="card"><h2>Prediksi</h2><p>Pilih lokasi, polutan, skenario, algoritma, dan rentang waktu yang tersedia.</p></article>
+      <article class="card"><h2>Evaluasi</h2><p>Tampilkan actual vs predicted, perbandingan model, dan metrics penelitian.</p></article>
+      <article class="card"><h2>Interpretasi</h2><p>Tampilkan gain-based importance dan hasil SHAP dari artefak nyata.</p></article>
+    </section>
+  </main>
+  <footer class="footer">NapasLoka · <span data-current-year></span></footer>
+  <script src="/js/app.js" defer></script>
+</body>
+</html>

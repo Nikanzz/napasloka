@@ -1,0 +1,7 @@
+strategy: chronological
+test_fraction: 0.20
+shuffle: false
+
+# Split dilakukan setelah pembentukan lag. Batas tanggal eksplisit dapat
+# ditambahkan setelah rentang data penelitian ditetapkan.
+cutoff_datetime: null

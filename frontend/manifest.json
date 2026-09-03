@@ -1,0 +1,19 @@
+{
+  "name": "NapasLoka",
+  "short_name": "NapasLoka",
+  "description": "PWA hasil penelitian prediksi konsentrasi CO dan CO2 di Jabodetabek.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#176b5b",
+  "lang": "id",
+  "icons": [
+    {
+      "src": "/assets/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+# TODO: Isi tepat 15 lokasi beserta latitude dan longitude setelah daftar lokasi
+# penelitian disahkan. Jangan menyalin atau mengarang koordinat tanpa verifikasi.
+locations: []
+
+# Bentuk entri yang diharapkan (contoh struktur saja, bukan data penelitian):
+# - id: <slug-lokasi>
+#   name: <nama-lokasi>
+#   latitude: <latitude-terverifikasi>
+#   longitude: <longitude-terverifikasi>

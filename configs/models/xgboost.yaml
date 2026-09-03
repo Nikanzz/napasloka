@@ -1,0 +1,4 @@
+algorithm: xgboost
+estimator: XGBRegressor
+parameters: {}
+# TODO: Parameter final dan search space ditetapkan setelah seminar proposal.

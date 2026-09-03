@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">NapasLoka</title>
+  <rect width="512" height="512" rx="112" fill="#176b5b"/>
+  <path d="M112 304c62-12 88-58 118-128 19 45 36 78 60 99 27 24 61 32 110 29" fill="none" stroke="#d8f3ea" stroke-width="38" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="111" cy="304" r="25" fill="#fff"/>
+  <circle cx="401" cy="304" r="25" fill="#fff"/>
+</svg>

@@ -1,0 +1,38 @@
+sources:
+  air_quality:
+    provider: Open-Meteo Air Quality API
+    product: CAMS grid output
+    base_url: https://air-quality-api.open-meteo.com/v1/air-quality
+  weather:
+    provider: Open-Meteo Historical Weather API
+    base_url: https://archive-api.open-meteo.com/v1/archive
+
+datetime:
+  column: datetime
+  timezone: Asia/Jakarta
+  frequency: 1h
+
+join_keys:
+  - location
+  - datetime
+
+columns:
+  identifiers:
+    - datetime
+    - location
+    - latitude
+    - longitude
+  pollutants:
+    - carbon_monoxide
+    - carbon_dioxide
+  meteorology:
+    - temperature_2m
+    - relative_humidity_2m
+    - rain
+    - wind_speed_100m
+
+preprocessing:
+  impute_missing: false
+  scale_features: false
+  remove_outliers: false
+  preserve_raw_data: true

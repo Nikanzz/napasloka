@@ -1,0 +1,11 @@
+enabled: false
+strategy: grid_search
+cross_validation:
+  type: TimeSeriesSplit
+  n_splits: null
+
+# TODO: Finalisasi search space setelah seminar proposal. Dictionary kosong
+# disengaja agar Phase 0 tidak menetapkan grid penelitian secara sembarangan.
+search_spaces:
+  xgboost: {}
+  lightgbm: {}

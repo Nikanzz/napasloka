@@ -1,0 +1,15 @@
+.card, .panel {
+  background: white;
+  border: 1px solid #dce7e4;
+  border-radius: .75rem;
+  padding: 1rem;
+  box-shadow: 0 3px 14px rgb(24 50 45 / 6%);
+}
+
+.form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; }
+label { display: grid; gap: .4rem; font-weight: 600; }
+select, input, button { font: inherit; padding: .65rem; border: 1px solid #aebfbb; border-radius: .4rem; }
+button { background: #176b5b; color: white; border-color: #176b5b; cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: .6; }
+.status { margin-top: 1rem; padding: .75rem; border-left: 4px solid #176b5b; background: #eaf3f1; }
+.plot-placeholder { min-height: 260px; display: grid; place-items: center; color: #60736f; border: 1px dashed #9db2ad; }
