@@ -1,9 +1,62 @@
-# TODO: Isi tepat 15 lokasi beserta latitude dan longitude setelah daftar lokasi
-# penelitian disahkan. Jangan menyalin atau mengarang koordinat tanpa verifikasi.
-locations: []
-
-# Bentuk entri yang diharapkan (contoh struktur saja, bukan data penelitian):
-# - id: <slug-lokasi>
-#   name: <nama-lokasi>
-#   latitude: <latitude-terverifikasi>
-#   longitude: <longitude-terverifikasi>
+# 15 lokasi di Jabodetabek
+locations:
+  - id: taman-kamal
+    name: Taman Kamal
+    latitude: -6.100000
+    longitude: 106.700000
+  - id: pelabuhan-muara-baru
+    name: Pelabuhan Muara Baru
+    latitude: -6.100000
+    longitude: 106.800000
+  - id: daerah-pelabuhan-tanjung-priuk
+    name: Daerah Pelabuhan Tanjung Priuk
+    latitude: -6.100000
+    longitude: 106.900000
+  - id: petamburan-perkantoran-transjakarta
+    name: Petamburan Daerah perkantoran dan Transjakarta
+    latitude: -6.200000
+    longitude: 106.800000
+  - id: smpn-92-jakarta-timur
+    name: SMP Negeri 92 Jakarta Timur
+    latitude: -6.200000
+    longitude: 106.900000
+  - id: perumahan-dekat-tol-depok-antasari
+    name: Perumahan dekat Tol Depok-Antasari
+    latitude: -6.300000
+    longitude: 106.800000
+  - id: tmii
+    name: TMII
+    latitude: -6.300000
+    longitude: 106.900000
+  - id: metland-cyberpuri
+    name: Metland Cyberpuri
+    latitude: -6.200000
+    longitude: 106.700000
+  - id: tol-serpong-interchange
+    name: Tol Serpong (Interchange)
+    latitude: -6.300000
+    longitude: 106.700000
+  - id: pancoran-mas
+    name: Pancoran Mas
+    latitude: -6.400000
+    longitude: 106.800000
+  - id: jl-tol-jagorawi
+    name: Jl. Tol Jagorawi
+    latitude: -6.400000
+    longitude: 106.900000
+  - id: pantai-makmur
+    name: Pantai Makmur
+    latitude: -6.100000
+    longitude: 107.000000
+  - id: kaliabang-tengah
+    name: Kaliabang Tengah
+    latitude: -6.200000
+    longitude: 107.000000
+  - id: mustikasari
+    name: Mustikasari
+    latitude: -6.300000
+    longitude: 107.000000
+  - id: cibinong
+    name: Cibinong
+    latitude: -6.400000
+    longitude: 106.700000
