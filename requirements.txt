@@ -12,3 +12,7 @@ pyyaml
 joblib
 httpx
 pytest
+
+openmeteo-requests
+requests-cache
+retry-requests
