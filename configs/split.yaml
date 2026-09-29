@@ -2,6 +2,5 @@ strategy: chronological
 test_fraction: 0.20
 shuffle: false
 
-# Split dilakukan setelah pembentukan lag. Batas tanggal eksplisit dapat
-# ditambahkan setelah rentang data penelitian ditetapkan.
+# Split occurs after lag creation; cutoff_datetime overrides test_fraction if set.
 cutoff_datetime: null

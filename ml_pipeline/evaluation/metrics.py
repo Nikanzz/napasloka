@@ -16,9 +16,10 @@ def mean_absolute_percentage_error_percent(
     predicted = np.asarray(y_pred, dtype=float)
     if actual.shape != predicted.shape:
         raise ValueError("y_true and y_pred must have the same shape")
-    if (actual == 0).any():
-        raise ValueError("MAPE is undefined when an actual value is zero")
-    return float(np.mean(np.abs((actual - predicted) / actual)) * 100)
+    mask = actual != 0
+    if not np.any(mask):
+        return 0.0
+    return float(np.mean(np.abs((actual[mask] - predicted[mask]) / actual[mask])) * 100)
 
 
 def calculate_regression_metrics(

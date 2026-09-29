@@ -6,7 +6,6 @@ import openmeteo_requests
 import requests_cache
 from retry_requests import retry
 
-# Tambahkan root directory ke sys.path agar bisa mengimpor module lokal
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -17,7 +16,6 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
 def main() -> None:
-    # 1. Baca konfigurasi lokasi
     config = load_yaml_config("locations.yaml")
     locations = config.get("locations", [])
     if not locations:
@@ -25,7 +23,6 @@ def main() -> None:
 
     logging.info(f"Ditemukan {len(locations)} lokasi dari konfigurasi.")
 
-    # 2. Parameter waktu
     START_DATE = "2024-10-26"
     END_DATE = "2026-08-04"
     TIMEZONE = "Asia/Bangkok"  
@@ -33,7 +30,6 @@ def main() -> None:
     weather_url = "https://archive-api.open-meteo.com/v1/archive"
     air_url = "https://air-quality-api.open-meteo.com/v1/air-quality"
 
-    # 3. Setup Open-Meteo Client
     cache_session = requests_cache.CachedSession(".cache", expire_after=-1)
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
     openmeteo = openmeteo_requests.Client(session=retry_session)
@@ -48,9 +44,7 @@ def main() -> None:
 
         logging.info(f"Mengunduh data untuk {name} ({lat}, {lon})...")
 
-        # ===========================
-        # WEATHER
-        # ===========================
+        # Weather data
         weather_params = {
             "latitude": lat,
             "longitude": lon,
@@ -81,9 +75,7 @@ def main() -> None:
             "wind_speed_100m": weather_hourly.Variables(3).ValuesAsNumpy(),
         })
 
-        # ===========================
-        # AIR QUALITY (CO)
-        # ===========================
+        # Air quality (CO)
         co_params = {
             "latitude": lat,
             "longitude": lon,
@@ -107,9 +99,7 @@ def main() -> None:
             "carbon_monoxide": co_hourly.Variables(0).ValuesAsNumpy(),
         })
 
-        # ===========================
-        # AIR QUALITY (CO2)
-        # ===========================
+        # Air quality (CO2)
         co2_params = {
             "latitude": lat,
             "longitude": lon,
@@ -133,24 +123,21 @@ def main() -> None:
             "carbon_dioxide": co2_hourly.Variables(0).ValuesAsNumpy(),
         })
 
-        # ===========================
-        # MERGE
-        # ===========================
+        # Merge
         df_co = pd.merge(weather_df, co_df, on="datetime", how="inner")
         df_co2 = pd.merge(weather_df, co2_df, on="datetime", how="inner")
 
-        df_co["location"] = name
+        df_co["location"] = f"{lat}_{lon}"
         df_co["latitude"] = lat
         df_co["longitude"] = lon
 
-        df_co2["location"] = name
+        df_co2["location"] = f"{lat}_{lon}"
         df_co2["latitude"] = lat
         df_co2["longitude"] = lon
 
         co_data_list.append(df_co)
         co2_data_list.append(df_co2)
 
-    # 4. Finalisasi Dataset
     co_final_df = pd.concat(co_data_list, ignore_index=True)
     co2_final_df = pd.concat(co2_data_list, ignore_index=True)
 
@@ -168,12 +155,11 @@ def main() -> None:
     co_final_df = co_final_df[cols_co]
     co2_final_df = co2_final_df[cols_co2]
 
-    # Pastikan data dimulai dari 26 Oktober 2024 pukul 07.00
+    # Trim to study start date
     start_datetime = pd.Timestamp("2024-10-26 07:00:00", tz=TIMEZONE)
     co_final_df = co_final_df[co_final_df["datetime"] >= start_datetime].reset_index(drop=True)
     co2_final_df = co2_final_df[co2_final_df["datetime"] >= start_datetime].reset_index(drop=True)
 
-    # 5. Simpan ke data/processed/
     processed_dir = DATA_DIR / "processed"
     processed_dir.mkdir(parents=True, exist_ok=True)
 
