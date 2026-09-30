@@ -13,12 +13,8 @@ data/raw/*
 !data/raw/weather/
 !data/raw/air_quality/.gitkeep
 !data/raw/weather/.gitkeep
-data/interim/*
-!data/interim/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-data/splits/*
-!data/splits/.gitkeep
 
 artifacts/experiments/*
 !artifacts/experiments/.gitkeep
