@@ -57,7 +57,7 @@ def main() -> None:
 
     # Summary metrics
     print("\n" + "="*80)
-    print("               RINGKASAN HASIL PENELITIAN UNTUK BAB 4 SKRIPSI")
+    print("               RINGKASAN HASIL PENELITIAN ")
     print("="*80)
 
     print("\n--- 1. Perbandingan Algoritma (XGBoost vs LightGBM) ---")
