@@ -8,10 +8,9 @@ __pycache__/
 .ipynb_checkpoints/
 logs/
 
-data/raw/*
-!data/raw/air_quality/
-!data/raw/weather/
+data/raw/air_quality/*
 !data/raw/air_quality/.gitkeep
+data/raw/weather/*
 !data/raw/weather/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
