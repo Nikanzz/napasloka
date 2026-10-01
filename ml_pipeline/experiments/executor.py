@@ -14,6 +14,7 @@ from ml_pipeline.evaluation.timing import PerformanceTimer
 from ml_pipeline.experiments.experiment import ExperimentSpec
 from ml_pipeline.features.lag_features import create_lag_features
 from ml_pipeline.features.scenarios import resolve_scenario
+from ml_pipeline.interpretation.feature_importance import gain_feature_importance
 from ml_pipeline.interpretation.shap_analysis import calculate_tree_shap, mean_absolute_shap
 from ml_pipeline.modeling.prediction import predict
 from ml_pipeline.modeling.training import create_estimator
@@ -101,14 +102,8 @@ def execute_single_experiment(spec: ExperimentSpec, artifact_dir: Path) -> dict[
     shap_values = calculate_tree_shap(best_model, x_test)
     df_shap_global = mean_absolute_shap(shap_values, feature_cols)
 
-    raw_importances = getattr(best_model, "feature_importances_", None)
-    if raw_importances is not None:
-        df_gain = pd.DataFrame({
-            "feature": feature_cols,
-            "importance": raw_importances,
-        }).sort_values(by="importance", ascending=False).reset_index(drop=True)
-    else:
-        df_gain = pd.DataFrame(columns=["feature", "importance"])
+    # Feature importance (Gain-based)
+    df_gain = gain_feature_importance(best_model, feature_cols, normalize=True)
 
     # Save artifacts
     artifact_dir.mkdir(parents=True, exist_ok=True)

@@ -8,7 +8,7 @@ def create_lightgbm_regressor(parameters: dict[str, Any] | None = None) -> Any:
 
     from lightgbm import LGBMRegressor
 
-    params = {"verbose": -1}
+    params = {"verbose": -1, "importance_type": "gain"}
     if parameters:
         params.update(parameters)
     return LGBMRegressor(**params)
