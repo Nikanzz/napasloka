@@ -1,37 +1,30 @@
-"""Read-only options exposed to the PWA."""
+"""Read-only configuration and options exposed to the PWA."""
 
 from typing import Any
-
 from fastapi import APIRouter
-
-from ml_pipeline.utils.config import load_yaml_config
-
+from backend.app.core.config import settings
+from backend.app.services.registry_service import registry_service
 
 router = APIRouter(prefix="/config", tags=["configuration"])
 
 
 @router.get("/options")
-def configuration_options() -> dict[str, list[dict[str, Any]]]:
-    """Return only locations and experiment dimensions supported by config."""
-
-    project = load_yaml_config("project.yaml")
-    features = load_yaml_config("features.yaml")
-    locations = load_yaml_config("locations.yaml").get("locations", [])
-    pollutants = [
-        {"id": key, **value}
-        for key, value in project.get("pollutants", {}).items()
-    ]
-    scenarios = [
-        {"id": key, "label": value["label"]}
-        for key, value in features.get("scenarios", {}).items()
-    ]
-    algorithms = [
-        {"id": value, "label": "XGBoost" if value == "xgboost" else "LightGBM"}
-        for value in project.get("algorithms", [])
-    ]
+def configuration_options() -> dict[str, Any]:
+    """Return locations and experiment dimensions supported by the NapasLoka system."""
     return {
-        "locations": locations,
-        "pollutants": pollutants,
-        "scenarios": scenarios,
-        "algorithms": algorithms,
+        "locations": settings.get_locations(),
+        "pollutants": settings.get_pollutants(),
+        "scenarios": settings.get_scenarios(),
+        "algorithms": settings.get_algorithms(),
+        "evaluation_range": {
+            "start": settings.default_test_start,
+            "end": settings.default_test_end,
+        },
+        "forecast_horizon_hours": 1,
     }
+
+
+@router.get("/models")
+def get_all_models_summary() -> dict[str, Any]:
+    """Return inventory summary of all 120 trained models in the registry."""
+    return registry_service.get_all_models_summary()

@@ -1,11 +1,20 @@
-enabled: false
-strategy: grid_search
+enabled: true
+strategy: randomized_search
+n_iter: 10
+n_jobs: -1
+random_state: 42
+scoring: neg_mean_absolute_error
 cross_validation:
   type: TimeSeriesSplit
-  n_splits: null
+  n_splits: 3
+  max_train_size: 3108
 
-# TODO: Finalisasi search space setelah seminar proposal. Dictionary kosong
-# disengaja agar Phase 0 tidak menetapkan grid penelitian secara sembarangan.
 search_spaces:
-  xgboost: {}
-  lightgbm: {}
+  xgboost:
+    learning_rate: [0.01, 0.05, 0.10]
+    n_estimators: [100, 300, 500]
+    max_depth: [3, 6, 9]
+  lightgbm:
+    learning_rate: [0.01, 0.05, 0.10]
+    n_estimators: [100, 300, 500]
+    max_depth: [3, 6, 9]

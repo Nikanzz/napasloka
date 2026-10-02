@@ -1,26 +1,33 @@
-"""FastAPI application factory for the Phase 0 backend."""
+"""FastAPI application factory for the Sistem NapasLoka backend."""
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.app.api import config, evaluation, health, interpretation, prediction
+from backend.app.core.config import settings
 
 
 def create_app() -> FastAPI:
-    """Create and configure the NapasLoka API."""
+    """Create and configure the Sistem NapasLoka API."""
 
     application = FastAPI(
-        title="NapasLoka API",
-        version="0.1.0",
-        description="Research artifact API; scientific prediction is unavailable in Phase 0.",
+        title=settings.app_name,
+        version=settings.app_version,
+        description=(
+            "Backend API untuk Sistem NapasLoka: Prediksi dan Evaluasi Kualitas Udara (CO dan CO2) "
+            "1 Jam ke Depan pada 15 Lokasi Jabodetabek menggunakan XGBoost dan LightGBM."
+        ),
     )
+
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://127.0.0.1:5500", "http://localhost:5500"],
-        allow_credentials=False,
-        allow_methods=["GET", "POST"],
+        allow_origins=settings.allowed_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # API Routers
     for router in (
         health.router,
         config.router,
@@ -28,7 +35,18 @@ def create_app() -> FastAPI:
         evaluation.router,
         interpretation.router,
     ):
-        application.include_router(router, prefix="/api/v1")
+        application.include_router(router, prefix=settings.api_v1_prefix)
+
+    @application.get("/", tags=["root"])
+    def root() -> dict[str, str]:
+        """Root endpoint returning API service identification."""
+        return {
+            "name": settings.app_name,
+            "version": settings.app_version,
+            "status": "online",
+            "docs_url": "/docs",
+        }
+
     return application
 
 

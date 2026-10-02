@@ -1,5 +1,3 @@
-# Single source of truth untuk schema fitur. Nama fitur konkret dibentuk oleh
-# ml_pipeline.features.scenarios dari konfigurasi ini.
 forecast_horizon_hours: 1
 lag_hours: [3, 2, 1]
 
