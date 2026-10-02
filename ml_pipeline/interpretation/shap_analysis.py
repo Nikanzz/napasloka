@@ -1,15 +1,8 @@
-"""Primary TreeSHAP interpretation interface.
-
-Future implementation will calculate local TreeSHAP values and aggregate
-global importance as mean absolute SHAP. SHAP describes model behavior and
-must never be interpreted as evidence of a causal relationship. SHAP is not
-executed during Phase 0.
-"""
+"""Primary TreeSHAP interpretation interface with Windows SAC DLL protection."""
 
 from typing import Any
-
 import sys
-import importlib.machinery
+from types import ModuleType
 from unittest.mock import MagicMock
 
 class MockModule(MagicMock):
@@ -28,8 +21,35 @@ class MatplotlibMockImporter:
             return importlib.machinery.ModuleSpec(fullname, MockLoader())
         return None
 
-# Mock matplotlib to prevent shap from importing it in headless environments
+import importlib.machinery
 sys.meta_path.insert(0, MatplotlibMockImporter())
+
+# Prevent Windows Smart App Control (SAC) from blocking unused Cython BLAS extensions
+if "sklearn.cluster" not in sys.modules:
+    m_cluster = ModuleType("sklearn.cluster")
+    m_cluster.KMeans = object
+    sys.modules["sklearn.cluster"] = m_cluster
+
+if "sklearn.impute" not in sys.modules:
+    m_impute = ModuleType("sklearn.impute")
+    m_impute.SimpleImputer = object
+    sys.modules["sklearn.impute"] = m_impute
+
+if "shap.explainers.other._maple" not in sys.modules:
+    m_maple = ModuleType("shap.explainers.other._maple")
+    m_maple.Maple = object
+    m_maple.TreeMaple = object
+    sys.modules["shap.explainers.other._maple"] = m_maple
+
+if "shap.explainers._kernel" not in sys.modules:
+    m_kernel = ModuleType("shap.explainers._kernel")
+    m_kernel.KernelExplainer = object
+    sys.modules["shap.explainers._kernel"] = m_kernel
+
+if "shap.explainers._linear" not in sys.modules:
+    m_linear = ModuleType("shap.explainers._linear")
+    m_linear.LinearExplainer = object
+    sys.modules["shap.explainers._linear"] = m_linear
 
 import shap
 import pandas as pd

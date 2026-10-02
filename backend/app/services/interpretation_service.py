@@ -4,6 +4,8 @@ import logging
 from typing import Any
 import numpy as np
 import pandas as pd
+
+import ml_pipeline.interpretation.shap_analysis  # Sets up Windows SAC protection
 import shap
 
 from backend.app.core.config import (
