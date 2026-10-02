@@ -1,13 +1,312 @@
 <!doctype html>
 <html lang="id">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
-  <link rel="manifest" href="/manifest.json"><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/css/components.css">
-  <title>Informasi — NapasLoka</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d382e">
+  <meta name="description" content="Informasi metodologi, sumber data, batasan sistem, dan spesifikasi 120 model machine learning Sistem NapasLoka.">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <title>Informasi & Metodologi — Sistem NapasLoka</title>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="/index.html">NapasLoka</a><nav class="nav" aria-label="Navigasi utama"><a href="/index.html">Beranda</a><a href="/pages/prediction.html">Konfigurasi Prediksi</a><a href="/pages/evaluation.html">Grafik & Evaluasi</a><a href="/pages/interpretation.html">Interpretasi</a><a href="/pages/information.html" aria-current="page">Informasi</a></nav></header>
-  <main><h1>Informasi Penelitian</h1><article class="panel"><p>NapasLoka adalah antarmuka untuk penelitian prediksi konsentrasi CO dan CO2 satu jam berikutnya menggunakan data historis polutan berbasis grid CAMS dan meteorologi Open-Meteo di wilayah Jabodetabek.</p><p>Aplikasi ini bukan sistem sensor realtime dan tidak menyediakan early warning.</p></article></main>
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
+        <a class="brand" href="/index.html">
+          NapasLoka
+          <span class="brand-badge">Jabodetabek</span>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="/index.html">Beranda</a>
+        <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
+        <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+        <a href="/pages/interpretation.html">Interpretasi</a>
+        <a href="/pages/information.html" aria-current="page">Informasi</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <header class="page-header">
+      <span class="page-tag">📚 Dokumentasi & Metodologi</span>
+      <h1>Informasi Sistem dan Metodologi Penelitian</h1>
+      <p class="lead">
+        Dokumentasi sumber data, batasan sistem, karakteristik 15 titik pengamatan wilayah Jabodetabek, skenario rekayasa fitur, dan kerangka pemodelan machine learning Sistem NapasLoka.
+      </p>
+    </header>
+
+    <!-- Important System Scope & Limitation Callout -->
+    <div class="alert alert-warning" role="alert">
+      <div class="alert-icon">⚠️</div>
+      <div class="alert-content">
+        <h4>Pemberitahuan Penting: Batasan dan Ruang Lingkup Data</h4>
+        <p>
+          Seluruh data konsentrasi polutan Karbon Monoksida (CO) dan Karbon Dioksida (CO₂) dalam sistem ini bersumber dari model atmosfer asimilasi data <strong>CAMS (Copernicus Atmosphere Monitoring Service)</strong> dari ECMWF, dan <strong>bukan merupakan hasil pengukuran langsung dari sensor in-situ / stasiun fisik di permukaan tanah</strong>.
+          Oleh karena itu, sistem ini dirancang sebagai instrumen analisis prediksi dan evaluasi komparatif machine learning dalam konteks akademik, bukan sebagai sistem peringatan dini darurat (<em>early warning system</em>).
+        </p>
+      </div>
+    </div>
+
+    <!-- Data Sources Grid (2 Cards) -->
+    <section style="margin-bottom: 2.5rem;" aria-labelledby="data-sources-heading">
+      <h2 id="data-sources-heading" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--color-text-main);">
+        Sumber Data Ilmiah
+      </h2>
+      <div class="grid-2">
+        <article class="card">
+          <div class="feature-icon-box" style="background: #e0f2fe; color: #0284c7;">🛰️</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">CAMS Atmosphere Data (Copernicus / ECMWF)</h3>
+          <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            Menyediakan data historis konsentrasi polutan atmosfer berbasis grid model global dengan resolusi temporal 1 jam:
+          </p>
+          <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            <li><strong>Karbon Monoksida (CO):</strong> Satuan mikrogram per meter kubik (µg/m³).</li>
+            <li><strong>Karbon Dioksida (CO₂):</strong> Satuan parts per million (ppm).</li>
+            <li><strong>Cakupan Waktu:</strong> 26 Oktober 2024 s.d. 04 Agustus 2026 (233.175 baris observasi per stasiun).</li>
+          </ul>
+          <span class="badge badge-blue">Resolusi 1 Jam · Spasial Grid</span>
+        </article>
+
+        <article class="card">
+          <div class="feature-icon-box" style="background: #fef3c7; color: #d97706;">🌤️</div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem;">Open-Meteo Historical Weather API</h3>
+          <p style="font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            Menyediakan empat variabel meteorologis permukaan historis yang diselaraskan dengan setiap titik koordinat dan jam observasi:
+          </p>
+          <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6; margin-bottom: 1rem;">
+            <li><strong>Temperatur Udara (2m):</strong> Suhu permukaan udara dalam satuan Celsius (°C).</li>
+            <li><strong>Kelembapan Relatif (2m):</strong> Persentase kejenuhan uap air (%).</li>
+            <li><strong>Curah Hujan (Rain):</strong> Akumulasi presipitasi per jam dalam milimeter (mm).</li>
+            <li><strong>Kecepatan Angin (100m):</strong> Kecepatan aliran angin atmosfer dalam meter per detik (m/s).</li>
+          </ul>
+          <span class="badge badge-amber">4 Parameter Meteorologi</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- 15 Locations Table -->
+    <section style="margin-bottom: 2.5rem;" aria-labelledby="locations-heading">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <h2 id="locations-heading" style="font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">
+          15 Titik Pengamatan Wilayah Jabodetabek
+        </h2>
+        <span class="badge badge-emerald">15 Titik Grid Terverifikasi</span>
+      </div>
+
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama Lokasi</th>
+              <th>Wilayah Administratif</th>
+              <th>Koordinat (Lintang, Bujur)</th>
+              <th>Karakteristik Lingkungan</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Taman Kamal</strong></td>
+              <td>Jakarta Barat</td>
+              <td><code>-6.100000, 106.700000</code></td>
+              <td>Pemukiman urban & kedekatan dengan koridor pesisir barat</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Pelabuhan Muara Baru</strong></td>
+              <td>Jakarta Utara</td>
+              <td><code>-6.100000, 106.800000</code></td>
+              <td>Pusat aktivitas maritim, perikanan & pesisir utara</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Daerah Pelabuhan Tanjung Priok</strong></td>
+              <td>Jakarta Utara</td>
+              <td><code>-6.100000, 106.900000</code></td>
+              <td>Kawasan pelabuhan internasional, logistik berat & industri maritim</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>Petamburan Perkantoran Transjakarta</strong></td>
+              <td>Jakarta Pusat</td>
+              <td><code>-6.200000, 106.800000</code></td>
+              <td>Kawasan perkantoran padat & koridor transportasi publik arteri</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>SMP Negeri 92 Jakarta Timur</strong></td>
+              <td>Jakarta Timur</td>
+              <td><code>-6.200000, 106.900000</code></td>
+              <td>Kawasan pendidikan & pemukiman padat penduduk</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><strong>Perumahan Dekat Tol Depok-Antasari</strong></td>
+              <td>Jakarta Selatan</td>
+              <td><code>-6.300000, 106.800000</code></td>
+              <td>Koridor jalan tol penghubung Jakarta-Depok & perumahan suburban</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td><strong>TMII (Taman Mini Indonesia Indah)</strong></td>
+              <td>Jakarta Timur</td>
+              <td><code>-6.300000, 106.900000</code></td>
+              <td>Kawasan cagar budaya, ruang terbuka hijau & rekreasi publik</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td><strong>Metland Cyberpuri</strong></td>
+              <td>Kota Tangerang</td>
+              <td><code>-6.200000, 106.700000</code></td>
+              <td>Kawasan komersial terencana & perbatasan Tangerang-Jakarta Barat</td>
+            </tr>
+            <tr>
+              <td>9</td>
+              <td><strong>Tol Serpong Interchange</strong></td>
+              <td>Kota Tangerang Selatan</td>
+              <td><code>-6.300000, 106.700000</code></td>
+              <td>Simpang susun arteri jalan tol & koridor komuter BSD-Serpong</td>
+            </tr>
+            <tr>
+              <td>10</td>
+              <td><strong>Pancoran Mas</strong></td>
+              <td>Kota Depok</td>
+              <td><code>-6.400000, 106.800000</code></td>
+              <td>Pusat pemukiman urban padat wilayah penyangga selatan</td>
+            </tr>
+            <tr>
+              <td>11</td>
+              <td><strong>Jl. Tol Jagorawi</strong></td>
+              <td>Kota Depok / Bogor</td>
+              <td><code>-6.400000, 106.900000</code></td>
+              <td>Jalan tol arteri utama penghubung Jakarta, Depok, dan Bogor</td>
+            </tr>
+            <tr>
+              <td>12</td>
+              <td><strong>Pantai Makmur</strong></td>
+              <td>Kabupaten Bekasi</td>
+              <td><code>-6.100000, 107.000000</code></td>
+              <td>Kawasan pesisir utara Tarumajaya & PLTU pembangkit listrik</td>
+            </tr>
+            <tr>
+              <td>13</td>
+              <td><strong>Kaliabang Tengah</strong></td>
+              <td>Kota Bekasi</td>
+              <td><code>-6.200000, 107.000000</code></td>
+              <td>Kawasan industri manufaktur lokal & pemukiman Bekasi Utara</td>
+            </tr>
+            <tr>
+              <td>14</td>
+              <td><strong>Mustikasari</strong></td>
+              <td>Kota Bekasi</td>
+              <td><code>-6.300000, 107.000000</code></td>
+              <td>Kawasan pergudangan, logistik & perumahan koridor timur</td>
+            </tr>
+            <tr>
+              <td>15</td>
+              <td><strong>Cibinong</strong></td>
+              <td>Kabupaten Bogor</td>
+              <td><code>-6.400000, 106.700000</code></td>
+              <td>Pusat pemerintahan Kabupaten Bogor & wilayah suburban selatan</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Modeling Framework & Methodology (3 Cards) -->
+    <section style="margin-bottom: 2.5rem;" aria-labelledby="methodology-heading">
+      <h2 id="methodology-heading" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--color-text-main);">
+        Kerangka Eksperimen & Metodologi Pemodelan
+      </h2>
+      <div class="grid-3">
+        <article class="card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Skenario Fitur (2 Skenario)</h3>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.55; margin-bottom: 0.75rem;">
+            <strong>Skenario 1 (3 Fitur):</strong> Menggunakan dinamika lag autoregresif murni konsentrasi polutan pada jam t-1, t-2, dan t-3.
+          </p>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.55; margin-bottom: 1rem;">
+            <strong>Skenario 2 (15 Fitur):</strong> 3 lag polutan ditambah masing-masing 3 lag untuk temperatur, kelembapan, curah hujan, dan kecepatan angin.
+          </p>
+          <span class="badge badge-gray">Horizon: 1 Jam Berikutnya (t+1)</span>
+        </article>
+
+        <article class="card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Validasi & Tuning</h3>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.55; margin-bottom: 0.75rem;">
+            <strong>Rolling Window TimeSeriesSplit:</strong> Menggunakan jendela bergerak berukuran tetap (3.108 baris) pada data latih agar data yang terlalu lampau tidak mendistorsi pola terbaru.
+          </p>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.55; margin-bottom: 1rem;">
+            <strong>Split Kronologis:</strong> 80% data latih (12.433 observasi) dan 20% data uji independen (3.109 observasi).
+          </p>
+          <span class="badge badge-emerald">Bebas Data Leakage</span>
+        </article>
+
+        <article class="card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">Matriks 120 Model</h3>
+          <p style="font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.55; margin-bottom: 0.75rem;">
+            Total 120 model mandiri terlatih:
+          </p>
+          <ul style="padding-left: 1.25rem; font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 1rem;">
+            <li>15 Lokasi Pengamatan</li>
+            <li>2 Polutan (CO & CO₂)</li>
+            <li>2 Skenario Rekayasa Fitur</li>
+            <li>2 Algoritma (XGBoost & LightGBM)</li>
+          </ul>
+          <span class="badge badge-purple">15 × 2 × 2 × 2 = 120 Model</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- Metrics & SHAP Explanation -->
+    <section class="card" aria-labelledby="metrics-heading">
+      <div class="card-header">
+        <div>
+          <h2 id="metrics-heading" class="card-title">Metrik Evaluasi dan Kerangka Interpretasi SHAP</h2>
+          <p class="card-subtitle">Standar pengujian performa kuantitatif dan prinsip interpretasi model machine learning.</p>
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-bottom: 1rem;">
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text-main);">Metrik Kinerja Regresi</h4>
+          <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6;">
+            <li><strong>MAE (Mean Absolute Error):</strong> Rata-rata besaran absolut selisih nilai aktual dan prediksi.</li>
+            <li><strong>RMSE (Root Mean Squared Error):</strong> Akar kuadrat dari rerata kesalahan kuadrat yang memberikan penalti lebih besar pada deviasi ekstrem.</li>
+            <li><strong>MAPE (Mean Absolute Percentage Error):</strong> Rata-rata persentase galat terhadap nilai aktual (%).</li>
+            <li><strong>R² (Koefisien Determinasi):</strong> Proporsi varians data aktual yang mampu dijelaskan oleh model (mendekati 1,0 menunjukkan performa prima).</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--color-text-main);">TreeSHAP & Gain-Based Importance</h4>
+          <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--color-text-muted); line-height: 1.6;">
+            <li><strong>Local TreeSHAP:</strong> Mengukur kontribusi marginal aditif setiap fitur terhadap hasil prediksi jam spesifik, memisahkan fitur yang menaikkan vs menurunkan konsentrasi.</li>
+            <li><strong>Gain Feature Importance:</strong> Proporsi total penurunan loss (gain) saat fitur digunakan dalam pemisahan percabangan pohon keputusan.</li>
+            <li><strong>Klausul Non-Kausalitas:</strong> Nilai kontribusi SHAP dan Gain murni mencerminkan asosiasi matematis internal model dan tidak boleh disimpulkan sebagai bukti kausalitas fisik atmosfer langsung.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>Sistem NapasLoka</strong> — Platform Prediksi Kualitas Udara (CO & CO₂) Berbasis Machine Learning.
+      </div>
+      <div>
+        Wilayah Jabodetabek · © <span data-current-year></span>
+      </div>
+    </div>
+  </footer>
+
   <script src="/js/app.js" defer></script>
 </body>
 </html>
