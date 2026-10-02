@@ -49,6 +49,7 @@ def create_app() -> FastAPI:
         application.mount("/assets", StaticFiles(directory=str(frontend_dir / "assets")), name="assets")
 
         @application.get("/app", include_in_schema=False)
+        @application.get("/index.html", include_in_schema=False)
         def serve_app() -> FileResponse:
             """Serve PWA Home page."""
             return FileResponse(frontend_dir / "index.html")
