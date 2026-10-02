@@ -1,0 +1,261 @@
+"""Prediction service for next-hour atmospheric pollutant forecasting."""
+
+import logging
+from typing import Any
+import pandas as pd
+
+from backend.app.core.config import (
+    ALGORITHM_METADATA,
+    LOCATION_REGIONS,
+    POLLUTANT_METADATA,
+    SCENARIO_METADATA,
+    settings,
+)
+from backend.app.schemas.prediction import (
+    AirQualityAssessment,
+    FeatureInputItem,
+    NextHourPredictionResponse,
+    PredictionRequest,
+)
+from backend.app.services.data_service import data_service
+from backend.app.services.registry_service import registry_service
+from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
+
+logger = logging.getLogger(__name__)
+
+MONTH_NAMES_ID = [
+    "", "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+    "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+]
+
+
+def format_indo_timestamp(ts: pd.Timestamp) -> str:
+    """Format timestamp into Indonesian standard string: '05 Agu 2026, 00:00 WIB'."""
+    day = f"{ts.day:02d}"
+    month = MONTH_NAMES_ID[ts.month]
+    year = ts.year
+    hour = f"{ts.hour:02d}"
+    minute = f"{ts.minute:02d}"
+    return f"{day} {month} {year}, {hour}:{minute} WIB"
+
+
+def get_feature_display_info(feature_name: str, pollutant_unit: str) -> tuple[str, str]:
+    """Return human-readable Indonesian label and measurement unit for a feature column."""
+    labels_map = {
+        "carbon_monoxide_lag_1h": ("CO (t-1: 1 Jam Lalu)", pollutant_unit),
+        "carbon_monoxide_lag_2h": ("CO (t-2: 2 Jam Lalu)", pollutant_unit),
+        "carbon_monoxide_lag_3h": ("CO (t-3: 3 Jam Lalu)", pollutant_unit),
+        "carbon_dioxide_lag_1h": ("CO₂ (t-1: 1 Jam Lalu)", pollutant_unit),
+        "carbon_dioxide_lag_2h": ("CO₂ (t-2: 2 Jam Lalu)", pollutant_unit),
+        "carbon_dioxide_lag_3h": ("CO₂ (t-3: 3 Jam Lalu)", pollutant_unit),
+        "temperature_2m_lag_1h": ("Temperatur Udara (t-1)", "°C"),
+        "temperature_2m_lag_2h": ("Temperatur Udara (t-2)", "°C"),
+        "temperature_2m_lag_3h": ("Temperatur Udara (t-3)", "°C"),
+        "relative_humidity_2m_lag_1h": ("Kelembapan Relatif (t-1)", "%"),
+        "relative_humidity_2m_lag_2h": ("Kelembapan Relatif (t-2)", "%"),
+        "relative_humidity_2m_lag_3h": ("Kelembapan Relatif (t-3)", "%"),
+        "rain_lag_1h": ("Curah Hujan (t-1)", "mm"),
+        "rain_lag_2h": ("Curah Hujan (t-2)", "mm"),
+        "rain_lag_3h": ("Curah Hujan (t-3)", "mm"),
+        "wind_speed_100m_lag_1h": ("Kecepatan Angin (t-1)", "m/s"),
+        "wind_speed_100m_lag_2h": ("Kecepatan Angin (t-2)", "m/s"),
+        "wind_speed_100m_lag_3h": ("Kecepatan Angin (t-3)", "m/s"),
+    }
+    return labels_map.get(feature_name, (feature_name, pollutant_unit))
+
+
+def assess_air_quality(pollutant: str, value: float) -> AirQualityAssessment:
+    """Categorize predicted pollutant concentration according to ISPU / WHO standards."""
+    if pollutant.lower() == "co":
+        if value <= 4000:
+            return AirQualityAssessment(
+                category="Baik",
+                color="#10b981",  # Emerald Green
+                description="Tingkat mutu udara sangat baik, tidak memberikan dampak negatif terhadap manusia, hewan, dan tumbuhan.",
+                standard="Baku Mutu ISPU / WHO 24-jam (4.000 µg/m³)",
+            )
+        elif value <= 8000:
+            return AirQualityAssessment(
+                category="Sedang",
+                color="#f59e0b",  # Amber
+                description="Konsentrasi dapat diterima masyarakat umum, namun kelompok sensitif disarankan membatasi aktivitas fisik di luar ruangan.",
+                standard="Baku Mutu ISPU Permen LHK",
+            )
+        elif value <= 15000:
+            return AirQualityAssessment(
+                category="Tidak Sehat",
+                color="#ef4444",  # Red
+                description="Tingkat kualitas udara mulai merugikan kesehatan pada populasi rentan (penderita penyakit kardiovaskular/pernapasan).",
+                standard="Baku Mutu ISPU Permen LHK",
+            )
+        elif value <= 30000:
+            return AirQualityAssessment(
+                category="Sangat Tidak Sehat",
+                color="#8b5cf6",  # Purple
+                description="Kualitas udara membahayakan kesehatan pada sejumlah segmen populasi. Hindari aktivitas luar ruangan yang berkepanjangan.",
+                standard="Baku Mutu ISPU Permen LHK",
+            )
+        else:
+            return AirQualityAssessment(
+                category="Berbahaya",
+                color="#b91c1c",  # Dark Maroon
+                description="Tingkat kualitas udara berbahaya secara umum bagi seluruh populasi dan berpotensi memicu masalah kesehatan serius.",
+                standard="Baku Mutu ISPU Permen LHK",
+            )
+    else:  # CO2 (Carbon Dioxide in ppm)
+        if value <= 450:
+            return AirQualityAssessment(
+                category="Normal Ambien",
+                color="#10b981",
+                description="Konsentrasi Karbon Dioksida berada pada tingkat normal ambien troposfer bumi (~415 - 430 ppm).",
+                standard="Baseline Global Troposfer Ambien",
+            )
+        elif value <= 600:
+            return AirQualityAssessment(
+                category="Terakumulasi Sedang",
+                color="#f59e0b",
+                description="Tingkat konsentrasi CO₂ sedikit terakumulasi akibat kepadatan aktivitas lalu lintas atau emisi lokal.",
+                standard="Indikator Emisi Urban",
+            )
+        else:
+            return AirQualityAssessment(
+                category="Tinggi",
+                color="#ef4444",
+                description="Akumulasi gas CO₂ tinggi di lapisan permukaan akibat emisi kendaraan dan pembakaran bahan bakar padat.",
+                standard="Indikator Emisi Urban",
+            )
+
+
+class PredictionService:
+    """Orchestrates next-hour forecasting using loaded models and latest observation lag vectors."""
+
+    def __init__(self) -> None:
+        self.registry = registry_service
+        self.data_service = data_service
+        self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
+
+    def predict_next_hour(self, request: PredictionRequest) -> NextHourPredictionResponse:
+        """Generate next-hour forecast (t+1) based on latest observations up to t."""
+        self.registry.validate_dimensions(
+            request.location,
+            request.pollutant,
+            request.scenario,
+            request.algorithm,
+        )
+
+        loc_slug = slugify_component(request.location)
+        loc_info = self.supported_locations[loc_slug]
+        pollutant_info = POLLUTANT_METADATA[request.pollutant]
+        scenario_info = SCENARIO_METADATA[request.scenario]
+        algorithm_info = ALGORITHM_METADATA[request.algorithm]
+
+        # 1. Build input feature vector from latest observations
+        reference_time = request.reference_datetime or request.end_datetime
+        X_df, meta = self.data_service.build_next_hour_features(
+            loc_slug,
+            request.pollutant,
+            request.scenario,
+            reference_datetime=reference_time,
+        )
+
+        # 2. Load model estimator from memory cache and run inference
+        model = self.registry.load_estimator(
+            loc_slug,
+            request.pollutant,
+            request.scenario,
+            request.algorithm,
+        )
+        pred_raw = float(model.predict(X_df)[0])
+        pred_value = round(pred_raw, 2)
+
+        # 3. Calculate delta and trend compared to latest observation (t)
+        latest_val = round(meta["latest_observation_value"], 2)
+        delta_val = round(pred_value - latest_val, 2)
+        delta_pct = round((delta_val / latest_val) * 100, 2) if latest_val != 0 else 0.0
+
+        if delta_val > (0.02 * latest_val):
+            trend = "naik"
+        elif delta_val < -(0.02 * latest_val):
+            trend = "turun"
+        else:
+            trend = "stabil"
+
+        # 4. Assess air quality standard
+        assessment = assess_air_quality(request.pollutant, pred_value)
+
+        # 5. Build human-readable feature inputs list
+        feature_inputs: list[FeatureInputItem] = []
+        for col_name, val in meta["feature_values"].items():
+            label, unit = get_feature_display_info(col_name, pollutant_info["unit"])
+            feature_inputs.append(
+                FeatureInputItem(
+                    name=col_name,
+                    label=label,
+                    value=round(val, 2),
+                    unit=unit,
+                )
+            )
+
+        # 6. Counterpart algorithm prediction for the identical next hour
+        counterpart_algo = self.registry.get_counterpart_algorithm(request.algorithm)
+        counterpart_meta = ALGORITHM_METADATA.get(counterpart_algo, {})
+        cp_pred_value: float | None = None
+        cp_delta: float | None = None
+
+        try:
+            cp_model = self.registry.load_estimator(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+                counterpart_algo,
+            )
+            cp_raw = float(cp_model.predict(X_df)[0])
+            cp_pred_value = round(cp_raw, 2)
+            cp_delta = round(pred_value - cp_pred_value, 2)
+        except Exception as e:
+            logger.warning("Could not compute counterpart next-hour prediction: %s", e)
+
+        target_ts = meta["target_prediction_time"]
+        latest_ts = meta["latest_observation_time"]
+
+        experiment_id = build_experiment_id(
+            loc_slug,
+            request.pollutant,
+            request.scenario,
+            request.algorithm,
+        )
+
+        return NextHourPredictionResponse(
+            experiment_id=experiment_id,
+            location=loc_slug,
+            location_name=loc_info["name"],
+            region=LOCATION_REGIONS.get(loc_slug, "Jabodetabek"),
+            latitude=loc_info["latitude"],
+            longitude=loc_info["longitude"],
+            pollutant=request.pollutant,
+            pollutant_label=pollutant_info["label"],
+            pollutant_unit=pollutant_info["unit"],
+            scenario=request.scenario,
+            scenario_label=scenario_info["label"],
+            algorithm=request.algorithm,
+            algorithm_label=algorithm_info["label"],
+            predicted_value=pred_value,
+            target_time=target_ts.isoformat(),
+            target_time_display=format_indo_timestamp(target_ts),
+            latest_observation_time=latest_ts.isoformat(),
+            latest_observation_display=format_indo_timestamp(latest_ts),
+            latest_observation_value=latest_val,
+            delta_value=delta_val,
+            delta_percentage=delta_pct,
+            trend=trend,
+            assessment=assessment,
+            feature_inputs=feature_inputs,
+            counterpart_algorithm=counterpart_algo,
+            counterpart_label=counterpart_meta.get("label", counterpart_algo.upper()),
+            counterpart_predicted_value=cp_pred_value,
+            counterpart_delta=cp_delta,
+        )
+
+
+# Singleton prediction service instance
+prediction_service = PredictionService()

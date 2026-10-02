@@ -1,31 +1,34 @@
-"""Prediction contract without fabricated Phase 0 output."""
+"""FastAPI router for next-hour pollutant concentration prediction."""
 
+import logging
 from fastapi import APIRouter, HTTPException, status
 
-from backend.app.schemas.prediction import PredictionRequest
-from backend.app.services.model_service import ModelService
+from backend.app.schemas.prediction import NextHourPredictionResponse, PredictionRequest
+from backend.app.services.prediction_service import prediction_service
 
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/predict", tags=["prediction"])
 
 
-@router.post("")
-def request_prediction(request: PredictionRequest) -> dict[str, str]:
-    """Reject requests clearly until the selected trained artifact exists."""
-
-    service = ModelService()
-    if not service.is_available(request):
+@router.post("", response_model=NextHourPredictionResponse)
+def request_prediction(request: PredictionRequest) -> NextHourPredictionResponse:
+    """Generate next-hour prediction for the selected location, pollutant, scenario, and algorithm."""
+    try:
+        return prediction_service.predict_next_hour(request)
+    except ValueError as e:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail={
-                "code": "MODEL_NOT_AVAILABLE",
-                "message": "The selected trained model is not available.",
-            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail={"code": "INVALID_PREDICTION_REQUEST", "message": str(e)},
         )
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail={
-            "code": "PREDICTION_NOT_IMPLEMENTED",
-            "message": "Prediction orchestration is scheduled for a later phase.",
-        },
-    )
+    except FileNotFoundError as e:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "MODEL_OR_DATA_NOT_FOUND", "message": str(e)},
+        )
+    except Exception as e:
+        logger.exception("Unexpected error in prediction endpoint: %s", e)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"code": "PREDICTION_FAILED", "message": "Terjadi kesalahan saat memproses prediksi satu jam berikutnya."},
+        )
