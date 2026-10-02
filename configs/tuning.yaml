@@ -7,6 +7,7 @@ scoring: neg_mean_absolute_error
 cross_validation:
   type: TimeSeriesSplit
   n_splits: 3
+  max_train_size: 3108
 
 search_spaces:
   xgboost:

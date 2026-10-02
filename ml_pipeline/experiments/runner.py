@@ -25,11 +25,12 @@ class ExperimentRunner:
         executor: ExperimentExecutor,
         *,
         retry_failed: bool = False,
+        force: bool = False,
     ) -> dict[str, Any]:
         """Execute one experiment, or return its existing record when skipped."""
 
         self.registry.register(spec)
-        if not self.registry.should_run(spec, retry_failed=retry_failed):
+        if not force and not self.registry.should_run(spec, retry_failed=retry_failed):
             return self.registry.get(spec.experiment_id) or {}
 
         artifact_directory = spec.artifact_directory

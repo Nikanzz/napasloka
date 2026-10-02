@@ -24,6 +24,8 @@ def build_search_cv(estimator: Any, algorithm: str) -> GridSearchCV | Randomized
         raise ValueError("TimeSeriesSplit n_splits must be finalized before tuning")
 
     max_train_size = cv_config.get("max_train_size")
+    if max_train_size is not None:
+        max_train_size = int(max_train_size)
     cv = TimeSeriesSplit(n_splits=n_splits, max_train_size=max_train_size)
     scoring = config.get("scoring", "neg_mean_absolute_error")
     strategy = config.get("strategy", "randomized_search")

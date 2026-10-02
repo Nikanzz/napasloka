@@ -23,6 +23,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scenario", choices=["scenario_1", "scenario_2"], help="Feature scenario.")
     parser.add_argument("--algorithm", choices=["xgboost", "lightgbm"], help="Model algorithm.")
     parser.add_argument("--retry-failed", action="store_true", help="Retry previously failed experiments.")
+    parser.add_argument("--force", action="store_true", help="Force rerun experiments even if already completed.")
     return parser.parse_args()
 
 
@@ -35,11 +36,11 @@ def main() -> None:
         logging.info(f"Starting batch execution of {len(specs)} experiments...")
         for idx, spec in enumerate(specs, start=1):
             exp_id = spec.experiment_id
-            if not runner.registry.should_run(spec, retry_failed=args.retry_failed):
+            if not args.force and not runner.registry.should_run(spec, retry_failed=args.retry_failed):
                 logging.info(f"[{idx}/{len(specs)}] SKIPPED (already completed): {exp_id}")
                 continue
             logging.info(f"[{idx}/{len(specs)}] RUNNING: {exp_id}")
-            record = runner.run(spec, execute_single_experiment, retry_failed=args.retry_failed)
+            record = runner.run(spec, execute_single_experiment, retry_failed=args.retry_failed, force=args.force)
             status = record.get("status", "unknown")
             logging.info(f"[{idx}/{len(specs)}] FINISHED: {exp_id} -> {status}")
         logging.info("Batch execution finished!")
@@ -57,7 +58,7 @@ def main() -> None:
         algorithm=args.algorithm,
     )
     logging.info(f"Executing single experiment: {spec.experiment_id}")
-    record = runner.run(spec, execute_single_experiment, retry_failed=args.retry_failed)
+    record = runner.run(spec, execute_single_experiment, retry_failed=args.retry_failed, force=args.force)
     logging.info(f"Experiment completed with status: {record.get('status')}")
     logging.info(f"Artifacts saved to: {spec.artifact_directory}")
 
