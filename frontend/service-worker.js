@@ -1,6 +1,10 @@
-const CACHE_NAME = "napasloka-phase0-v2";
+"use strict";
+
+const CACHE_NAME = "napasloka-v1.0.0";
+
 const APP_SHELL = [
   "/",
+  "/app",
   "/index.html",
   "/pages/prediction.html",
   "/pages/evaluation.html",
@@ -10,28 +14,83 @@ const APP_SHELL = [
   "/css/components.css",
   "/js/app.js",
   "/js/api.js",
-  "/js/config.js",
+  "/js/home.js",
   "/js/prediction.js",
   "/js/evaluation.js",
   "/js/interpretation.js",
-  "/assets/icons/icon.svg"
+  "/manifest.json",
+  "/assets/icons/icon.svg",
 ];
 
+// Install Event: Precaching App Shell
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)));
-});
-
-self.addEventListener("activate", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.keys().then((names) =>
-      Promise.all(names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name)))
-    )
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(APP_SHELL);
+    })
   );
 });
 
+// Activate Event: Clean up outdated caches
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
+});
+
+// Fetch Event: Routing Strategy
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET" || new URL(event.request.url).origin !== self.location.origin) {
+  const request = event.request;
+  const url = new URL(request.url);
+
+  // 1. Never cache non-GET requests or backend API requests
+  if (request.method !== "GET" || url.pathname.startsWith("/api/")) {
     return;
   }
-  event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+
+  // 2. Cache-First with Network Fallback for App Shell and Static Assets
+  event.respondWith(
+    caches.match(request).then((cachedResponse) => {
+      if (cachedResponse) {
+        // Fetch in background to update cache (stale-while-revalidate for static files)
+        fetch(request)
+          .then((networkResponse) => {
+            if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+              caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse));
+            }
+          })
+          .catch(() => {
+            // Network failure is expected when offline; cached response is already returned
+          });
+        return cachedResponse;
+      }
+
+      return fetch(request).then((networkResponse) => {
+        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== "basic") {
+          return networkResponse;
+        }
+
+        const responseToCache = networkResponse.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(request, responseToCache);
+        });
+
+        return networkResponse;
+      }).catch(() => {
+        // Offline fallback for HTML navigation
+        if (request.headers.get("accept")?.includes("text/html")) {
+          return caches.match("/index.html");
+        }
+      });
+    })
+  );
 });
