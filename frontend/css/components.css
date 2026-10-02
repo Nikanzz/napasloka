@@ -368,3 +368,181 @@ tbody tr:hover {
   padding: 2rem;
   text-align: center;
 }
+
+/* --------------------------------------------------------------------------
+   Prediction Hero & Result Card
+   -------------------------------------------------------------------------- */
+.prediction-hero-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-top: 5px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+}
+
+.prediction-main-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 1rem 0 0.5rem;
+  flex-wrap: wrap;
+}
+
+.prediction-big-val {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  color: var(--color-text-main);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.prediction-unit {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+}
+
+.comparison-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.comparison-pill {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 140px;
+  flex: 1;
+}
+
+.comparison-pill-label {
+  font-size: 0.725rem;
+  font-weight: 600;
+  color: var(--color-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.comparison-pill-value {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+}
+
+.trend-up {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.trend-down {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.trend-stable {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+}
+
+/* Summary Details List */
+.summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--color-border-subtle);
+  font-size: 0.875rem;
+  gap: 1rem;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.summary-label {
+  color: var(--color-text-light);
+  font-weight: 500;
+}
+
+.summary-val {
+  color: var(--color-text-main);
+  font-weight: 600;
+  text-align: right;
+}
+
+/* Feature Inputs Grid */
+.feature-chips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.feature-chip {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.feature-chip-title {
+  font-size: 0.72rem;
+  color: var(--color-text-light);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.feature-chip-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  border-top-color: #ffffff;
+  animation: spin 0.6s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
