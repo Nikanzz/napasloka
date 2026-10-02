@@ -3,34 +3,216 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#176b5b">
+  <meta name="theme-color" content="#0d382e">
+  <meta name="description" content="Sistem Prediksi Kualitas Udara NapasLoka (CO & CO2) 1 Jam ke Depan di 15 Lokasi Jabodetabek dengan XGBoost dan LightGBM.">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
   <link rel="stylesheet" href="/css/components.css">
-  <title>Beranda — NapasLoka</title>
+  <title>Beranda — Sistem NapasLoka</title>
 </head>
 <body>
   <header class="site-header">
-    <a class="brand" href="/index.html">NapasLoka</a>
-    <nav class="nav" aria-label="Navigasi utama">
-      <a href="/index.html" aria-current="page">Beranda</a>
-      <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
-      <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
-      <a href="/pages/interpretation.html">Interpretasi</a>
-      <a href="/pages/information.html">Informasi</a>
-    </nav>
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
+        <a class="brand" href="/index.html">
+          NapasLoka
+          <span class="brand-badge">Jabodetabek</span>
+        </a>
+      </div>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a href="/index.html" aria-current="page">Beranda</a>
+        <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
+        <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+        <a href="/pages/interpretation.html">Interpretasi</a>
+        <a href="/pages/information.html">Informasi</a>
+      </nav>
+    </div>
   </header>
+
   <main>
-    <h1>Prediksi CO dan CO2 berbasis data historis</h1>
-    <p class="lead">Skeleton PWA untuk menyajikan hasil penelitian XGBoost dan LightGBM pada lokasi penelitian yang telah dikonfigurasi. Phase 0 belum memuat hasil model.</p>
-    <section class="grid" aria-label="Area aplikasi">
-      <article class="card"><h2>Prediksi</h2><p>Pilih lokasi, polutan, skenario, algoritma, dan rentang waktu yang tersedia.</p></article>
-      <article class="card"><h2>Evaluasi</h2><p>Tampilkan actual vs predicted, perbandingan model, dan metrics penelitian.</p></article>
-      <article class="card"><h2>Interpretasi</h2><p>Tampilkan gain-based importance dan hasil SHAP dari artefak nyata.</p></article>
+    <!-- Hero Section -->
+    <header class="page-header">
+      <span class="page-tag">🌱 Sistem Pembelajaran Mesin Prediktif</span>
+      <h1>Prediksi Konsentrasi CO dan CO₂ Satu Jam ke Depan di Jabodetabek</h1>
+      <p class="lead">
+        Sistem NapasLoka mengintegrasikan 120 model machine learning berbasis XGBoost dan LightGBM untuk memproyeksikan konsentrasi polutan atmosfer 1 jam berikutnya menggunakan fitur lag autoregresif dan variabel meteorologi pada 15 titik pengamatan wilayah Jabodetabek.
+      </p>
+    </header>
+
+    <!-- KPI / Stats Bar -->
+    <section class="stats-bar" aria-label="Statistik dan cakupan sistem">
+      <div class="stat-pill">
+        <div class="stat-icon">📍</div>
+        <div class="stat-content">
+          <span class="stat-value">15 Titik Pengamatan</span>
+          <span class="stat-label">Wilayah Jabodetabek</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">🧪</div>
+        <div class="stat-content">
+          <span class="stat-value">2 Target Polutan</span>
+          <span class="stat-label">CO (µg/m³) & CO₂ (ppm)</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-content">
+          <span class="stat-value">Horizon 1 Jam</span>
+          <span class="stat-label">Prediksi Langkah t+1</span>
+        </div>
+      </div>
+      <div class="stat-pill">
+        <div class="stat-icon">🤖</div>
+        <div class="stat-content">
+          <span class="stat-value">120 Model Terlatih</span>
+          <span class="stat-label">XGBoost & LightGBM</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Configuration Card -->
+    <section class="card" style="margin-bottom: 2.5rem; background: linear-gradient(to bottom, #ffffff, #fcfdfd); border-top: 4px solid var(--color-primary);" aria-labelledby="quick-config-title">
+      <div class="card-header">
+        <div>
+          <h2 id="quick-config-title" class="card-title">
+            <span>⚡ Mulai Prediksi Kualitas Udara</span>
+          </h2>
+          <p class="card-subtitle">
+            Pilih lokasi pengamatan, polutan target, dan skenario fitur untuk memulai proyeksi konsentrasi atau analisis evaluasi kinerja model.
+          </p>
+        </div>
+        <span class="badge badge-emerald">Siap Digunakan</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="home-location-select">
+            <span>📍 Lokasi Pengamatan</span>
+          </label>
+          <select id="home-location-select" class="form-control" aria-label="Pilih lokasi pengamatan">
+            <option value="taman-kamal">Taman Kamal (Jakarta Barat)</option>
+            <option value="pelabuhan-muara-baru">Pelabuhan Muara Baru (Jakarta Utara)</option>
+            <option value="daerah-pelabuhan-tanjung-priuk">Daerah Pelabuhan Tanjung Priuk (Jakarta Utara)</option>
+            <option value="petamburan-perkantoran-transjakarta">Petamburan Perkantoran (Jakarta Pusat)</option>
+            <option value="smpn-92-jakarta-timur">SMPN 92 Jakarta Timur (Jakarta Timur)</option>
+            <option value="perumahan-dekat-tol-depok-antasari">Tol Depok-Antasari (Jakarta Selatan)</option>
+            <option value="tmii">TMII (Jakarta Timur)</option>
+            <option value="metland-cyberpuri">Metland Cyberpuri (Kota Tangerang)</option>
+            <option value="tol-serpong-interchange">Tol Serpong Interchange (Tangerang Selatan)</option>
+            <option value="pancoran-mas">Pancoran Mas (Kota Depok)</option>
+            <option value="jl-tol-jagorawi">Jl. Tol Jagorawi (Kota Depok)</option>
+            <option value="pantai-makmur">Pantai Makmur (Kabupaten Bekasi)</option>
+            <option value="kaliabang-tengah">Kaliabang Tengah (Kota Bekasi)</option>
+            <option value="mustikasari">Mustikasari (Kota Bekasi)</option>
+            <option value="cibinong">Cibinong (Kabupaten Bogor)</option>
+          </select>
+          <span class="form-hint">15 stasiun koordinat grid CAMS Jabodetabek</span>
+        </div>
+
+        <div class="form-group">
+          <label for="home-pollutant-select">
+            <span>🧪 Target Polutan</span>
+          </label>
+          <select id="home-pollutant-select" class="form-control" aria-label="Pilih target polutan">
+            <option value="co">Karbon Monoksida (CO) [µg/m³]</option>
+            <option value="co2">Karbon Dioksida (CO₂) [ppm]</option>
+          </select>
+          <span class="form-hint">Parameter kualitas udara & emisi atmosfer</span>
+        </div>
+
+        <div class="form-group">
+          <label for="home-scenario-select">
+            <span>📐 Skenario Fitur</span>
+          </label>
+          <select id="home-scenario-select" class="form-control" aria-label="Pilih skenario fitur">
+            <option value="scenario_1">Skenario 1 (Lag Polutan: 3 Fitur)</option>
+            <option value="scenario_2">Skenario 2 (Lag Polutan + Meteorologi: 15 Fitur)</option>
+          </select>
+          <span class="form-hint">Fitur lag autoregresif historis t-1, t-2, t-3</span>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; align-items: center; border-top: 1px solid var(--color-border-subtle); padding-top: 1.25rem;">
+        <button id="btn-quick-config" class="btn btn-primary" type="button">
+          Lanjutkan Konfigurasi
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- System Capabilities Grid (4 Cards) -->
+    <section aria-labelledby="features-heading">
+      <h2 id="features-heading" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--color-text-main);">
+        Kerangka Kerja & Kemampuan Sistem
+      </h2>
+      <div class="grid-2">
+        <article class="card feature-card">
+          <div class="feature-icon-box">🌲</div>
+          <h3>Dua Algoritma Gradient Boosting</h3>
+          <p>
+            Menerapkan model <strong>XGBoost</strong> dan <strong>LightGBM</strong> yang telah dioptimasi dengan validasi Rolling Window TimeSeriesSplit berukuran tetap (3.108 baris) untuk menangkap dinamika temporal non-linear tanpa kebocoran data (<em>data leakage</em>).
+          </p>
+          <div class="feature-tag-list">
+            <span class="badge badge-emerald">XGBoost (L1/L2 Regularized)</span>
+            <span class="badge badge-blue">LightGBM (Leaf-wise Split)</span>
+          </div>
+        </article>
+
+        <article class="card feature-card">
+          <div class="feature-icon-box">📊</div>
+          <h3>Dua Skenario Fitur Multivariat</h3>
+          <p>
+            Mengevaluasi pengaruh penambahan faktor atmosfer: <strong>Skenario 1</strong> menggunakan 3 lag konsentrasi polutan (t-1, t-2, t-3), sedangkan <strong>Skenario 2</strong> diperkaya dengan 12 fitur lag meteorologis (temperatur, kelembapan relatif, curah hujan, dan kecepatan angin).
+          </p>
+          <div class="feature-tag-list">
+            <span class="badge badge-gray">Skenario 1 (3 Fitur)</span>
+            <span class="badge badge-emerald">Skenario 2 (15 Fitur)</span>
+          </div>
+        </article>
+
+        <article class="card feature-card">
+          <div class="feature-icon-box">📈</div>
+          <h3>Evaluasi Kinerja & Komparasi Model</h3>
+          <p>
+            Mengukur akurasi peramalan secara objektif menggunakan metrik regresi standar: <strong>MAE</strong>, <strong>RMSE</strong>, <strong>MAPE</strong>, dan <strong>R²</strong> pada data uji serta menyediakan kartu perbandingan langsung antara XGBoost dan LightGBM untuk kondisi yang sama.
+          </p>
+          <div class="feature-tag-list">
+            <span class="badge badge-amber">MAE & RMSE</span>
+            <span class="badge badge-blue">MAPE (%) & R² Score</span>
+          </div>
+        </article>
+
+        <article class="card feature-card">
+          <div class="feature-icon-box">🔍</div>
+          <h3>Transparansi Prediksi dengan TreeSHAP</h3>
+          <p>
+            Menyediakan interpretabilitas model machine learning melalui perhitungan <strong>TreeSHAP lokal</strong> (menampilkan kontribusi marginal fitur yang menaikkan atau menurunkan konsentrasi) dan <strong>Gain-based feature importance global</strong> secara transparan tanpa klaim kausalitas langsung.
+          </p>
+          <div class="feature-tag-list">
+            <span class="badge badge-purple">Local TreeSHAP</span>
+            <span class="badge badge-emerald">Normalized Gain Importance</span>
+          </div>
+        </article>
+      </div>
     </section>
   </main>
-  <footer class="footer">NapasLoka · <span data-current-year></span></footer>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>
+        <strong>Sistem NapasLoka</strong> — Platform Prediksi Kualitas Udara (CO & CO₂) Berbasis Machine Learning.
+      </div>
+      <div>
+        Wilayah Jabodetabek · © <span data-current-year></span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/api.js"></script>
   <script src="/js/app.js" defer></script>
+  <script src="/js/home.js" defer></script>
 </body>
 </html>
