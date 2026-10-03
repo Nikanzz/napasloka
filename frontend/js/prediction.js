@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Controller for Konfigurasi Prediksi (Prediction Page).
+ * Controller for Konfigurasi Prediksi (Precision Matching Chapter 3 Mockup 1).
  */
 document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("prediction-form");
@@ -14,15 +14,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const selectScen = document.getElementById("select-scenario");
   const selectAlgo = document.getElementById("select-algorithm");
   const inputRefTime = document.getElementById("input-ref-time");
+  const evalStartDate = document.getElementById("eval-start-date");
+  const evalEndDate = document.getElementById("eval-end-date");
+  const scenarioHintText = document.getElementById("scenario-hint-text");
 
-  // Summary elements
+  // Summary elements (Mockup 1 Right Card)
   const summaryLocName = document.getElementById("summary-location-name");
-  const summaryRegion = document.getElementById("summary-region");
-  const summaryCoords = document.getElementById("summary-coords");
   const summaryPol = document.getElementById("summary-pollutant");
-  const summaryUnit = document.getElementById("summary-unit");
   const summaryScen = document.getElementById("summary-scenario");
-  const summaryFeaturesCount = document.getElementById("summary-features-count");
   const summaryAlgo = document.getElementById("summary-algorithm");
 
   // Result card elements
@@ -32,17 +31,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resPredictedVal = document.getElementById("res-predicted-val");
   const resUnit = document.getElementById("res-unit");
   const resAssessmentDesc = document.getElementById("res-assessment-desc");
-  const resLatestVal = document.getElementById("res-latest-val");
-  const resLatestTime = document.getElementById("res-latest-time");
-  const resDeltaVal = document.getElementById("res-delta-val");
-  const resDeltaPct = document.getElementById("res-delta-pct");
-  const resTrendBadge = document.getElementById("res-trend-badge");
-  const resCounterpartLabel = document.getElementById("res-counterpart-label");
-  const resCounterpartVal = document.getElementById("res-counterpart-val");
-  const resCounterpartDelta = document.getElementById("res-counterpart-delta");
-  const resFeatureChips = document.getElementById("res-feature-chips");
   const btnGotoEvaluation = document.getElementById("btn-goto-evaluation");
   const btnGotoInterpretation = document.getElementById("btn-goto-interpretation");
+
+  // Segmented control buttons (CO / CO2)
+  const segmentedBtns = document.querySelectorAll("#pollutant-segmented .segmented-btn");
+  segmentedBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      segmentedBtns.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const val = btn.getAttribute("data-val");
+      selectPol.value = val;
+      selectPol.dispatchEvent(new Event("change"));
+    });
+  });
 
   let appOptions = null;
 
@@ -55,11 +57,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     appOptions.locations.forEach((loc) => {
       const opt = document.createElement("option");
       opt.value = loc.id;
-      opt.textContent = `${loc.name} (${loc.region || "Jabodetabek"})`;
+      opt.textContent = loc.name;
       selectLoc.appendChild(opt);
     });
 
-    // Populate Pollutant
+    // Populate Pollutant select
     selectPol.innerHTML = "";
     appOptions.pollutants.forEach((pol) => {
       const opt = document.createElement("option");
@@ -73,7 +75,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     appOptions.scenarios.forEach((sc) => {
       const opt = document.createElement("option");
       opt.value = sc.id;
-      opt.textContent = `${sc.label} (${sc.feature_count || (sc.id === "scenario_1" ? 3 : 15)} Fitur)`;
+      opt.textContent = sc.id === "scenario_1" ? "S1 · Historis polutan" : "S2 · Polutan + meteorologi";
       selectScen.appendChild(opt);
     });
 
@@ -82,23 +84,30 @@ document.addEventListener("DOMContentLoaded", async () => {
     appOptions.algorithms.forEach((algo) => {
       const opt = document.createElement("option");
       opt.value = algo.id;
-      opt.textContent = algo.label || algo.name;
+      opt.textContent = algo.name || algo.label;
       selectAlgo.appendChild(opt);
     });
 
     // 2. Pre-select values from URL parameters or localStorage
     const urlParams = new URLSearchParams(window.location.search);
-    const initialLoc = urlParams.get("location") || localStorage.getItem("napasloka_selected_location") || "taman-kamal";
-    const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co";
-    const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_1";
-    const initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "xgboost";
+    const initialLoc = urlParams.get("location") || localStorage.getItem("napasloka_selected_location") || "petamburan-perkantoran-transjakarta";
+    const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co2";
+    const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_2";
+    const initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
 
     if (selectLoc.querySelector(`option[value="${initialLoc}"]`)) selectLoc.value = initialLoc;
-    if (selectPol.querySelector(`option[value="${initialPol}"]`)) selectPol.value = initialPol;
+    if (selectPol.querySelector(`option[value="${initialPol}"]`)) {
+      selectPol.value = initialPol;
+      // sync segmented buttons
+      segmentedBtns.forEach((b) => {
+        b.classList.toggle("active", b.getAttribute("data-val") === initialPol);
+      });
+    }
     if (selectScen.querySelector(`option[value="${initialScen}"]`)) selectScen.value = initialScen;
     if (selectAlgo.querySelector(`option[value="${initialAlgo}"]`)) selectAlgo.value = initialAlgo;
 
     updateSummaryCard();
+    await syncDatasetBounds();
 
     // 3. Automatically perform initial prediction
     executePrediction();
@@ -113,6 +122,44 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
+  // Sync date bounds when location or pollutant changes
+  selectLoc.addEventListener("change", syncDatasetBounds);
+  selectPol.addEventListener("change", syncDatasetBounds);
+
+  if (evalEndDate) {
+    evalEndDate.addEventListener("change", () => {
+      if (evalEndDate.value && inputRefTime) {
+        inputRefTime.value = `${evalEndDate.value}T23:00:00`;
+      }
+    });
+  }
+
+  async function syncDatasetBounds() {
+    try {
+      const bounds = await window.NapasLokaApi.getEvaluationRange(selectLoc.value, selectPol.value);
+      if (bounds && evalStartDate && evalEndDate) {
+        const startDay = bounds.start.substring(0, 10);
+        const endDay = bounds.end.substring(0, 10);
+        evalStartDate.min = startDay;
+        evalStartDate.max = endDay;
+        evalEndDate.min = startDay;
+        evalEndDate.max = endDay;
+
+        if (!evalEndDate.value || evalEndDate.value > endDay || evalEndDate.value < startDay) {
+          evalEndDate.value = endDay;
+        }
+        if (!evalStartDate.value || evalStartDate.value < startDay || evalStartDate.value > evalEndDate.value) {
+          evalStartDate.value = "2026-07-29";
+        }
+        if (inputRefTime) {
+          inputRefTime.value = `${evalEndDate.value}T23:00:00`;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not sync evaluation range bounds:", e);
+    }
+  }
+
   function updateSummaryCard() {
     if (!appOptions) return;
 
@@ -121,21 +168,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     const scenObj = appOptions.scenarios.find((s) => s.id === selectScen.value);
     const algoObj = appOptions.algorithms.find((a) => a.id === selectAlgo.value);
 
-    if (locObj) {
+    if (locObj && summaryLocName) {
       summaryLocName.textContent = locObj.name;
-      summaryRegion.textContent = locObj.region || "Jabodetabek";
-      summaryCoords.textContent = `${locObj.latitude.toFixed(2)}, ${locObj.longitude.toFixed(2)}`;
     }
-    if (polObj) {
-      summaryPol.textContent = polObj.label;
-      summaryUnit.textContent = polObj.unit;
+    if (polObj && summaryPol) {
+      summaryPol.textContent = `${polObj.symbol} · ${polObj.unit}`;
     }
-    if (scenObj) {
-      summaryScen.textContent = scenObj.label;
-      summaryFeaturesCount.textContent = `${scenObj.feature_count || (scenObj.id === "scenario_1" ? 3 : 15)} Fitur`;
+    if (scenObj && summaryScen) {
+      const isS1 = scenObj.id === "scenario_1";
+      summaryScen.textContent = isS1 ? "Historis polutan" : "Polutan + meteorologi";
+      if (scenarioHintText) {
+        scenarioHintText.textContent = isS1
+          ? "Fitur lag 3 jam historis konsentrasi polutan."
+          : "Fitur lag polutan digabungkan dengan kondisi meteorologis.";
+      }
     }
-    if (algoObj) {
-      summaryAlgo.textContent = algoObj.label || algoObj.name;
+    if (algoObj && summaryAlgo) {
+      summaryAlgo.textContent = algoObj.name || algoObj.label;
     }
   }
 
@@ -151,7 +200,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const pol = selectPol.value;
     const scen = selectScen.value;
     const algo = selectAlgo.value;
-    const refTime = inputRefTime.value || null;
+    const refTime = (inputRefTime && inputRefTime.value) ? inputRefTime.value : null;
 
     // Save to localStorage
     localStorage.setItem("napasloka_selected_location", loc);
@@ -162,7 +211,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Set button loading state
     submitBtn.disabled = true;
     const originalBtnText = submitBtn.innerHTML;
-    submitBtn.innerHTML = '<span class="spinner"></span> <span>Memproses Prediksi...</span>';
+    submitBtn.innerHTML = '<span>Memproses Prediksi...</span>';
 
     try {
       const payload = {
@@ -189,69 +238,37 @@ document.addEventListener("DOMContentLoaded", async () => {
     resultSection.style.display = "block";
 
     // Header info
-    resPollutantTitle.textContent = `${res.pollutant_label} di ${res.location_name}`;
-    resTargetTimeBadge.textContent = `🎯 Target Prediksi: ${res.target_time_display}`;
+    if (resPollutantTitle) {
+      resPollutantTitle.textContent = `Prediksi ${res.pollutant_label} di ${res.location_name}`;
+    }
+    if (resTargetTimeBadge) {
+      resTargetTimeBadge.textContent = `Target: ${res.target_time_display}`;
+    }
 
     // Assessment badge & color
-    resAssessmentBadge.textContent = res.assessment.category;
-    resAssessmentBadge.style.backgroundColor = res.assessment.color || "#10b981";
-    resAssessmentBadge.style.color = "#ffffff";
-    resAssessmentDesc.textContent = `${res.assessment.description} (${res.assessment.standard})`;
+    if (resAssessmentBadge) {
+      resAssessmentBadge.textContent = res.assessment.category;
+      resAssessmentBadge.style.backgroundColor = res.assessment.color || "#10b981";
+      resAssessmentBadge.style.color = "#ffffff";
+    }
+    if (resAssessmentDesc) {
+      resAssessmentDesc.textContent = `${res.assessment.description} (${res.assessment.standard})`;
+    }
 
     // Main prediction values
-    resPredictedVal.textContent = res.predicted_value.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    resUnit.textContent = res.pollutant_unit;
-
-    // Latest observation pill
-    resLatestVal.textContent = `${res.latest_observation_value.toLocaleString("id-ID", { minimumFractionDigits: 2 })} ${res.pollutant_unit}`;
-    resLatestTime.textContent = `Acuan: ${res.latest_observation_display}`;
-
-    // Delta & percentage
-    const deltaSign = res.delta_value >= 0 ? "+" : "";
-    resDeltaVal.textContent = `${deltaSign}${res.delta_value.toLocaleString("id-ID", { minimumFractionDigits: 2 })} ${res.pollutant_unit}`;
-    resDeltaPct.textContent = `(${deltaSign}${res.delta_percentage.toFixed(1)}%)`;
-
-    // Trend badge
-    if (res.trend === "naik") {
-      resTrendBadge.className = "trend-badge trend-up";
-      resTrendBadge.innerHTML = "📈 Tren Naik";
-    } else if (res.trend === "turun") {
-      resTrendBadge.className = "trend-badge trend-down";
-      resTrendBadge.innerHTML = "📉 Tren Menurun";
-    } else {
-      resTrendBadge.className = "trend-badge trend-stable";
-      resTrendBadge.innerHTML = "➡️ Stabil";
+    if (resPredictedVal) {
+      resPredictedVal.textContent = res.predicted_value.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
     }
-
-    // Counterpart comparison pill
-    resCounterpartLabel.textContent = `Pembanding ${res.counterpart_label}`;
-    if (res.counterpart_predicted_value !== null && res.counterpart_predicted_value !== undefined) {
-      resCounterpartVal.textContent = `${res.counterpart_predicted_value.toLocaleString("id-ID", { minimumFractionDigits: 2 })} ${res.pollutant_unit}`;
-      const cpDeltaSign = (res.counterpart_delta || 0) >= 0 ? "+" : "";
-      resCounterpartDelta.textContent = `Selisih: ${cpDeltaSign}${(res.counterpart_delta || 0).toFixed(2)} ${res.pollutant_unit}`;
-    } else {
-      resCounterpartVal.textContent = "Tidak tersedia";
-      resCounterpartDelta.textContent = "";
-    }
-
-    // Feature input chips
-    resFeatureChips.innerHTML = "";
-    if (res.feature_inputs && res.feature_inputs.length > 0) {
-      res.feature_inputs.forEach((f) => {
-        const chip = document.createElement("div");
-        chip.className = "feature-chip";
-        chip.innerHTML = `
-          <span class="feature-chip-title" title="${f.label}">${f.label}</span>
-          <span class="feature-chip-val">${f.value.toLocaleString("id-ID", { minimumFractionDigits: 2 })} <small style="font-weight: normal; font-size: 0.75rem; color: #64748b;">${f.unit}</small></span>
-        `;
-        resFeatureChips.appendChild(chip);
-      });
+    if (resUnit) {
+      resUnit.textContent = res.pollutant_unit;
     }
 
     // Update Quick Links to Evaluation and Interpretation
-    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}`;
-    btnGotoEvaluation.href = `/pages/evaluation.html?${queryParams}`;
-    btnGotoInterpretation.href = `/pages/interpretation.html?${queryParams}`;
+    const startVal = evalStartDate ? evalStartDate.value : "2026-07-29";
+    const endVal = evalEndDate ? evalEndDate.value : "2026-08-04";
+    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}`;
+    if (btnGotoEvaluation) btnGotoEvaluation.href = `/pages/evaluation.html?${queryParams}`;
+    if (btnGotoInterpretation) btnGotoInterpretation.href = `/pages/interpretation.html?${queryParams}`;
 
     // Smooth scroll to result
     resultSection.scrollIntoView({ behavior: "smooth", block: "nearest" });
@@ -260,12 +277,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   function showError(msg) {
     statusContainer.style.display = "block";
     statusContainer.innerHTML = `
-      <div class="alert alert-warning" role="alert">
-        <div class="alert-icon">⚠️</div>
-        <div class="alert-content">
-          <h4>Terjadi Kendala Prediksi</h4>
-          <p>${msg}</p>
-        </div>
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; color: #b91c1c; font-size: 0.85rem;">
+        <strong>Terjadi Kendala:</strong> ${msg}
       </div>
     `;
   }

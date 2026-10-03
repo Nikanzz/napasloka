@@ -256,23 +256,20 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       const data = await window.NapasLokaApi.postInterpretation(payload);
 
-      // A. Update Active Prediction Reference Banner (Mockup 5)
-      refSummaryText.textContent = `${data.pollutant_label} · ${data.location_name} · ${data.target_time_display}`;
+      // A. Update Active Prediction Reference Banner (Mockup 4)
+      refSummaryText.textContent = `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}`;
       refPredVal.textContent = formatNumber(data.predicted_value, 1);
       refPredUnit.textContent = data.pollutant_unit;
-      refModelBadge.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
-        ${data.algorithm_label} · ${data.scenario_label}
-      `;
-      refBaseValuePill.innerHTML = `Base E[f(X)]: <strong>${formatNumber(data.base_value, 1)} ${data.pollutant_unit}</strong>`;
+      refModelBadge.textContent = `${data.algorithm_label} · ${data.scenario_label}`;
+      if (refBaseValuePill) {
+        refBaseValuePill.innerHTML = `Base E[f(X)]: <strong>${formatNumber(data.base_value, 1)} ${data.pollutant_unit}</strong>`;
+      }
 
       // B. Update Cara Membaca & Reading Guide
       highlightFindingDesc.textContent = `${data.top_contributor.label} menjadi fitur dengan kontribusi terbesar terhadap prediksi yang dipilih.`;
       badgeTopKCount.textContent = `${data.local_contributions.length} fitur utama`;
 
-      // C. Render Custom Visual Bars (Matching Mockup 5)
+      // C. Render Custom Visual Bars (Matching Mockup 4)
       shapBarsList.innerHTML = "";
       const maxMagnitude = Math.max(...data.local_contributions.map((c) => c.impact_magnitude), 0.01);
 
@@ -286,18 +283,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const directionClass = item.direction === "positive" ? "positive" : "negative";
 
         row.innerHTML = `
-          <div class="shap-item-header">
-            <div class="shap-item-label">
-              <span>${item.label}</span>
-              <span class="shap-item-input-val">(Nilai: ${formatNumber(item.feature_value, 1)} ${item.unit})</span>
-            </div>
-            <div class="shap-item-value ${directionClass}">
-              ${formattedVal}
-            </div>
-          </div>
-          <div class="shap-track-wrapper" title="${item.label}: ${item.direction_label} (${formatNumber(item.percentage_impact, 1)}% dari total dampak)">
+          <span class="shap-feature-name">${item.label}</span>
+          <div class="shap-bar-track" title="${item.label}: ${item.direction_label} (${formatNumber(item.percentage_impact, 1)}%)">
             <div class="shap-bar-fill ${directionClass}" style="width: ${widthPct.toFixed(1)}%;"></div>
           </div>
+          <span class="shap-val ${directionClass}">${formattedVal}</span>
         `;
         shapBarsList.appendChild(row);
       });
