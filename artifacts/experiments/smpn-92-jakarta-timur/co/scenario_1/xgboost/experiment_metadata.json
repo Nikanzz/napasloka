@@ -1,0 +1,28 @@
+{
+  "experiment_id": "smpn-92-jakarta-timur__co__scenario_1__xgboost",
+  "location": "smpn-92-jakarta-timur",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:03:47.992010+00:00",
+  "metrics": {
+    "mae": 168.4245325028992,
+    "rmse": 257.37796123492086,
+    "mape": 9.320461207717107,
+    "r2": 0.976829127125231,
+    "training_time_seconds": 2.8566567999987456,
+    "prediction_time_seconds": 0.0049874999986059265
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

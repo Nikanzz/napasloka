@@ -1,0 +1,4 @@
+feature,mean_absolute_shap
+carbon_monoxide_lag_1h,874.4333522641497
+carbon_monoxide_lag_2h,353.0955135502707
+carbon_monoxide_lag_3h,99.20618579336369

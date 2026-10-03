@@ -1,0 +1,28 @@
+{
+  "experiment_id": "smpn-92-jakarta-timur__co2__scenario_1__lightgbm",
+  "location": "smpn-92-jakarta-timur",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:04:25.155421+00:00",
+  "metrics": {
+    "mae": 1.8150276521050492,
+    "rmse": 2.602233461329826,
+    "mape": 0.3828732232439793,
+    "r2": 0.9811377282668758,
+    "training_time_seconds": 5.23710519999986,
+    "prediction_time_seconds": 0.020448900000701542
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

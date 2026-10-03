@@ -1,0 +1,28 @@
+{
+  "experiment_id": "tol-serpong-interchange__co__scenario_1__xgboost",
+  "location": "tol-serpong-interchange",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:08:00.089860+00:00",
+  "metrics": {
+    "mae": 125.13220940973645,
+    "rmse": 218.59774802118062,
+    "mape": 7.615033996952504,
+    "r2": 0.9703444660586507,
+    "training_time_seconds": 2.510695699998905,
+    "prediction_time_seconds": 0.004494100001465995
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

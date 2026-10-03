@@ -1,0 +1,28 @@
+{
+  "experiment_id": "taman-kamal__co__scenario_1__lightgbm",
+  "location": "taman-kamal",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T09:59:34.642850+00:00",
+  "metrics": {
+    "mae": 94.688402877773,
+    "rmse": 160.22417728675808,
+    "mape": 7.571850053862482,
+    "r2": 0.9794507966318825,
+    "training_time_seconds": 5.0762008000001515,
+    "prediction_time_seconds": 0.020053800000823685
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

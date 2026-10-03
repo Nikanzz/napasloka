@@ -1,0 +1,28 @@
+{
+  "experiment_id": "petamburan-perkantoran-transjakarta__co2__scenario_1__xgboost",
+  "location": "petamburan-perkantoran-transjakarta",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:03:16.494582+00:00",
+  "metrics": {
+    "mae": 1.9814332193329849,
+    "rmse": 2.9106000668951357,
+    "mape": 0.4148172936664694,
+    "r2": 0.9784192041233468,
+    "training_time_seconds": 1.7381164000016724,
+    "prediction_time_seconds": 0.004907700000330806
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

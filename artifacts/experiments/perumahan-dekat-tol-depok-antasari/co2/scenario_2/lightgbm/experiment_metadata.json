@@ -1,0 +1,40 @@
+{
+  "experiment_id": "perumahan-dekat-tol-depok-antasari__co2__scenario_2__lightgbm",
+  "location": "perumahan-dekat-tol-depok-antasari",
+  "pollutant": "co2",
+  "scenario": "scenario_2",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:05:49.832489+00:00",
+  "metrics": {
+    "mae": 2.335057046969979,
+    "rmse": 3.4897007441920698,
+    "mape": 0.4808854311166345,
+    "r2": 0.9779028777274289,
+    "training_time_seconds": 7.071039099999325,
+    "prediction_time_seconds": 0.021466899999722955
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h",
+    "temperature_2m_lag_3h",
+    "temperature_2m_lag_2h",
+    "temperature_2m_lag_1h",
+    "relative_humidity_2m_lag_3h",
+    "relative_humidity_2m_lag_2h",
+    "relative_humidity_2m_lag_1h",
+    "rain_lag_3h",
+    "rain_lag_2h",
+    "rain_lag_1h",
+    "wind_speed_100m_lag_3h",
+    "wind_speed_100m_lag_2h",
+    "wind_speed_100m_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

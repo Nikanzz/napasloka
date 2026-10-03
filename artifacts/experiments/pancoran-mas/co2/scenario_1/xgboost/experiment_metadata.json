@@ -1,0 +1,28 @@
+{
+  "experiment_id": "pancoran-mas__co2__scenario_1__xgboost",
+  "location": "pancoran-mas",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:09:31.240978+00:00",
+  "metrics": {
+    "mae": 2.294162361289804,
+    "rmse": 3.222944686823247,
+    "mape": 0.4758621717945581,
+    "r2": 0.9837028597334181,
+    "training_time_seconds": 1.796339700000317,
+    "prediction_time_seconds": 0.006244399999559391
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

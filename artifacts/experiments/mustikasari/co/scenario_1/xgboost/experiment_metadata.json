@@ -1,0 +1,28 @@
+{
+  "experiment_id": "mustikasari__co__scenario_1__xgboost",
+  "location": "mustikasari",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:13:02.941886+00:00",
+  "metrics": {
+    "mae": 84.25568826944739,
+    "rmse": 129.25743576018738,
+    "mape": 7.616422019331987,
+    "r2": 0.9787249400160247,
+    "training_time_seconds": 2.833408699998472,
+    "prediction_time_seconds": 0.006620300000577117
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

@@ -1,0 +1,28 @@
+{
+  "experiment_id": "tmii__co2__scenario_1__lightgbm",
+  "location": "tmii",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:06:31.910889+00:00",
+  "metrics": {
+    "mae": 2.0524566722732356,
+    "rmse": 3.0304056797977745,
+    "mape": 0.4265416332575363,
+    "r2": 0.9798289279474457,
+    "training_time_seconds": 4.642412900000636,
+    "prediction_time_seconds": 0.019617699999798788
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

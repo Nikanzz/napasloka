@@ -1,0 +1,28 @@
+{
+  "experiment_id": "mustikasari__co2__scenario_1__xgboost",
+  "location": "mustikasari",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:13:34.286346+00:00",
+  "metrics": {
+    "mae": 1.637775645680886,
+    "rmse": 2.302103639502902,
+    "mape": 0.3502076696568973,
+    "r2": 0.9807185048004469,
+    "training_time_seconds": 1.5101038999982848,
+    "prediction_time_seconds": 0.0052019000013387995
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

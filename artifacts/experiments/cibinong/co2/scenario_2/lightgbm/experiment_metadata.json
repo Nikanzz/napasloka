@@ -1,0 +1,40 @@
+{
+  "experiment_id": "cibinong__co2__scenario_2__lightgbm",
+  "location": "cibinong",
+  "pollutant": "co2",
+  "scenario": "scenario_2",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:15:02.898928+00:00",
+  "metrics": {
+    "mae": 2.18997869693133,
+    "rmse": 3.0977771430498016,
+    "mape": 0.4555078300280177,
+    "r2": 0.988265818441433,
+    "training_time_seconds": 7.360130499999286,
+    "prediction_time_seconds": 0.020932200000970624
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h",
+    "temperature_2m_lag_3h",
+    "temperature_2m_lag_2h",
+    "temperature_2m_lag_1h",
+    "relative_humidity_2m_lag_3h",
+    "relative_humidity_2m_lag_2h",
+    "relative_humidity_2m_lag_1h",
+    "rain_lag_3h",
+    "rain_lag_2h",
+    "rain_lag_1h",
+    "wind_speed_100m_lag_3h",
+    "wind_speed_100m_lag_2h",
+    "wind_speed_100m_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

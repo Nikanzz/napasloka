@@ -1,0 +1,28 @@
+{
+  "experiment_id": "pancoran-mas__co2__scenario_1__lightgbm",
+  "location": "pancoran-mas",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:09:37.524099+00:00",
+  "metrics": {
+    "mae": 2.248785994854188,
+    "rmse": 3.1754156700150054,
+    "mape": 0.4664405855999842,
+    "r2": 0.9841799858900887,
+    "training_time_seconds": 4.948181199999453,
+    "prediction_time_seconds": 0.019132599998556543
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

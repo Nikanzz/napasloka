@@ -1,0 +1,28 @@
+{
+  "experiment_id": "tol-serpong-interchange__co__scenario_1__lightgbm",
+  "location": "tol-serpong-interchange",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:08:06.089415+00:00",
+  "metrics": {
+    "mae": 122.05748192520262,
+    "rmse": 222.41226456362256,
+    "mape": 7.40669400410308,
+    "r2": 0.9693004616490257,
+    "training_time_seconds": 4.627603000000818,
+    "prediction_time_seconds": 0.019201999999495456
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}
