@@ -1,12 +1,14 @@
 /* ==========================================================================
-   Sistem NapasLoka - Main Stylesheet (Modern Dashboard & Responsive PWA)
+   Sistem NapasLoka - Main Stylesheet (Precision Matching Chapter 3 Mockups)
    ========================================================================== */
 
 :root {
-  --color-primary: #0f766e;        /* Teal 700 */
-  --color-primary-dark: #115e59;   /* Teal 800 */
-  --color-primary-light: #ccfbf1;  /* Teal 100 */
-  --color-header-bg: #0d382e;      /* Deep Forest Teal */
+  --color-primary: #2563eb;        /* Royal Blue 600 */
+  --color-primary-dark: #1d4ed8;   /* Royal Blue 700 */
+  --color-primary-light: #eff6ff;  /* Blue 50 */
+  --color-navy: #0c1445;           /* Deep Midnight Navy for Mockup Cards & Footer */
+  --color-navy-card: #0c1445;
+  --color-navy-subtle: rgba(255, 255, 255, 0.08);
   
   --color-bg: #f8fafc;             /* Slate 50 */
   --color-surface: #ffffff;        /* Pure White */
@@ -14,15 +16,14 @@
   --color-border-subtle: #f1f5f9;  /* Slate 100 */
   
   --color-text-main: #0f172a;      /* Slate 900 */
-  --color-text-muted: #475569;     /* Slate 600 */
-  --color-text-light: #64748b;     /* Slate 500 */
+  --color-text-muted: #64748b;     /* Slate 500 */
+  --color-text-light: #94a3b8;     /* Slate 400 */
   
   --color-success: #10b981;        /* Emerald 500 */
-  --color-warning: #f59e0b;        /* Amber 500 */
   --color-danger: #ef4444;         /* Red 500 */
   --color-info: #3b82f6;           /* Blue 500 */
   
-  --font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -30,7 +31,6 @@
   
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
 }
 
 * {
@@ -46,7 +46,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  line-height: 1.55;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -61,16 +61,16 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   Site Header & Navigation
+   Site Header & Navigation (White Clean Bar from Mockups)
    -------------------------------------------------------------------------- */
 .site-header {
-  background: var(--color-header-bg);
-  color: white;
-  padding: 0.85rem clamp(1rem, 4vw, 3rem);
-  box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
+  background: #ffffff;
+  border-bottom: 1px solid #eef2f6;
+  padding: 0.75rem clamp(1rem, 4vw, 3rem);
   position: sticky;
   top: 0;
   z-index: 50;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.02);
 }
 
 .header-container {
@@ -90,56 +90,84 @@ a:hover {
 }
 
 .brand-logo {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-sm);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  flex-shrink: 0;
 }
 
-.brand {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: white;
+.brand-text-block {
   display: flex;
-  align-items: baseline;
-  gap: 0.4rem;
+  flex-direction: column;
 }
 
-.brand-badge {
-  font-size: 0.72rem;
-  font-weight: 500;
-  background: rgba(255, 255, 255, 0.18);
-  color: #d1fae5;
-  padding: 0.15rem 0.5rem;
-  border-radius: var(--radius-full);
-  letter-spacing: normal;
+.brand-system-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.brand-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+  line-height: 1.2;
 }
 
 .nav {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
 .nav a {
-  color: rgba(255, 255, 255, 0.82);
-  padding: 0.4rem 0.85rem;
-  border-radius: var(--radius-full);
-  font-size: 0.9rem;
+  color: #475569;
+  font-size: 0.88rem;
   font-weight: 500;
-  transition: all 0.15s ease;
+  padding: 0.5rem 0.2rem;
+  position: relative;
+  transition: color 0.15s ease;
 }
 
 .nav a:hover {
-  color: white;
-  background: rgba(255, 255, 255, 0.12);
+  color: #0f172a;
 }
 
 .nav a[aria-current="page"] {
-  color: white;
-  background: rgba(255, 255, 255, 0.22);
+  color: var(--color-primary);
   font-weight: 600;
+}
+
+.nav a[aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  bottom: -0.75rem;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #334155;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--color-success);
 }
 
 /* --------------------------------------------------------------------------
@@ -151,29 +179,38 @@ main {
   flex: 1;
 }
 
-/* Page Header / Hero */
-.page-header {
+/* Page Header Row with Breadcrumb */
+.page-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 2rem;
+}
+
+.page-header-text {
+  max-width: 800px;
 }
 
 .page-tag {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-light);
+  color: #475569;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.01em;
 }
 
 h1 {
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
-  font-weight: 700;
+  font-size: clamp(1.75rem, 3.2vw, 2.25rem);
+  font-weight: 800;
   line-height: 1.25;
   color: var(--color-text-main);
   letter-spacing: -0.025em;
@@ -181,67 +218,28 @@ h1 {
 }
 
 .lead {
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
   max-width: 75ch;
-  line-height: 1.6;
+  line-height: 1.55;
 }
 
-/* --------------------------------------------------------------------------
-   KPI & Stats Pills Bar
-   -------------------------------------------------------------------------- */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.85rem;
-  margin: 1.5rem 0 2rem;
-}
-
-.stat-pill {
-  background: var(--color-surface);
+.breadcrumb-badge {
+  background: #ffffff;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0.85rem 1.15rem;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.stat-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-md);
-  display: grid;
-  place-items: center;
-  font-size: 1.2rem;
-  background: var(--color-primary-light);
-  color: var(--color-primary);
-  flex-shrink: 0;
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-value {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--color-text-main);
-  line-height: 1.2;
-}
-
-.stat-label {
+  border-radius: 8px;
+  padding: 0.35rem 0.85rem;
   font-size: 0.8rem;
-  color: var(--color-text-light);
-  font-weight: 500;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.breadcrumb-badge .active {
+  color: #0f172a;
+  font-weight: 700;
 }
 
 /* --------------------------------------------------------------------------
@@ -249,51 +247,110 @@ h1 {
    -------------------------------------------------------------------------- */
 .grid-2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: 1.45fr 1fr;
+  gap: 1.75rem;
 }
 
 .grid-3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 1.25rem;
-  margin-bottom: 2rem;
 }
 
 .grid-4 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.25rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 992px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-3 {
+    grid-template-columns: 1fr;
+  }
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* --------------------------------------------------------------------------
-   Footer
+   Site Footer (Deep Navy from Mockups)
    -------------------------------------------------------------------------- */
 .site-footer {
-  background: white;
-  border-top: 1px solid var(--color-border);
-  padding: 1.5rem clamp(1rem, 4vw, 3rem);
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--color-text-light);
+  background: var(--color-navy);
+  color: #ffffff;
+  padding: 2.25rem clamp(1rem, 4vw, 3rem);
   margin-top: auto;
 }
 
-.footer-content {
+.footer-container {
   max-width: 1200px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 1.5rem;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.footer-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+}
+
+.footer-brand-text h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.footer-brand-text p {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.footer-info {
+  text-align: right;
+}
+
+.footer-info-primary {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #f1f5f9;
+}
+
+.footer-info-secondary {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-top: 2px;
 }
 
 @media (max-width: 640px) {
-  .footer-content {
+  .footer-container {
     flex-direction: column;
-    text-align: center;
+    align-items: flex-start;
+  }
+  .footer-info {
+    text-align: left;
   }
 }

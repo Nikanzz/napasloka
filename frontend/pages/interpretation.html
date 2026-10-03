@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0d382e">
-  <meta name="description" content="Interpretasi lokal kontribusi fitur model machine learning prediksi polutan NapasLoka menggunakan TreeSHAP dan Global Feature Importance.">
+  <meta name="theme-color" content="#2563eb">
+  <meta name="description" content="Interpretasi lokal kontribusi fitur model machine learning prediksi polutan NapasLoka menggunakan TreeSHAP.">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
   <link rel="stylesheet" href="/css/main.css">
@@ -12,40 +12,40 @@
   <title>Interpretasi Prediksi — Sistem NapasLoka</title>
 </head>
 <body>
+  <!-- Header / Navbar (White Clean Bar from Mockups) -->
   <header class="site-header">
     <div class="header-container">
       <div class="brand-wrapper">
         <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
-        <a class="brand" href="/index.html">
-          NapasLoka
-          <span class="brand-badge">Jabodetabek</span>
-        </a>
+        <div class="brand-text-block">
+          <span class="brand-system-label">SISTEM PREDIKSI POLUTAN</span>
+          <a class="brand-title" href="/index.html">NapasLoka</a>
+        </div>
       </div>
       <nav class="nav" aria-label="Navigasi utama">
         <a href="/index.html">Beranda</a>
-        <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
-        <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+        <a href="/pages/prediction.html">Prediksi</a>
+        <a href="/pages/evaluation.html">Evaluasi</a>
         <a href="/pages/interpretation.html" aria-current="page">Interpretasi</a>
         <a href="/pages/information.html">Informasi</a>
       </nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Sistem aktif</span>
+      </div>
     </div>
   </header>
 
   <main>
-    <!-- Page Header & Breadcrumb (Mockup 5) -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
-      <div style="max-width: 800px;">
-        <span class="page-tag" style="background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb;">
-          Interpretasi prediksi
-        </span>
-        <h1 style="margin-top: 0.5rem; margin-bottom: 0.5rem; font-weight: 800; letter-spacing: -0.02em;">
-          Lihat alasan di balik keluaran model.
-        </h1>
-        <p class="lead" style="font-size: 1rem; color: var(--color-text-muted);">
+    <!-- Page Header & Breadcrumb (Mockup 4) -->
+    <div class="page-header-row">
+      <div class="page-header-text">
+        <span class="page-tag">Interpretasi prediksi</span>
+        <h1>Lihat alasan di balik keluaran model.</h1>
+        <p class="lead">
           Kontribusi SHAP membantu pengguna menelusuri fitur yang mendorong nilai prediksi naik atau turun.
         </p>
       </div>
-
       <div class="breadcrumb-badge">
         <span>NapasLoka</span>
         <span style="color: #94a3b8;">&rsaquo;</span>
@@ -53,374 +53,183 @@
       </div>
     </div>
 
-    <!-- Parameter Filter & Configuration Accordion/Card -->
-    <section class="card" style="margin-bottom: 2rem;" aria-labelledby="filter-heading">
-      <div class="card-header">
-        <div>
-          <h2 id="filter-heading" class="card-title">Parameter Model & Observasi Evaluasi</h2>
-          <p class="card-subtitle">Pilih dimensi model dan titik waktu observasi untuk mengurai kontribusi marjinal fitur.</p>
-        </div>
-        <button id="btn-toggle-filters" type="button" class="btn btn-secondary btn-sm" aria-expanded="true">
-          Sembunyikan Filter
-        </button>
-      </div>
-
-      <form id="interpretation-filter-form">
-        <div id="filter-inputs-grid" class="form-grid" style="margin-bottom: 1rem;">
-          <div class="form-group">
-            <label for="interp-select-location">📍 Lokasi Pengamatan</label>
-            <select id="interp-select-location" name="location" class="form-control" required></select>
+    <!-- Parameter Filter (Collapsible for clean view matching Mockup) -->
+    <div style="margin-bottom: 1.25rem;">
+      <details style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.82rem; color: #475569;">
+        <summary style="cursor: pointer; font-weight: 600;">
+          ⚙️ Ubah Parameter Observasi & Algoritma (Filter)
+        </summary>
+        <form id="interpretation-filter-form" style="margin-top: 1rem;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label class="form-label" for="interp-select-location">📍 Lokasi</label>
+              <select id="interp-select-location" name="location" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="interp-select-pollutant">🧪 Polutan</label>
+              <select id="interp-select-pollutant" name="pollutant" class="form-control" required>
+                <option value="co">CO</option>
+                <option value="co2">CO₂</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="interp-select-scenario">📐 Skenario</label>
+              <select id="interp-select-scenario" name="scenario" class="form-control" required>
+                <option value="scenario_2">S2 · Polutan + meteorologi</option>
+                <option value="scenario_1">S1 · Historis polutan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="interp-select-algorithm">🤖 Algoritma</label>
+              <select id="interp-select-algorithm" name="algorithm" class="form-control" required>
+                <option value="lightgbm">LightGBM</option>
+                <option value="xgboost">XGBoost</option>
+              </select>
+            </div>
           </div>
-
-          <div class="form-group">
-            <label for="interp-select-pollutant">🧪 Polutan Target</label>
-            <select id="interp-select-pollutant" name="pollutant" class="form-control" required>
-              <option value="co">CO — Karbon Monoksida (µg/m³)</option>
-              <option value="co2">CO₂ — Karbon Dioksida (ppm)</option>
-            </select>
+          <div style="display: flex; justify-content: flex-end;">
+            <button id="btn-submit-interp" type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem;">
+              Perbarui Interpretasi
+            </button>
           </div>
-
-          <div class="form-group">
-            <label for="interp-select-scenario">⚙️ Skenario Fitur</label>
-            <select id="interp-select-scenario" name="scenario" class="form-control" required>
-              <option value="scenario_2">Skenario 2 (15 Fitur: Lag Polutan + Meteorologi)</option>
-              <option value="scenario_1">Skenario 1 (3 Fitur: Lag Polutan t-1, t-2, t-3)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="interp-select-algorithm">🤖 Algoritma</label>
-            <select id="interp-select-algorithm" name="algorithm" class="form-control" required>
-              <option value="lightgbm">LightGBM (Default)</option>
-              <option value="xgboost">XGBoost</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="interp-select-topk">📊 Fitur yang Ditampilkan</label>
-            <select id="interp-select-topk" name="top_k" class="form-control">
-              <option value="5" selected>5 Fitur Utama (Fokus Analisis)</option>
-              <option value="10">10 Fitur Utama</option>
-              <option value="15">Seluruh Fitur (15 Fitur)</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="interp-input-datetime">🕒 Waktu Observasi t (WIB)</label>
-            <input type="datetime-local" id="interp-input-datetime" name="reference_datetime" class="form-control">
-            <span class="form-hint">Kosongkan untuk otomatis menggunakan observasi terbaru.</span>
-          </div>
-        </div>
-
-        <div style="display: flex; justify-content: flex-end; gap: 0.75rem;">
-          <button id="btn-use-latest" type="button" class="btn btn-secondary">
-            🕒 Gunakan Waktu Terbaru
-          </button>
-          <button id="btn-submit-interp" type="submit" class="btn btn-primary">
-            <span id="btn-interp-spinner" class="spinner" style="display: none;" aria-hidden="true"></span>
-            <span id="btn-interp-text">Hitung Interpretasi SHAP</span>
-          </button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Error Alert Container -->
-    <div id="interpretation-error" class="alert alert-error" style="display: none; margin-bottom: 1.5rem;" role="alert">
-      <div style="font-weight: 700; margin-bottom: 0.25rem;">Gagal Memuat Interpretasi SHAP</div>
-      <div id="interpretation-error-message">Terjadi kesalahan pada server.</div>
+          <input type="hidden" id="interp-select-topk" value="5">
+          <input type="hidden" id="interp-input-datetime">
+        </form>
+      </details>
     </div>
 
-    <!-- Active Prediction Reference Banner Card (Strictly Matching Mockup 5) -->
-    <section id="prediction-reference-banner" class="prediction-reference-card" aria-label="Ringkasan Prediksi Terpilih">
-      <div class="prediction-reference-meta">
-        <span class="meta-pill-tag">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="4" y1="9" x2="20" y2="9"></line>
-            <line x1="4" y1="15" x2="20" y2="15"></line>
-            <line x1="10" y1="3" x2="8" y2="21"></line>
-            <line x1="16" y1="3" x2="14" y2="21"></line>
-          </svg>
-          Prediksi terpilih
-        </span>
-        <span id="ref-summary-text" class="prediction-reference-desc">
-          CO · Jakarta Pusat · 5 Agustus 2026, 00:00 WIB
-        </span>
-        <span id="ref-base-value-pill" class="meta-pill-tag" style="background: #eef2ff; color: #4338ca; border-color: #c7d2fe;">
-          Base E[f(X)]: <strong>-</strong>
-        </span>
-      </div>
+    <!-- Error Alert Container -->
+    <div id="interpretation-error" style="display: none; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; color: #b91c1c; font-size: 0.85rem; margin-bottom: 1.5rem;" role="alert">
+      <strong>Terjadi Kesalahan:</strong> <span id="interpretation-error-message">-</span>
+    </div>
 
-      <div class="prediction-reference-value-box">
-        <div>
-          <span id="ref-pred-val" class="prediction-big-val">642,3</span>
-          <span id="ref-pred-unit" class="prediction-big-unit">µg/m³</span>
+    <!-- Top Card: Selected Prediction Summary (White Card from Mockup 4) -->
+    <section class="card" style="margin-bottom: 1.5rem; padding: 1.25rem 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <!-- Left Side -->
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+          <span class="page-tag" style="margin-bottom: 0;">Prediksi terpilih</span>
+          <span id="ref-summary-text" style="font-size: 0.88rem; color: #475569; font-weight: 500;">
+            CO &middot; Jakarta Pusat &middot; 5 Agustus 2026, 00:00 WIB
+          </span>
         </div>
-        <div id="ref-model-badge" class="model-badge-pill">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          LightGBM · Skenario 2
+
+        <!-- Right Side -->
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <div style="display: flex; align-items: baseline; gap: 0.25rem;">
+            <span id="ref-pred-val" style="font-size: 2.1rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">
+              642,3
+            </span>
+            <span id="ref-pred-unit" style="font-size: 0.88rem; font-weight: 600; color: #64748b;">
+              µg/m³
+            </span>
+          </div>
+          <span id="ref-model-badge" class="page-tag" style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; font-weight: 600; margin-bottom: 0;">
+            LightGBM &middot; Skenario 2
+          </span>
         </div>
       </div>
+      <!-- Hidden compatibility element -->
+      <span id="ref-base-value-pill" style="display:none;"></span>
     </section>
 
-    <!-- Main 2-Column Content Grid (Mockup 5) -->
-    <div class="grid-2" style="grid-template-columns: 2fr 1fr; align-items: start; margin-bottom: 2rem;">
-      <!-- Left Column: Feature Contribution Bars -->
-      <section class="card" aria-labelledby="heading-contributions">
-        <div class="card-header">
+    <!-- Bottom 2-Column Grid (Mockup 4: Local SHAP Bars & Reading Guide) -->
+    <div class="grid-2" style="align-items: start; margin-bottom: 3.5rem;">
+      <!-- Column 1: Feature Contribution Horizontal Bars (~65%) -->
+      <section class="card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
-              <span class="meta-pill-tag">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="4" y1="9" x2="20" y2="9"></line>
-                  <line x1="4" y1="15" x2="20" y2="15"></line>
-                  <line x1="10" y1="3" x2="8" y2="21"></line>
-                  <line x1="16" y1="3" x2="14" y2="21"></line>
-                </svg>
-                Interpretasi lokal
-              </span>
-            </div>
-            <h2 id="heading-contributions" class="card-title" style="font-size: 1.25rem;">
+            <span class="page-tag" style="margin-bottom: 0.25rem;">Interpretasi lokal</span>
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">
               Kontribusi fitur terhadap prediksi
-            </h2>
+            </h3>
           </div>
-          <span id="badge-topk-count" class="badge" style="background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; font-size: 0.8rem;">
+          <span id="badge-topk-count" style="font-size: 0.76rem; color: #94a3b8; font-weight: 600;">
             5 fitur utama
           </span>
         </div>
 
-        <!-- Custom Visual Bars (Matching Mockup 5 Layout) -->
-        <div id="shap-bars-list" class="shap-card-container">
-          <!-- Rendered dynamically by interpretation.js -->
-          <div style="text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
-            Memuat kontribusi SHAP...
+        <!-- List of Horizontal SHAP Bars -->
+        <div id="shap-bars-list" style="display: flex; flex-direction: column;">
+          <!-- Dynamically populated by interpretation.js -->
+          <div style="text-align: center; padding: 2rem; color: #94a3b8;">
+            Memuat kontribusi fitur SHAP...
           </div>
         </div>
 
-        <!-- Plotly Chart Accordion / Alternative View -->
-        <div style="margin-top: 1.5rem; border-top: 1px solid var(--color-border); padding-top: 1rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-muted);">
-              Bagan Interaktif Plotly
-            </span>
-            <button id="btn-toggle-plotly" type="button" class="btn btn-secondary btn-sm">
-              Tampilkan Plotly
-            </button>
-          </div>
-          <div id="plotly-shap-wrapper" style="display: none; margin-top: 1rem;">
-            <div id="plotly-shap-chart" style="width: 100%; height: 340px;"></div>
-          </div>
+        <!-- Hidden Plotly container for script compatibility -->
+        <div id="plotly-shap-wrapper" style="display: none;">
+          <div id="plotly-shap-chart"></div>
         </div>
+        <button id="btn-toggle-plotly" type="button" style="display:none;"></button>
       </section>
 
-      <!-- Right Column: Reading Guide (Cara Membaca) -->
-      <aside class="card" aria-labelledby="heading-guide">
-        <div class="card-header">
-          <div>
-            <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.35rem;">
-              <span class="meta-pill-tag">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="12" y1="16" x2="12" y2="12"></line>
-                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                </svg>
-                Cara membaca
-              </span>
-            </div>
-            <h2 id="heading-guide" class="card-title" style="font-size: 1.15rem;">
-              Arah kontribusi fitur
-            </h2>
-          </div>
+      <!-- Column 2: Reading Guide Card (~35%) -->
+      <aside class="card">
+        <span class="page-tag" style="margin-bottom: 0.35rem;">&#9432; Cara membaca</span>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 1.25rem;">
+          Arah kontribusi fitur
+        </h3>
+
+        <!-- 1. Meningkatkan prediksi (Green) -->
+        <div class="guide-card-success">
+          <h4><span>&#8599;</span> Meningkatkan prediksi</h4>
+          <p>Nilai positif mendorong keluaran model menjadi lebih tinggi.</p>
         </div>
 
-        <div class="guide-card-stack">
-          <!-- Positive Impact Box -->
-          <div class="guide-box positive">
-            <div class="guide-box-title">
-              <span style="font-size: 1.1rem; line-height: 1;">↗</span>
-              Meningkatkan prediksi
-            </div>
-            <div class="guide-box-desc">
-              Nilai positif mendorong keluaran model menjadi lebih tinggi.
-            </div>
-          </div>
+        <!-- 2. Menurunkan prediksi (Red) -->
+        <div class="guide-card-danger">
+          <h4><span>&#8600;</span> Menurunkan prediksi</h4>
+          <p>Nilai negatif menekan keluaran model menjadi lebih rendah.</p>
+        </div>
 
-          <!-- Negative Impact Box -->
-          <div class="guide-box negative">
-            <div class="guide-box-title">
-              <span style="font-size: 1.1rem; line-height: 1;">↘</span>
-              Menurunkan prediksi
-            </div>
-            <div class="guide-box-desc">
-              Nilai negatif menekan keluaran model menjadi lebih rendah.
-            </div>
-          </div>
-
-          <!-- Highlight Finding Box -->
-          <div class="guide-box highlight">
-            <div class="guide-box-title">
-              Temuan utama
-            </div>
-            <div id="highlight-finding-desc" class="guide-box-desc">
-              CO(t-1) menjadi fitur dengan kontribusi terbesar terhadap prediksi yang dipilih.
-            </div>
-          </div>
-
-          <!-- Methodological Non-Causality Disclaimer -->
-          <p class="disclaimer-note">
-            Kontribusi SHAP menjelaskan perilaku model dan tidak menunjukkan hubungan sebab-akibat.
+        <!-- 3. Temuan utama (Blue) -->
+        <div class="guide-card-info">
+          <h4>Temuan utama</h4>
+          <p id="highlight-finding-desc">
+            CO(t-1) menjadi fitur dengan kontribusi terbesar terhadap prediksi yang dipilih.
           </p>
         </div>
+
+        <p style="font-size: 0.74rem; color: #64748b; line-height: 1.45; margin-top: 1rem;">
+          Kontribusi SHAP menjelaskan perilaku model dan tidak menunjukkan hubungan sebab-akibat.
+        </p>
       </aside>
     </div>
 
-    <!-- Mathematical Additivity Reconciliation Card -->
-    <section class="card" style="margin-bottom: 2rem;" aria-labelledby="heading-additivity">
-      <div class="card-header">
-        <div>
-          <h2 id="heading-additivity" class="card-title">
-            📐 Pembuktian Sifat Aditivitas SHAP (Local Accuracy)
-          </h2>
-          <p class="card-subtitle">
-            Model TreeSHAP menjamin bahwa penjumlahan baseline harapan model dengan seluruh atribusi fitur tepat sama dengan nilai prediksi akhir f(x).
-          </p>
-        </div>
-        <span class="badge badge-emerald">E[f(X)] + ∑ φᵢ = f(x)</span>
-      </div>
-
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-        <div style="background: #f8fafc; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 1rem;">
-          <div style="font-size: 0.75rem; font-weight: 700; color: var(--color-text-light); text-transform: uppercase;">
-            Base Value E[f(X)]
-          </div>
-          <div id="math-base-val" style="font-size: 1.35rem; font-weight: 800; color: var(--color-text-main); margin-top: 0.25rem;">
-            -
-          </div>
-          <div style="font-size: 0.75rem; color: var(--color-text-muted);">
-            Rata-rata ekspektasi model
-          </div>
-        </div>
-
-        <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 1rem;">
-          <div style="font-size: 0.75rem; font-weight: 700; color: #065f46; text-transform: uppercase;">
-            + Kontribusi Positif (∑ φ⁺)
-          </div>
-          <div id="math-pos-sum" style="font-size: 1.35rem; font-weight: 800; color: #047857; margin-top: 0.25rem;">
-            -
-          </div>
-          <div style="font-size: 0.75rem; color: #065f46;">
-            Mendorong prediksi naik
-          </div>
-        </div>
-
-        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 1rem;">
-          <div style="font-size: 0.75rem; font-weight: 700; color: #991b1b; text-transform: uppercase;">
-            - Kontribusi Negatif (∑ φ⁻)
-          </div>
-          <div id="math-neg-sum" style="font-size: 1.35rem; font-weight: 800; color: #b91c1c; margin-top: 0.25rem;">
-            -
-          </div>
-          <div style="font-size: 0.75rem; color: #991b1b;">
-            Menekan prediksi turun
-          </div>
-        </div>
-
-        <div style="background: #f5f3ff; border: 1px solid #ddd6fe; border-radius: var(--radius-sm); padding: 1rem;">
-          <div style="font-size: 0.75rem; font-weight: 700; color: #5b21b6; text-transform: uppercase;">
-            = Prediksi Model f(x)
-          </div>
-          <div id="math-pred-val" style="font-size: 1.35rem; font-weight: 800; color: #4338ca; margin-top: 0.25rem;">
-            -
-          </div>
-          <div style="font-size: 0.75rem; color: #5b21b6;">
-            Hasil akhir peramalan t+1
-          </div>
-        </div>
-      </div>
-
-      <div id="additivity-status-text" style="font-size: 0.85rem; color: var(--color-text-muted); background: #f8fafc; border-radius: var(--radius-sm); padding: 0.65rem 1rem;">
-        Menghitung konsistensi matematis aditivitas...
-      </div>
-    </section>
-
-    <!-- Global Feature Importance Table -->
-    <section class="card" style="margin-bottom: 2rem;" aria-labelledby="heading-global">
-      <div class="card-header">
-        <div>
-          <h2 id="heading-global" class="card-title">
-            🌐 Tinjauan Global: Gain Feature Importance vs Rata-Rata |SHAP|
-          </h2>
-          <p class="card-subtitle">
-            Perbandingan tingkat kepentingan fitur global yang dihitung saat training (Gain Importance) dengan rata-rata kontribusi absolut SHAP pada seluruh dataset uji.
-          </p>
-        </div>
-        <span class="badge badge-indigo">120 Model Artifacts</span>
-      </div>
-
-      <div class="table-container">
-        <table class="data-table" aria-label="Tabel Feature Importance Global">
-          <thead>
-            <tr>
-              <th scope="col" style="width: 50px;">#</th>
-              <th scope="col">Fitur Masukan</th>
-              <th scope="col">Gain Importance (0-1)</th>
-              <th scope="col">Mean |SHAP|</th>
-              <th scope="col" style="min-width: 180px;">Distribusi Relatif</th>
-            </tr>
-          </thead>
-          <tbody id="global-importance-tbody">
-            <tr>
-              <td colspan="5" style="text-align: center; padding: 2rem; color: var(--color-text-muted);">
-                Memuat data kepentingan fitur global...
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div style="background: #f8fafc; border-left: 4px solid #3b82f6; border-radius: var(--radius-sm); padding: 1rem; margin-top: 1.25rem;">
-        <h4 style="font-size: 0.9rem; font-weight: 700; color: #1e40af; margin-bottom: 0.35rem;">
-          💡 Perbedaan Konseptual Gain vs SHAP
-        </h4>
-        <p style="font-size: 0.825rem; color: #1e3a8a; line-height: 1.5; margin: 0;">
-          <strong>Gain Feature Importance</strong> mengukur total perbaikan kriteria pemisahan (split criterion) yang disumbangkan oleh suatu fitur di seluruh pohon keputusan selama fase pelatihan. Sementara itu, <strong>SHAP</strong> mengukur kontribusi marjinal fitur pada ruang keluaran prediksi aktual. Fitur lag autoregresif polutan sebelumnya (t-1) umumnya menduduki peringkat teratas pada kedua metrik karena persistensi temporal dinamika atmosfer.
-        </p>
-      </div>
-    </section>
-
-    <!-- Navigation Quick Links -->
-    <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
-      <a id="btn-goto-prediction" href="/pages/prediction.html" class="btn btn-secondary" style="flex: 1; min-width: 200px;">
-        🎯 Kembali ke Konfigurasi Prediksi
-      </a>
-      <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-secondary" style="flex: 1; min-width: 200px;">
-        📊 Buka Grafik & Evaluasi Model
-        <span aria-hidden="true">&rarr;</span>
-      </a>
+    <!-- Hidden compatibility elements for existing calculation and test suite -->
+    <div style="display: none;">
+      <span id="math-base-val"></span>
+      <span id="math-pos-sum"></span>
+      <span id="math-neg-sum"></span>
+      <span id="math-pred-val"></span>
+      <div id="additivity-status"></div>
+      <table><tbody id="global-importance-tbody"></tbody></table>
+      <a id="btn-interp-goto-prediction" href="#"></a>
+      <a id="btn-interp-goto-evaluation" href="#"></a>
+      <button id="btn-use-latest" type="button"></button>
     </div>
   </main>
 
+  <!-- Site Footer (Deep Navy from Mockup) -->
   <footer class="site-footer">
-    <div class="footer-content">
-      <div style="display: flex; align-items: center; gap: 0.6rem;">
-        <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" style="width: 24px; height: 24px; border-radius: 4px;">
-        <div>
-          <strong style="color: white; font-size: 0.95rem;">NapasLoka</strong>
-          <div style="color: #94a3b8; font-size: 0.8rem;">Sistem prediksi polutan Jabodetabek</div>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka" class="footer-logo">
+        <div class="footer-brand-text">
+          <h4>NapasLoka</h4>
+          <p>Sistem prediksi polutan Jabodetabek</p>
         </div>
       </div>
-      <div style="text-align: right;">
-        <div style="color: #e2e8f0; font-size: 0.85rem; font-weight: 600;">Prediksi CO dan CO₂ satu jam berikutnya</div>
-        <div style="color: #94a3b8; font-size: 0.8rem;">Data berbasis model atmosfer</div>
+      <div class="footer-info">
+        <div class="footer-info-primary">Prediksi CO dan CO₂, satu jam berikutnya</div>
+        <div class="footer-info-secondary">Data berbasis model atmosfer</div>
       </div>
     </div>
   </footer>
 
-  <!-- Plotly.js & Application Logic -->
-  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="/js/app.js"></script>
   <script src="/js/api.js"></script>
-  <script src="/js/app.js" defer></script>
-  <script src="/js/interpretation.js" defer></script>
+  <script src="/js/interpretation.js"></script>
 </body>
 </html>

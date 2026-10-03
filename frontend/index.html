@@ -16,18 +16,22 @@
     <div class="header-container">
       <div class="brand-wrapper">
         <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
-        <a class="brand" href="/index.html">
-          NapasLoka
-          <span class="brand-badge">Jabodetabek</span>
-        </a>
+        <div class="brand-text-block">
+          <span class="brand-system-label">SISTEM PREDIKSI POLUTAN</span>
+          <a class="brand-title" href="/index.html">NapasLoka</a>
+        </div>
       </div>
       <nav class="nav" aria-label="Navigasi utama">
         <a href="/index.html" aria-current="page">Beranda</a>
-        <a href="/pages/prediction.html">Konfigurasi Prediksi</a>
-        <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+        <a href="/pages/prediction.html">Prediksi</a>
+        <a href="/pages/evaluation.html">Evaluasi</a>
         <a href="/pages/interpretation.html">Interpretasi</a>
         <a href="/pages/information.html">Informasi</a>
       </nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Sistem aktif</span>
+      </div>
     </div>
   </header>
 
@@ -201,12 +205,17 @@
   </main>
 
   <footer class="site-footer">
-    <div class="footer-content">
-      <div>
-        <strong>Sistem NapasLoka</strong> — Platform Prediksi Kualitas Udara (CO & CO₂) Berbasis Machine Learning.
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka" class="footer-logo">
+        <div class="footer-brand-text">
+          <h4>NapasLoka</h4>
+          <p>Sistem prediksi polutan Jabodetabek</p>
+        </div>
       </div>
-      <div>
-        Wilayah Jabodetabek · © <span data-current-year></span>
+      <div class="footer-info">
+        <div class="footer-info-primary">Prediksi CO dan CO₂, satu jam berikutnya</div>
+        <div class="footer-info-secondary">Data berbasis model atmosfer</div>
       </div>
     </div>
   </footer>

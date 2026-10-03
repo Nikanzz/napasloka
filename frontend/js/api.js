@@ -5,12 +5,11 @@
  */
 window.NapasLokaApi = {
   baseUrl: (() => {
-    // If the browser is accessing the backend directly on port 8000
-    if (window.location.port === "8000") {
-      return `${window.location.origin}/api/v1`;
+    if ((window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") &&
+      window.location.port && window.location.port !== "8000") {
+      return "http://127.0.0.1:8000/api/v1";
     }
-    // Default local backend address
-    return "http://127.0.0.1:8000/api/v1";
+    return `${window.location.origin}/api/v1`;
   })(),
 
   async request(path, options = {}) {

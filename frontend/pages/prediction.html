@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0d382e">
+  <meta name="theme-color" content="#2563eb">
   <meta name="description" content="Konfigurasi dan eksekusi prediksi konsentrasi CO dan CO2 satu jam ke depan di wilayah Jabodetabek.">
   <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
   <link rel="manifest" href="/manifest.json">
@@ -12,245 +12,240 @@
   <title>Konfigurasi Prediksi — Sistem NapasLoka</title>
 </head>
 <body>
+  <!-- Header / Navbar (White Clean Bar from Mockup 1) -->
   <header class="site-header">
     <div class="header-container">
       <div class="brand-wrapper">
         <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
-        <a class="brand" href="/index.html">
-          NapasLoka
-          <span class="brand-badge">Jabodetabek</span>
-        </a>
+        <div class="brand-text-block">
+          <span class="brand-system-label">SISTEM PREDIKSI POLUTAN</span>
+          <a class="brand-title" href="/index.html">NapasLoka</a>
+        </div>
       </div>
       <nav class="nav" aria-label="Navigasi utama">
         <a href="/index.html">Beranda</a>
-        <a href="/pages/prediction.html" aria-current="page">Konfigurasi Prediksi</a>
-        <a href="/pages/evaluation.html">Grafik & Evaluasi</a>
+        <a href="/pages/prediction.html" aria-current="page">Prediksi</a>
+        <a href="/pages/evaluation.html">Evaluasi</a>
         <a href="/pages/interpretation.html">Interpretasi</a>
         <a href="/pages/information.html">Informasi</a>
       </nav>
+      <div class="header-status">
+        <span class="status-dot"></span>
+        <span>Sistem aktif</span>
+      </div>
     </div>
   </header>
 
   <main>
-    <header class="page-header">
-      <span class="page-tag">🎯 Proyeksi Konsentrasi Polutan</span>
-      <h1>Konfigurasi Prediksi Kualitas Udara</h1>
-      <p class="lead">
-        Pilih kombinasi lokasi stasiun, polutan target, skenario fitur, dan algoritma machine learning untuk menghasilkan proyeksi konsentrasi satu jam ke depan ($t+1$).
-      </p>
-    </header>
+    <!-- Page Header & Breadcrumb (Mockup 1) -->
+    <div class="page-header-row">
+      <div class="page-header-text">
+        <span class="page-tag">Konfigurasi prediksi</span>
+        <h1>Atur kebutuhan prediksi Anda.</h1>
+        <p class="lead">
+          Pilih kombinasi lokasi, polutan, skenario fitur, algoritma, dan periode evaluasi yang tersedia pada sistem.
+        </p>
+      </div>
+      <div class="breadcrumb-badge">
+        <span>NapasLoka</span>
+        <span style="color: #94a3b8;">&rsaquo;</span>
+        <span class="active">Prediksi</span>
+      </div>
+    </div>
 
-    <!-- 2-Column: Form & Selection Summary -->
-    <div class="grid-2" style="align-items: start; margin-bottom: 2rem;">
-      <!-- Column 1: Configuration Form -->
+    <!-- 2-Column: Configuration Form & Model Request Summary -->
+    <div class="grid-2" style="align-items: start; margin-bottom: 2.5rem;">
+      <!-- Column 1: Configuration Form (White Card) -->
       <form id="prediction-form" class="card">
-        <div class="card-header">
-          <div>
-            <h2 class="card-title">Parameter Model & Observasi</h2>
-            <p class="card-subtitle">Pilih dimensi eksperimen yang ingin diproyeksikan.</p>
-          </div>
-          <span class="badge badge-emerald">120 Model Siap</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <span class="page-tag" style="margin-bottom: 0;">Parameter prediksi</span>
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">5 masukan</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.5rem; color: #0f172a;">
+          Tentukan konfigurasi
+        </h2>
+
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          <!-- 01 Lokasi penelitian -->
           <div class="form-group">
-            <label for="select-location">📍 Lokasi Pengamatan</label>
+            <label class="form-label" for="select-location">
+              <span class="form-label-num">01</span> Lokasi penelitian
+            </label>
             <select id="select-location" name="location" class="form-control" required></select>
-            <span class="form-hint">15 stasiun koordinat grid CAMS Jabodetabek</span>
           </div>
 
+          <!-- 02 Jenis polutan -->
           <div class="form-group">
-            <label for="select-pollutant">🧪 Target Polutan</label>
-            <select id="select-pollutant" name="pollutant" class="form-control" required></select>
-            <span class="form-hint">CO (µg/m³) atau CO₂ (ppm)</span>
+            <label class="form-label">
+              <span class="form-label-num">02</span> Jenis polutan
+            </label>
+            <div class="segmented-control" id="pollutant-segmented">
+              <button type="button" class="segmented-btn" data-val="co">CO</button>
+              <button type="button" class="segmented-btn active" data-val="co2">CO₂</button>
+            </div>
+            <!-- Hidden native select for form & API binding -->
+            <select id="select-pollutant" name="pollutant" style="display: none;" required>
+              <option value="co">CO</option>
+              <option value="co2" selected>CO₂</option>
+            </select>
           </div>
 
+          <!-- 03 Skenario penggunaan fitur -->
           <div class="form-group">
-            <label for="select-scenario">📐 Skenario Fitur</label>
+            <label class="form-label" for="select-scenario">
+              <span class="form-label-num">03</span> Skenario penggunaan fitur
+            </label>
             <select id="select-scenario" name="scenario" class="form-control" required></select>
-            <span class="form-hint">Skenario 1 (3 Lag Polutan) atau Skenario 2 (+ Meteorologi)</span>
+            <span class="form-hint" id="scenario-hint-text">Fitur lag polutan digabungkan dengan kondisi meteorologis.</span>
           </div>
 
+          <!-- 04 Algoritma prediksi -->
           <div class="form-group">
-            <label for="select-algorithm">🤖 Algoritma Machine Learning</label>
+            <label class="form-label" for="select-algorithm">
+              <span class="form-label-num">04</span> Algoritma prediksi
+            </label>
             <select id="select-algorithm" name="algorithm" class="form-control" required></select>
-            <span class="form-hint">Model berbasis ensemble gradient boosted trees</span>
           </div>
 
+          <!-- 05 Rentang waktu evaluasi -->
           <div class="form-group">
-            <label for="input-ref-time">⏱️ Titik Waktu Acuan Historis (Opsional)</label>
-            <input id="input-ref-time" name="reference_datetime" type="datetime-local" class="form-control">
-            <span class="form-hint">Biarkan kosong untuk otomatis memprediksi dari observasi terbaru ($t$)</span>
+            <label class="form-label" for="eval-start-date">
+              <span class="form-label-num">05</span> Rentang waktu evaluasi
+            </label>
+            <div class="date-range-row">
+              <div class="date-input-wrap">
+                <input id="eval-start-date" type="date" class="form-control" value="2026-07-29" min="2026-03-28" max="2026-08-04" title="Tanggal Mulai Evaluasi">
+              </div>
+              <span class="date-arrow">&rarr;</span>
+              <div class="date-input-wrap">
+                <input id="eval-end-date" type="date" class="form-control" value="2026-08-04" min="2026-03-28" max="2026-08-04" title="Tanggal Akhir Evaluasi">
+              </div>
+            </div>
+            <!-- Hidden reference datetime for backend inference -->
+            <input id="input-ref-time" name="reference_datetime" type="hidden">
           </div>
         </div>
 
-        <button id="btn-submit-prediction" type="submit" class="btn btn-primary btn-block">
-          <span>⚡ Proses Prediksi</span>
-        </button>
+        <div class="form-footer-bar">
+          <span class="form-footer-note">
+            <span>&#9432;</span> Koordinat dan nilai konsentrasi tidak dimasukkan secara manual.
+          </span>
+          <button id="btn-submit-prediction" type="submit" class="btn btn-primary">
+            <span>Proses prediksi &rarr;</span>
+          </button>
+        </div>
       </form>
 
-      <!-- Column 2: Selection Summary Card -->
-      <aside class="card" style="background: #ffffff; border-left: 4px solid var(--color-primary);">
-        <div class="card-header">
-          <div>
-            <h2 class="card-title">Ringkasan Konfigurasi</h2>
-            <p class="card-subtitle">Spesifikasi model terpilih dari registry artefak.</p>
-          </div>
-          <span class="badge badge-blue" id="summary-badge">Model Siap</span>
-        </div>
+      <!-- Column 2: Model Request Summary (Deep Navy Card #0c1445) -->
+      <aside class="navy-card">
+        <span class="navy-pill" style="margin-bottom: 0.75rem;">Ringkasan pilihan</span>
+        <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.25rem;">Permintaan model</h2>
 
-        <div class="summary-list">
-          <div class="summary-item">
-            <span class="summary-label">Nama Stasiun</span>
-            <span class="summary-val" id="summary-location-name">-</span>
+        <div style="margin-bottom: 1.5rem;">
+          <div class="navy-table-row">
+            <span class="navy-table-label">Lokasi</span>
+            <span class="navy-table-value" id="summary-location-name">Jakarta Pusat</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Wilayah Administratif</span>
-            <span class="summary-val" id="summary-region">-</span>
+          <div class="navy-table-row">
+            <span class="navy-table-label">Target</span>
+            <span class="navy-table-value" id="summary-pollutant">CO₂ &middot; ppm</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Koordinat Spasial</span>
-            <span class="summary-val" id="summary-coords">-</span>
+          <div class="navy-table-row">
+            <span class="navy-table-label">Fitur</span>
+            <span class="navy-table-value" id="summary-scenario">Polutan + meteorologi</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Target Polutan</span>
-            <span class="summary-val" id="summary-pollutant">-</span>
+          <div class="navy-table-row">
+            <span class="navy-table-label">Model</span>
+            <span class="navy-table-value" id="summary-algorithm">LightGBM</span>
           </div>
-          <div class="summary-item">
-            <span class="summary-label">Satuan Konsentrasi</span>
-            <span class="summary-val" id="summary-unit">-</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Skenario Fitur</span>
-            <span class="summary-val" id="summary-scenario">-</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Jumlah Fitur Masukan</span>
-            <span class="summary-val" id="summary-features-count">-</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Algoritma Terpilih</span>
-            <span class="summary-val" id="summary-algorithm">-</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Horizon Prediksi</span>
-            <span class="summary-val">1 Jam Berikutnya ($t+1$)</span>
-          </div>
-          <div class="summary-item">
-            <span class="summary-label">Sumber Data</span>
-            <span class="summary-val">CAMS Reanalysis & Open-Meteo</span>
+          <div class="navy-table-row">
+            <span class="navy-table-label">Horizon</span>
+            <span class="navy-table-value">1 jam berikutnya</span>
           </div>
         </div>
 
-        <div style="margin-top: 1.25rem; padding: 0.75rem; background: #f8fafc; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--color-text-light);">
-          ℹ️ Sistem NapasLoka tidak memerlukan input sensor manual; seluruh lag masukan dibentuk otomatis oleh pipeline backend.
+        <div class="navy-note-box">
+          <span style="font-size: 1rem;">&#9432;</span>
+          <span>Sistem memilih artefak model yang sesuai dengan kombinasi masukan pengguna.</span>
         </div>
+
+        <!-- Hidden elements for test compatibility -->
+        <span id="summary-region" style="display:none;"></span>
+        <span id="summary-coords" style="display:none;"></span>
+        <span id="summary-unit" style="display:none;"></span>
+        <span id="summary-features-count" style="display:none;"></span>
       </aside>
     </div>
 
-    <!-- Feedback / Status Container -->
+    <!-- Feedback & Result Container -->
     <div id="prediction-status-container" style="display: none; margin-bottom: 1.5rem;"></div>
 
-    <!-- Prediction Result Section -->
-    <section id="prediction-result-section" style="display: none;" aria-labelledby="result-heading">
-      <h2 id="result-heading" style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1rem; color: var(--color-text-main);">
-        Hasil Prediksi Satu Jam Berikutnya
-      </h2>
-
-      <!-- Hero Prediction Card -->
-      <article class="prediction-hero-card">
+    <!-- Prediction Result Panel (Appears dynamically upon clicking Proses Prediksi) -->
+    <section id="prediction-result-section" style="display: none; margin-bottom: 3rem;" aria-labelledby="result-heading">
+      <div class="card" style="border-left: 4px solid var(--color-primary); background: #ffffff;">
         <div class="card-header">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-              <span class="badge badge-emerald">Hasil Prediksi Berhasil</span>
-              <span id="res-target-time-badge" class="badge badge-gray">-</span>
-            </div>
-            <h3 id="res-pollutant-title" style="font-size: 1.25rem; font-weight: 700; margin-top: 0.5rem; color: var(--color-text-main);">
-              Konsentrasi Polutan
-            </h3>
+            <span class="page-tag" id="res-pollutant-title">Hasil Prediksi Polutan</span>
+            <h2 id="result-heading" style="font-size: 1.35rem; font-weight: 700; margin-top: 0.25rem;">
+              Estimasi Konsentrasi 1 Jam ke Depan
+            </h2>
           </div>
-          <div id="res-assessment-badge" class="badge badge-emerald" style="font-size: 0.9rem; padding: 0.35rem 0.85rem;">
-            Baik
-          </div>
+          <span class="page-tag" id="res-assessment-badge" style="background: #eff6ff; color: #1d4ed8; font-weight: 700;">
+            Kategori
+          </span>
         </div>
 
-        <!-- Big Prediction Value Box -->
-        <div class="prediction-main-box">
-          <span id="res-predicted-val" class="prediction-big-val">0.00</span>
-          <span id="res-unit" class="prediction-unit">µg/m³</span>
+        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
+          <span id="res-predicted-val" style="font-size: 3rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">-</span>
+          <span id="res-unit" style="font-size: 1.25rem; font-weight: 600; color: #64748b;">-</span>
         </div>
 
-        <p id="res-assessment-desc" style="font-size: 0.95rem; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 1.25rem;">
-          Memuat penilaian kualitas udara...
-        </p>
+        <p id="res-assessment-desc" style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem; line-height: 1.5;">-</p>
 
-        <!-- Metric Comparison Pills -->
-        <div class="comparison-pills-row">
-          <div class="comparison-pill">
-            <span class="comparison-pill-label">Observasi Terakhir (t)</span>
-            <span id="res-latest-val" class="comparison-pill-value">0.00 µg/m³</span>
-            <span id="res-latest-time" style="font-size: 0.75rem; color: var(--color-text-light);">-</span>
-          </div>
-
-          <div class="comparison-pill">
-            <span class="comparison-pill-label">Selisih Kenaikan / Penurunan</span>
-            <span id="res-delta-val" class="comparison-pill-value">+0.00 µg/m³</span>
-            <span id="res-delta-pct" style="font-size: 0.75rem; color: var(--color-text-light);">(0.0%)</span>
-          </div>
-
-          <div class="comparison-pill">
-            <span class="comparison-pill-label">Tren Dinamika Arah</span>
-            <div style="margin-top: 0.2rem;">
-              <span id="res-trend-badge" class="trend-badge trend-stable">➡️ Stabil</span>
-            </div>
-          </div>
-
-          <div class="comparison-pill">
-            <span class="comparison-pill-label" id="res-counterpart-label">Pembanding Counterpart</span>
-            <span id="res-counterpart-val" class="comparison-pill-value">-</span>
-            <span id="res-counterpart-delta" style="font-size: 0.75rem; color: var(--color-text-light);">-</span>
-          </div>
-        </div>
-
-        <!-- Feature Inputs Section -->
-        <div style="margin-top: 1.75rem; border-top: 1px solid var(--color-border); padding-top: 1.25rem;">
-          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--color-text-main); margin-bottom: 0.35rem;">
-            Vektor Masukan Fitur Historis ($t-1, t-2, t-3$)
-          </h4>
-          <p style="font-size: 0.8rem; color: var(--color-text-light); margin-bottom: 0.75rem;">
-            Nilai-nilai observasi aktual yang digunakan sebagai masukan input model untuk menghasilkan prediksi ini:
-          </p>
-          <div id="res-feature-chips" class="feature-chips-grid"></div>
-        </div>
-
-        <!-- Quick Links to Evaluation and Interpretation -->
-        <div style="display: flex; gap: 1rem; margin-top: 1.75rem; flex-wrap: wrap; border-top: 1px solid var(--color-border-subtle); padding-top: 1.25rem;">
-          <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-secondary" style="flex: 1; min-width: 200px;">
-            📊 Lihat Grafik & Evaluasi Model
-            <span aria-hidden="true">→</span>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-primary">
+            Lihat Grafik & Evaluasi &rarr;
           </a>
-          <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn btn-secondary" style="flex: 1; min-width: 200px;">
-            🔍 Lihat Interpretasi SHAP
-            <span aria-hidden="true">→</span>
+          <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
+            Telusuri Kontribusi SHAP &rarr;
           </a>
         </div>
-      </article>
+
+        <!-- Hidden result holders for JS/test compatibility -->
+        <span id="res-target-time-badge" style="display:none;"></span>
+        <span id="res-latest-val" style="display:none;"></span>
+        <span id="res-latest-time" style="display:none;"></span>
+        <span id="res-delta-val" style="display:none;"></span>
+        <span id="res-delta-pct" style="display:none;"></span>
+        <span id="res-trend-badge" style="display:none;"></span>
+        <span id="res-counterpart-label" style="display:none;"></span>
+        <span id="res-counterpart-val" style="display:none;"></span>
+        <span id="res-counterpart-delta" style="display:none;"></span>
+        <div id="res-feature-chips" style="display:none;"></div>
+      </div>
     </section>
   </main>
 
+  <!-- Site Footer (Deep Navy from Mockup 1) -->
   <footer class="site-footer">
-    <div class="footer-content">
-      <div>
-        <strong>Sistem NapasLoka</strong> — Platform Prediksi Kualitas Udara (CO & CO₂) Berbasis Machine Learning.
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka" class="footer-logo">
+        <div class="footer-brand-text">
+          <h4>NapasLoka</h4>
+          <p>Sistem prediksi polutan Jabodetabek</p>
+        </div>
       </div>
-      <div>
-        Wilayah Jabodetabek · © <span data-current-year></span>
+      <div class="footer-info">
+        <div class="footer-info-primary">Prediksi CO dan CO₂, satu jam berikutnya</div>
+        <div class="footer-info-secondary">Data berbasis model atmosfer</div>
       </div>
     </div>
   </footer>
 
+  <script src="/js/app.js"></script>
   <script src="/js/api.js"></script>
-  <script src="/js/app.js" defer></script>
-  <script src="/js/prediction.js" defer></script>
+  <script src="/js/prediction.js"></script>
 </body>
 </html>
