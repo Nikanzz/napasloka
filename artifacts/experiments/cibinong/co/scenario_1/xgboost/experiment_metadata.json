@@ -1,0 +1,28 @@
+{
+  "experiment_id": "cibinong__co__scenario_1__xgboost",
+  "location": "cibinong",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:14:04.228563+00:00",
+  "metrics": {
+    "mae": 80.56759754964952,
+    "rmse": 121.9459884785203,
+    "mape": 6.85452555802921,
+    "r2": 0.9766019128236052,
+    "training_time_seconds": 2.5037125999988348,
+    "prediction_time_seconds": 0.004965199999787728
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

@@ -1,0 +1,28 @@
+{
+  "experiment_id": "metland-cyberpuri__co__scenario_1__lightgbm",
+  "location": "metland-cyberpuri",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:07:04.412715+00:00",
+  "metrics": {
+    "mae": 161.66653186812374,
+    "rmse": 285.17967722060934,
+    "mape": 7.991206911893181,
+    "r2": 0.9724259600077088,
+    "training_time_seconds": 4.5677998999999545,
+    "prediction_time_seconds": 0.020107100001041545
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

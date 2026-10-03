@@ -1,0 +1,28 @@
+{
+  "experiment_id": "daerah-pelabuhan-tanjung-priuk__co__scenario_1__xgboost",
+  "location": "daerah-pelabuhan-tanjung-priuk",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:01:40.228514+00:00",
+  "metrics": {
+    "mae": 79.6637640186505,
+    "rmse": 123.57375227987781,
+    "mape": 7.411517470764946,
+    "r2": 0.9794962071341936,
+    "training_time_seconds": 2.7760763999995106,
+    "prediction_time_seconds": 0.004909500001303968
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

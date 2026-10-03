@@ -1,0 +1,40 @@
+{
+  "experiment_id": "kaliabang-tengah__co__scenario_2__lightgbm",
+  "location": "kaliabang-tengah",
+  "pollutant": "co",
+  "scenario": "scenario_2",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:12:28.800228+00:00",
+  "metrics": {
+    "mae": 104.49183173336614,
+    "rmse": 172.60239538865423,
+    "mape": 8.360851289393143,
+    "r2": 0.976272135906896,
+    "training_time_seconds": 6.6916707000000315,
+    "prediction_time_seconds": 0.019625199998699827
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h",
+    "temperature_2m_lag_3h",
+    "temperature_2m_lag_2h",
+    "temperature_2m_lag_1h",
+    "relative_humidity_2m_lag_3h",
+    "relative_humidity_2m_lag_2h",
+    "relative_humidity_2m_lag_1h",
+    "rain_lag_3h",
+    "rain_lag_2h",
+    "rain_lag_1h",
+    "wind_speed_100m_lag_3h",
+    "wind_speed_100m_lag_2h",
+    "wind_speed_100m_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

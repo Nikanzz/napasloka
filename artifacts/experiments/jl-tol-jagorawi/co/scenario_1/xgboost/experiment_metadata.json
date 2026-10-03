@@ -1,0 +1,28 @@
+{
+  "experiment_id": "jl-tol-jagorawi__co__scenario_1__xgboost",
+  "location": "jl-tol-jagorawi",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:10:01.723374+00:00",
+  "metrics": {
+    "mae": 100.43537238296798,
+    "rmse": 146.8023628697427,
+    "mape": 7.704176164779803,
+    "r2": 0.9783455212032787,
+    "training_time_seconds": 3.0802808000007644,
+    "prediction_time_seconds": 0.006812499999796273
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

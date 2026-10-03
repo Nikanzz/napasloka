@@ -1,0 +1,28 @@
+{
+  "experiment_id": "tmii__co2__scenario_1__xgboost",
+  "location": "tmii",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:06:25.700476+00:00",
+  "metrics": {
+    "mae": 2.1188158567176445,
+    "rmse": 3.094093053646161,
+    "mape": 0.44041691472661043,
+    "r2": 0.9789721834409807,
+    "training_time_seconds": 1.7938847000004898,
+    "prediction_time_seconds": 0.005001300000003539
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

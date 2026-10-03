@@ -72,8 +72,8 @@ class MemoryCache:
             }
 
 
-# Global model cache (can hold up to 128 models in memory)
-model_cache = MemoryCache(maxsize=128)
+# Global model cache (can hold up to 16 models in memory)
+model_cache = MemoryCache(maxsize=16)
 
 # Global test predictions cache (holds parsed DataFrames for fast slicing)
-predictions_cache = MemoryCache(maxsize=128)
+predictions_cache = MemoryCache(maxsize=16)

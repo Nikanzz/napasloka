@@ -1,0 +1,28 @@
+{
+  "experiment_id": "taman-kamal__co__scenario_1__xgboost",
+  "location": "taman-kamal",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T09:59:28.048366+00:00",
+  "metrics": {
+    "mae": 98.0347594282335,
+    "rmse": 183.4034338793422,
+    "mape": 7.735801046553156,
+    "r2": 0.9730751175945312,
+    "training_time_seconds": 8.158562799999345,
+    "prediction_time_seconds": 0.005469600000651553
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

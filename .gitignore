@@ -15,12 +15,12 @@ data/raw/weather/*
 data/processed/*
 !data/processed/.gitkeep
 
-artifacts/experiments/*
+#artifacts/experiments/*
 !artifacts/experiments/.gitkeep
 artifacts/registry/*.json
 !artifacts/registry/.gitkeep
 
-*.joblib
+#*.joblib
 *.pkl
 *.ubj
 *.model

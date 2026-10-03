@@ -1,0 +1,28 @@
+{
+  "experiment_id": "jl-tol-jagorawi__co2__scenario_1__lightgbm",
+  "location": "jl-tol-jagorawi",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:10:39.162369+00:00",
+  "metrics": {
+    "mae": 1.883070835178542,
+    "rmse": 2.6268638806891387,
+    "mape": 0.3981972507763481,
+    "r2": 0.9816429757812506,
+    "training_time_seconds": 4.732580299998517,
+    "prediction_time_seconds": 0.019201699999030097
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

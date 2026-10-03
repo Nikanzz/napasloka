@@ -1,0 +1,28 @@
+{
+  "experiment_id": "pelabuhan-muara-baru__co2__scenario_1__lightgbm",
+  "location": "pelabuhan-muara-baru",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:01:14.976214+00:00",
+  "metrics": {
+    "mae": 1.3339471821364817,
+    "rmse": 1.8336674398035062,
+    "mape": 0.2889461738890633,
+    "r2": 0.9804471072481761,
+    "training_time_seconds": 5.809803300000567,
+    "prediction_time_seconds": 0.020410199998877943
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

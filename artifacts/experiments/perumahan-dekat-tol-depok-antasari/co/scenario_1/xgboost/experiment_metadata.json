@@ -1,0 +1,28 @@
+{
+  "experiment_id": "perumahan-dekat-tol-depok-antasari__co__scenario_1__xgboost",
+  "location": "perumahan-dekat-tol-depok-antasari",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:04:49.764169+00:00",
+  "metrics": {
+    "mae": 186.5277992756507,
+    "rmse": 324.8406324018502,
+    "mape": 8.682032357198098,
+    "r2": 0.9707234646994156,
+    "training_time_seconds": 2.831528000000617,
+    "prediction_time_seconds": 0.004427099998792983
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

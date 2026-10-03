@@ -1,0 +1,28 @@
+{
+  "experiment_id": "kaliabang-tengah__co__scenario_1__xgboost",
+  "location": "kaliabang-tengah",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "xgboost",
+  "completed_at": "2026-10-01T10:12:00.579545+00:00",
+  "metrics": {
+    "mae": 106.40173763889867,
+    "rmse": 167.2638589103967,
+    "mape": 9.041583973218778,
+    "r2": 0.9777172271480217,
+    "training_time_seconds": 2.590324499999042,
+    "prediction_time_seconds": 0.004477799999222043
+  },
+  "best_params": {
+    "n_estimators": 300,
+    "max_depth": 6,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

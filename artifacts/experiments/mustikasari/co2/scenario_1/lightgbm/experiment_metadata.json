@@ -1,0 +1,28 @@
+{
+  "experiment_id": "mustikasari__co2__scenario_1__lightgbm",
+  "location": "mustikasari",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:13:39.912579+00:00",
+  "metrics": {
+    "mae": 1.5742003414162413,
+    "rmse": 2.198758259757488,
+    "mape": 0.33669048174419053,
+    "r2": 0.9824108062199948,
+    "training_time_seconds": 4.2994612000002235,
+    "prediction_time_seconds": 0.019048099999054102
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

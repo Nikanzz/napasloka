@@ -1,0 +1,28 @@
+{
+  "experiment_id": "cibinong__co__scenario_1__lightgbm",
+  "location": "cibinong",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:14:10.458210+00:00",
+  "metrics": {
+    "mae": 77.22476355549196,
+    "rmse": 114.79819293902182,
+    "mape": 6.63295947951226,
+    "r2": 0.9792644565758359,
+    "training_time_seconds": 4.851751199999853,
+    "prediction_time_seconds": 0.01981750000049942
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}

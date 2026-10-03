@@ -1,0 +1,28 @@
+{
+  "experiment_id": "petamburan-perkantoran-transjakarta__co__scenario_1__lightgbm",
+  "location": "petamburan-perkantoran-transjakarta",
+  "pollutant": "co",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "completed_at": "2026-10-01T10:02:50.557984+00:00",
+  "metrics": {
+    "mae": 179.26547341925647,
+    "rmse": 291.55481065731624,
+    "mape": 8.157562084603741,
+    "r2": 0.9754527532012466,
+    "training_time_seconds": 4.392720800000461,
+    "prediction_time_seconds": 0.020561499999530497
+  },
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h"
+  ],
+  "n_train_samples": 12433,
+  "n_test_samples": 3109
+}
