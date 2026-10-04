@@ -49,14 +49,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const mathPosSum = document.getElementById("math-pos-sum");
   const mathNegSum = document.getElementById("math-neg-sum");
   const mathPredVal = document.getElementById("math-pred-val");
-  const additivityStatus = document.getElementById("additivity-status-text");
+  const additivityStatus = document.getElementById("additivity-status-text") || document.getElementById("additivity-status");
 
   // Global feature importance elements
   const globalImportanceTbody = document.getElementById("global-importance-tbody");
 
   // Quick navigation buttons
-  const btnGotoPrediction = document.getElementById("btn-goto-prediction");
-  const btnGotoEvaluation = document.getElementById("btn-goto-evaluation");
+  const btnGotoPrediction = document.getElementById("btn-goto-prediction") || document.getElementById("btn-interp-goto-prediction");
+  const btnGotoEvaluation = document.getElementById("btn-goto-evaluation") || document.getElementById("btn-interp-goto-evaluation");
 
   let appOptions = null;
 
@@ -70,30 +70,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showError(message) {
-    errorMsg.textContent = message;
-    errorBox.style.display = "block";
-    errorBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (errorMsg) errorMsg.textContent = message;
+    if (errorBox) {
+      errorBox.style.display = "block";
+      errorBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 
   function hideError() {
-    errorBox.style.display = "none";
+    if (errorBox) errorBox.style.display = "none";
   }
 
   function setLoading(loading) {
-    if (loading) {
-      btnSubmit.disabled = true;
-      btnSpinner.style.display = "inline-block";
-      btnText.textContent = "Menghitung TreeSHAP...";
+    if (btnSubmit) btnSubmit.disabled = loading;
+    if (btnSpinner) btnSpinner.style.display = loading ? "inline-block" : "none";
+    if (btnText) btnText.textContent = loading ? "Menghitung TreeSHAP..." : "Hitung Interpretasi SHAP";
+    if (loading && shapBarsList) {
       shapBarsList.innerHTML = `
-        <div style="text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
-          <div class="spinner" style="border-color: rgba(15,118,110,0.3); border-top-color: var(--color-primary); width: 1.75rem; height: 1.75rem; margin-bottom: 0.75rem;"></div>
+        <div style="text-align: center; padding: 2.5rem 1rem; color: var(--color-text-muted);">
+          <div class="spinner" style="border: 2px solid #cbd5e1; border-top-color: var(--color-primary); width: 1.75rem; height: 1.75rem; border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.75rem auto;"></div>
           <div>Menghitung dekomposisi TreeSHAP untuk observasi terpilih...</div>
         </div>
       `;
-    } else {
-      btnSubmit.disabled = false;
-      btnSpinner.style.display = "none";
-      btnText.textContent = "Hitung Interpretasi SHAP";
     }
   }
 
@@ -102,40 +100,54 @@ document.addEventListener("DOMContentLoaded", async () => {
     appOptions = await window.NapasLokaApi.getOptions();
 
     // Populate Location selector
-    selectLoc.innerHTML = "";
-    appOptions.locations.forEach((loc) => {
-      const opt = document.createElement("option");
-      opt.value = loc.id;
-      opt.textContent = `${loc.name} (${loc.region || "Jabodetabek"})`;
-      selectLoc.appendChild(opt);
-    });
+    if (selectLoc && appOptions.locations) {
+      selectLoc.innerHTML = "";
+      appOptions.locations.forEach((loc) => {
+        const opt = document.createElement("option");
+        opt.value = loc.id;
+        opt.textContent = `${loc.name} (${loc.region || "Jabodetabek"})`;
+        selectLoc.appendChild(opt);
+      });
+    }
 
     // Check URL search parameters
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("location") && appOptions.locations.some((l) => l.id === urlParams.get("location"))) {
-      selectLoc.value = urlParams.get("location");
+    if (urlParams.has("location") && selectLoc) {
+      const loc = urlParams.get("location");
+      if (selectLoc.querySelector(`option[value="${loc}"]`)) {
+        selectLoc.value = loc;
+      }
     }
-    if (urlParams.has("pollutant")) {
+    if (urlParams.has("pollutant") && selectPol) {
       const p = urlParams.get("pollutant").toLowerCase();
-      if (["co", "co2"].includes(p)) selectPol.value = p;
+      if (selectPol.querySelector(`option[value="${p}"]`)) selectPol.value = p;
     }
-    if (urlParams.has("scenario")) {
+    if (urlParams.has("scenario") && selectScen) {
       const s = urlParams.get("scenario").toLowerCase();
-      if (["scenario_1", "scenario_2"].includes(s)) selectScen.value = s;
+      if (selectScen.querySelector(`option[value="${s}"]`)) selectScen.value = s;
     }
-    if (urlParams.has("algorithm")) {
+    if (urlParams.has("algorithm") && selectAlgo) {
       const a = urlParams.get("algorithm").toLowerCase();
-      if (["lightgbm", "xgboost"].includes(a)) selectAlgo.value = a;
+      if (selectAlgo.querySelector(`option[value="${a}"]`)) selectAlgo.value = a;
     }
-    if (urlParams.has("top_k")) {
+    if (urlParams.has("top_k") && selectTopK) {
       const k = urlParams.get("top_k");
       if (["5", "10", "15"].includes(k)) selectTopK.value = k;
     }
-    if (urlParams.has("datetime")) {
+    if (urlParams.has("datetime") && inputDatetime) {
       const dt = urlParams.get("datetime");
-      // Format to datetime-local compatible format YYYY-MM-DDTHH:mm
       try {
         const d = new Date(dt);
+        if (!isNaN(d.getTime())) {
+          inputDatetime.value = d.toISOString().slice(0, 16);
+        }
+      } catch {
+        // ignore format error
+      }
+    } else if (urlParams.has("end_date") && inputDatetime) {
+      const ed = urlParams.get("end_date");
+      try {
+        const d = new Date(`${ed}T23:00:00`);
         if (!isNaN(d.getTime())) {
           inputDatetime.value = d.toISOString().slice(0, 16);
         }
@@ -149,33 +161,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // 2. Filter toggle accordion
-  let filtersVisible = true;
-  btnToggleFilters.addEventListener("click", () => {
-    filtersVisible = !filtersVisible;
-    filterInputsGrid.style.display = filtersVisible ? "grid" : "none";
-    btnToggleFilters.textContent = filtersVisible ? "Sembunyikan Filter" : "Ubah Parameter";
-    btnToggleFilters.setAttribute("aria-expanded", String(filtersVisible));
-  });
+  if (btnToggleFilters && filterInputsGrid) {
+    let filtersVisible = true;
+    btnToggleFilters.addEventListener("click", () => {
+      filtersVisible = !filtersVisible;
+      filterInputsGrid.style.display = filtersVisible ? "grid" : "none";
+      btnToggleFilters.textContent = filtersVisible ? "Sembunyikan Filter" : "Ubah Parameter";
+      btnToggleFilters.setAttribute("aria-expanded", String(filtersVisible));
+    });
+  }
 
   // 3. Clear datetime to use latest observation
-  btnUseLatest.addEventListener("click", () => {
-    inputDatetime.value = "";
-    loadInterpretation();
-  });
+  if (btnUseLatest) {
+    btnUseLatest.addEventListener("click", () => {
+      if (inputDatetime) inputDatetime.value = "";
+      loadInterpretation();
+    });
+  }
 
   // 4. Toggle Plotly interactive chart
-  btnTogglePlotly.addEventListener("click", () => {
-    const isHidden = plotlyWrapper.style.display === "none";
-    plotlyWrapper.style.display = isHidden ? "block" : "none";
-    btnTogglePlotly.textContent = isHidden ? "Sembunyikan Plotly" : "Tampilkan Plotly";
-    if (isHidden && lastChartSeries) {
-      renderPlotlyChart(lastChartSeries, lastPollutantUnit);
-    }
-  });
+  if (btnTogglePlotly && plotlyWrapper) {
+    btnTogglePlotly.addEventListener("click", () => {
+      const isHidden = plotlyWrapper.style.display === "none";
+      plotlyWrapper.style.display = isHidden ? "block" : "none";
+      btnTogglePlotly.textContent = isHidden ? "Sembunyikan Plotly" : "Tampilkan Plotly";
+      if (isHidden && lastChartSeries) {
+        renderPlotlyChart(lastChartSeries, lastPollutantUnit);
+      }
+    });
+  }
 
   // 5. Render Plotly Horizontal Bar Chart
   function renderPlotlyChart(series, unit) {
-    if (!window.Plotly || !series || !series.features || series.features.length === 0) return;
+    if (!window.Plotly || !plotlyContainer || !series || !series.features || series.features.length === 0) return;
 
     const trace = {
       type: "bar",
@@ -224,14 +242,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     hideError();
     setLoading(true);
 
-    const location = selectLoc.value;
-    const pollutant = selectPol.value;
-    const scenario = selectScen.value;
-    const algorithm = selectAlgo.value;
-    const topK = parseInt(selectTopK.value, 10) || 5;
+    const location = selectLoc ? selectLoc.value : "mustikasari";
+    const pollutant = selectPol ? selectPol.value : "co";
+    const scenario = selectScen ? selectScen.value : "scenario_2";
+    const algorithm = selectAlgo ? selectAlgo.value : "lightgbm";
+    const topK = selectTopK ? (parseInt(selectTopK.value, 10) || 5) : 5;
 
     let refDatetime = null;
-    if (inputDatetime.value) {
+    if (inputDatetime && inputDatetime.value) {
       try {
         refDatetime = new Date(inputDatetime.value).toISOString();
       } catch {
@@ -241,8 +259,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // Update Quick Links query parameters
     const queryParams = `?location=${encodeURIComponent(location)}&pollutant=${encodeURIComponent(pollutant)}&scenario=${encodeURIComponent(scenario)}&algorithm=${encodeURIComponent(algorithm)}`;
-    btnGotoPrediction.href = `/pages/prediction.html${queryParams}`;
-    btnGotoEvaluation.href = `/pages/evaluation.html${queryParams}`;
+    if (btnGotoPrediction) btnGotoPrediction.href = `/pages/prediction.html${queryParams}`;
+    if (btnGotoEvaluation) btnGotoEvaluation.href = `/pages/evaluation.html${queryParams}`;
 
     try {
       const payload = {
@@ -257,128 +275,146 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data = await window.NapasLokaApi.postInterpretation(payload);
 
       // A. Update Active Prediction Reference Banner (Mockup 4)
-      refSummaryText.textContent = `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}`;
-      refPredVal.textContent = formatNumber(data.predicted_value, 1);
-      refPredUnit.textContent = data.pollutant_unit;
-      refModelBadge.textContent = `${data.algorithm_label} · ${data.scenario_label}`;
+      if (refSummaryText) {
+        refSummaryText.textContent = `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}`;
+      }
+      if (refPredVal) refPredVal.textContent = formatNumber(data.predicted_value, 1);
+      if (refPredUnit) refPredUnit.textContent = data.pollutant_unit;
+      if (refModelBadge) refModelBadge.textContent = `${data.algorithm_label} · ${data.scenario_label}`;
       if (refBaseValuePill) {
         refBaseValuePill.innerHTML = `Base E[f(X)]: <strong>${formatNumber(data.base_value, 1)} ${data.pollutant_unit}</strong>`;
       }
 
       // B. Update Cara Membaca & Reading Guide
-      highlightFindingDesc.textContent = `${data.top_contributor.label} menjadi fitur dengan kontribusi terbesar terhadap prediksi yang dipilih.`;
-      badgeTopKCount.textContent = `${data.local_contributions.length} fitur utama`;
+      if (highlightFindingDesc && data.top_contributor) {
+        highlightFindingDesc.textContent = `${data.top_contributor.label} menjadi fitur dengan kontribusi terbesar terhadap prediksi yang dipilih.`;
+      }
+      if (badgeTopKCount && data.local_contributions) {
+        badgeTopKCount.textContent = `${data.local_contributions.length} fitur utama`;
+      }
 
       // C. Render Custom Visual Bars (Matching Mockup 4)
-      shapBarsList.innerHTML = "";
-      const maxMagnitude = Math.max(...data.local_contributions.map((c) => c.impact_magnitude), 0.01);
+      if (shapBarsList) {
+        shapBarsList.innerHTML = "";
+        const maxMagnitude = Math.max(...data.local_contributions.map((c) => c.impact_magnitude), 0.01);
 
-      data.local_contributions.forEach((item) => {
-        const row = document.createElement("div");
-        row.className = "shap-item-row";
+        data.local_contributions.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "shap-item-row";
 
-        const widthPct = Math.min(100, Math.max(6, (item.impact_magnitude / maxMagnitude) * 100));
-        const sign = item.shap_value > 0 ? "+" : "";
-        const formattedVal = `${sign}${formatNumber(item.shap_value, 1)}`;
-        const directionClass = item.direction === "positive" ? "positive" : "negative";
+          const widthPct = Math.min(100, Math.max(6, (item.impact_magnitude / maxMagnitude) * 100));
+          const sign = item.shap_value > 0 ? "+" : "";
+          const formattedVal = `${sign}${formatNumber(item.shap_value, 1)}`;
+          const directionClass = item.direction === "positive" ? "positive" : "negative";
 
-        row.innerHTML = `
-          <span class="shap-feature-name">${item.label}</span>
-          <div class="shap-bar-track" title="${item.label}: ${item.direction_label} (${formatNumber(item.percentage_impact, 1)}%)">
-            <div class="shap-bar-fill ${directionClass}" style="width: ${widthPct.toFixed(1)}%;"></div>
-          </div>
-          <span class="shap-val ${directionClass}">${formattedVal}</span>
-        `;
-        shapBarsList.appendChild(row);
-      });
+          row.innerHTML = `
+            <span class="shap-feature-name">${item.label}</span>
+            <div class="shap-bar-track" title="${item.label}: ${item.direction_label} (${formatNumber(item.percentage_impact, 1)}%)">
+              <div class="shap-bar-fill ${directionClass}" style="width: ${widthPct.toFixed(1)}%;"></div>
+            </div>
+            <span class="shap-val ${directionClass}">${formattedVal}</span>
+          `;
+          shapBarsList.appendChild(row);
+        });
+      }
 
       // D. Store Plotly Chart Data & Render if open
       lastChartSeries = data.chart_series;
       lastPollutantUnit = data.pollutant_unit;
-      if (plotlyWrapper.style.display !== "none") {
+      if (plotlyWrapper && plotlyWrapper.style.display !== "none") {
         renderPlotlyChart(lastChartSeries, lastPollutantUnit);
       }
 
       // E. Update Mathematical Additivity Card (E[f(X)] + sum(phi) = f(x))
-      const posSum = data.local_contributions
-        .filter((c) => c.direction === "positive")
-        .reduce((sum, c) => sum + c.shap_value, 0);
+      if (data.local_contributions) {
+        const posSum = data.local_contributions
+          .filter((c) => c.direction === "positive")
+          .reduce((sum, c) => sum + c.shap_value, 0);
 
-      const negSum = data.local_contributions
-        .filter((c) => c.direction === "negative")
-        .reduce((sum, c) => sum + c.shap_value, 0);
+        const negSum = data.local_contributions
+          .filter((c) => c.direction === "negative")
+          .reduce((sum, c) => sum + c.shap_value, 0);
 
-      mathBaseVal.textContent = `${formatNumber(data.base_value, 1)} ${data.pollutant_unit}`;
-      mathPosSum.textContent = `+${formatNumber(posSum, 1)} ${data.pollutant_unit}`;
-      mathNegSum.textContent = `${formatNumber(negSum, 1)} ${data.pollutant_unit}`;
-      mathPredVal.textContent = `${formatNumber(data.predicted_value, 1)} ${data.pollutant_unit}`;
+        if (mathBaseVal) mathBaseVal.textContent = `${formatNumber(data.base_value, 1)} ${data.pollutant_unit}`;
+        if (mathPosSum) mathPosSum.textContent = `+${formatNumber(posSum, 1)} ${data.pollutant_unit}`;
+        if (mathNegSum) mathNegSum.textContent = `${formatNumber(negSum, 1)} ${data.pollutant_unit}`;
+        if (mathPredVal) mathPredVal.textContent = `${formatNumber(data.predicted_value, 1)} ${data.pollutant_unit}`;
 
-      const reconstructed = data.base_value + posSum + negSum;
-      const diff = Math.abs(reconstructed - data.predicted_value);
-      if (diff < 1.0) {
-        additivityStatus.innerHTML = `
-          <strong style="color: #047857;">✓ Konsistensi Aditivitas Terverifikasi:</strong>
-          Rekonstruksi matematis (${formatNumber(data.base_value, 1)} + ${formatNumber(posSum, 1)} ${formatNumber(negSum, 1)} = <strong>${formatNumber(reconstructed, 1)} ${data.pollutant_unit}</strong>)
-          secara eksak mereproduksi nilai keluaran model f(x) (selisih marjinal: ${diff.toFixed(2)} ${data.pollutant_unit}).
-        `;
-      } else {
-        additivityStatus.innerHTML = `
-          <span style="color: #475569;">ℹ️ Ditampilkan untuk ${data.local_contributions.length} fitur teratas dari total fitur skenario.</span>
-        `;
+        if (additivityStatus) {
+          const reconstructed = data.base_value + posSum + negSum;
+          const diff = Math.abs(reconstructed - data.predicted_value);
+          if (diff < 1.0) {
+            additivityStatus.innerHTML = `
+              <strong style="color: #047857;">✓ Konsistensi Aditivitas Terverifikasi:</strong>
+              Rekonstruksi matematis (${formatNumber(data.base_value, 1)} + ${formatNumber(posSum, 1)} ${formatNumber(negSum, 1)} = <strong>${formatNumber(reconstructed, 1)} ${data.pollutant_unit}</strong>)
+              secara eksak mereproduksi nilai keluaran model f(x) (selisih marjinal: ${diff.toFixed(2)} ${data.pollutant_unit}).
+            `;
+          } else {
+            additivityStatus.innerHTML = `
+              <span style="color: #475569;">ℹ️ Ditampilkan untuk ${data.local_contributions.length} fitur teratas dari total fitur skenario.</span>
+            `;
+          }
+        }
       }
 
       // F. Render Global Feature Importance Table
-      globalImportanceTbody.innerHTML = "";
-      if (data.global_importance && data.global_importance.length > 0) {
-        const maxGain = Math.max(...data.global_importance.map((g) => g.gain_importance), 0.001);
+      if (globalImportanceTbody) {
+        globalImportanceTbody.innerHTML = "";
+        if (data.global_importance && data.global_importance.length > 0) {
+          const maxGain = Math.max(...data.global_importance.map((g) => g.gain_importance), 0.001);
 
-        data.global_importance.forEach((g, idx) => {
-          const tr = document.createElement("tr");
-          const widthGain = Math.min(100, Math.max(3, (g.gain_importance / maxGain) * 100));
-          const meanShapText = g.mean_abs_shap !== null ? formatNumber(g.mean_abs_shap, 3) : "-";
+          data.global_importance.forEach((g, idx) => {
+            const tr = document.createElement("tr");
+            const widthGain = Math.min(100, Math.max(3, (g.gain_importance / maxGain) * 100));
+            const meanShapText = g.mean_abs_shap !== null ? formatNumber(g.mean_abs_shap, 3) : "-";
 
-          tr.innerHTML = `
-            <td style="font-weight: 700; color: var(--color-text-light);">${idx + 1}</td>
-            <td>
-              <div style="font-weight: 600; color: var(--color-text-main);">${g.label}</div>
-              <div style="font-size: 0.75rem; color: var(--color-text-light); font-family: monospace;">${g.feature_name}</div>
-            </td>
-            <td style="font-weight: 700; font-family: monospace;">${g.gain_importance.toFixed(4)}</td>
-            <td style="font-weight: 600; font-family: monospace; color: #4338ca;">${meanShapText}</td>
-            <td>
-              <div style="width: 100%; height: 8px; background: #f1f5f9; border-radius: var(--radius-full); overflow: hidden;">
-                <div style="height: 100%; width: ${widthGain.toFixed(1)}%; background: #6366f1; border-radius: var(--radius-full);"></div>
-              </div>
-            </td>
+            tr.innerHTML = `
+              <td style="font-weight: 700; color: var(--color-text-light);">${idx + 1}</td>
+              <td>
+                <div style="font-weight: 600; color: var(--color-text-main);">${g.label}</div>
+                <div style="font-size: 0.75rem; color: var(--color-text-light); font-family: monospace;">${g.feature_name}</div>
+              </td>
+              <td style="font-weight: 700; font-family: monospace;">${g.gain_importance.toFixed(4)}</td>
+              <td style="font-weight: 600; font-family: monospace; color: #4338ca;">${meanShapText}</td>
+              <td>
+                <div style="width: 100%; height: 8px; background: #f1f5f9; border-radius: var(--radius-full); overflow: hidden;">
+                  <div style="height: 100%; width: ${widthGain.toFixed(1)}%; background: #6366f1; border-radius: var(--radius-full);"></div>
+                </div>
+              </td>
+            `;
+            globalImportanceTbody.appendChild(tr);
+          });
+        } else {
+          globalImportanceTbody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--color-text-muted);">
+                Data feature importance global tidak tersedia untuk model ini.
+              </td>
+            </tr>
           `;
-          globalImportanceTbody.appendChild(tr);
-        });
-      } else {
-        globalImportanceTbody.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--color-text-muted);">
-              Data feature importance global tidak tersedia untuk model ini.
-            </td>
-          </tr>
-        `;
+        }
       }
     } catch (err) {
       showError(err.message || "Gagal memproses interpretasi SHAP.");
-      shapBarsList.innerHTML = `
-        <div style="text-align: center; padding: 2rem; color: #ef4444;">
-          Gagal memuat kontribusi fitur. Silakan periksa koneksi backend atau ganti parameter.
-        </div>
-      `;
+      if (shapBarsList) {
+        shapBarsList.innerHTML = `
+          <div style="text-align: center; padding: 2rem; color: #ef4444;">
+            Gagal memuat kontribusi fitur. Silakan periksa koneksi backend atau ganti parameter.
+          </div>
+        `;
+      }
     } finally {
       setLoading(false);
     }
   }
 
   // Form submit handler
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    loadInterpretation();
-  });
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      loadInterpretation();
+    });
+  }
 
   // Automatically execute first load on initialization
   loadInterpretation();

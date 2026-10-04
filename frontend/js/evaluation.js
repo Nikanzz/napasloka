@@ -204,6 +204,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (valMape) valMape.textContent = res.metrics.mape.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     if (valR2) valR2.textContent = res.metrics.r2.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
+    // Update Quality Badges
+    const badgeMae = document.getElementById("badge-mae-quality");
+    const badgeRmse = document.getElementById("badge-rmse-quality");
+    const badgeMape = document.getElementById("badge-mape-quality");
+    const badgeR2 = document.getElementById("badge-r2-quality");
+    const humanSummary = document.getElementById("eval-human-summary");
+    const btnGotoInterp = document.getElementById("btn-eval-goto-interp");
+
+    if (badgeMape && res.metrics.mape !== undefined) {
+      if (res.metrics.mape < 10) {
+        badgeMape.textContent = "Akurasi Tinggi";
+        badgeMape.className = "badge badge-emerald";
+      } else if (res.metrics.mape < 20) {
+        badgeMape.textContent = "Akurasi Baik";
+        badgeMape.className = "badge badge-blue";
+      } else {
+        badgeMape.textContent = "Akurasi Cukup";
+        badgeMape.className = "badge badge-gray";
+      }
+    }
+
+    if (badgeR2 && res.metrics.r2 !== undefined) {
+      if (res.metrics.r2 >= 0.85) {
+        badgeR2.textContent = "Korelasi Sangat Kuat";
+        badgeR2.className = "badge badge-emerald";
+      } else if (res.metrics.r2 >= 0.70) {
+        badgeR2.textContent = "Korelasi Kuat";
+        badgeR2.className = "badge badge-blue";
+      } else {
+        badgeR2.textContent = "Korelasi Moderat";
+        badgeR2.className = "badge badge-gray";
+      }
+    }
+
+    if (humanSummary && res.metrics) {
+      const r2Pct = Math.round(res.metrics.r2 * 100);
+      const mapeVal = res.metrics.mape.toFixed(1);
+      const algoName = res.algorithm_label || "Model terpilih";
+      let compNote = "";
+      if (res.comparison && res.comparison.counterpart_metrics) {
+        const isBetter = res.metrics.rmse <= res.comparison.counterpart_metrics.rmse;
+        const diffRmse = Math.abs(res.metrics.rmse - res.comparison.counterpart_metrics.rmse).toFixed(2);
+        compNote = isBetter
+          ? `Model ${algoName} lebih unggul dibanding ${res.comparison.counterpart_label} dengan margin RMSE ${diffRmse} ${res.pollutant_unit}.`
+          : `Model pembanding (${res.comparison.counterpart_label}) memiliki error lebih rendah sebesar ${diffRmse} ${res.pollutant_unit}.`;
+      }
+      humanSummary.textContent = `${algoName} berhasil menjelaskan ${r2Pct}% variasi polutan (R² = ${res.metrics.r2.toFixed(2)}) dengan deviasi rata-rata ${mapeVal}%. ${compNote}`;
+    }
+
+    if (btnGotoInterp) {
+      const loc = selectLoc ? selectLoc.value : res.location;
+      const pol = selectPol ? selectPol.value : res.pollutant;
+      const scen = selectScen ? selectScen.value : res.scenario;
+      const algo = selectAlgo ? selectAlgo.value : res.algorithm;
+      btnGotoInterp.href = `/pages/interpretation.html?location=${encodeURIComponent(loc)}&pollutant=${encodeURIComponent(pol)}&scenario=${encodeURIComponent(scen)}&algorithm=${encodeURIComponent(algo)}`;
+    }
+
     // 3. Render Plotly Chart
     renderPlotlyChart(res);
 
