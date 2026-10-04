@@ -190,9 +190,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (heroPredVal) heroPredVal.textContent = lastPred.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     }
     if (heroPredUnit) heroPredUnit.textContent = res.pollutant_unit;
-    if (heroLocName) heroLocName.textContent = `📍 ${res.location_name}`;
-    if (heroModelName) heroModelName.textContent = `📈 ${res.algorithm_label} - ${res.scenario_label}`;
-    if (heroTimeStamp) heroTimeStamp.textContent = `⏱️ ${formatDateDisplay(res.time_range.end)} WIB`;
+    if (heroLocName) heroLocName.textContent = res.location_name;
+    if (heroModelName) heroModelName.textContent = `${res.algorithm_label} · ${res.scenario_label}`;
+    if (heroTimeStamp) heroTimeStamp.textContent = `${formatDateDisplay(res.time_range.end)} WIB`;
 
     // 2. 4 Metric Cards (Mockup 3)
     if (valMae) valMae.textContent = res.metrics.mae.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -287,6 +287,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       line: { color: "#0c1445", width: 2 },
       marker: { size: 4, color: "#0c1445" },
       hoverinfo: "x+y",
+      hoverlabel: {
+        bgcolor: "#ffffff",
+        bordercolor: "#cbd5e1",
+        font: { color: "#0c1445", size: 12, family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+      },
     };
 
     const tracePredicted = {
@@ -298,6 +303,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       line: { color: "#2563eb", width: 2, dash: "dash" },
       marker: { size: 4, color: "#2563eb" },
       hoverinfo: "x+y",
+      hoverlabel: {
+        bgcolor: "#ffffff",
+        bordercolor: "#cbd5e1",
+        font: { color: "#2563eb", size: 12, family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+      },
     };
 
     const traces = [traceActual, tracePredicted];
@@ -305,6 +315,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     const layout = {
       margin: { t: 15, r: 15, l: 45, b: 35 },
       hovermode: "x unified",
+      hoverlabel: {
+        bgcolor: "#ffffff",
+        bordercolor: "#cbd5e1",
+        font: {
+          family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+          size: 12,
+          color: "#0f172a",
+        },
+        namelength: -1,
+      },
       showlegend: false,
       xaxis: {
         showgrid: true,

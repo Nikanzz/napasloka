@@ -59,24 +59,32 @@
     <div style="margin-bottom: 1.25rem;">
       <details style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.82rem; color: #475569;">
         <summary style="cursor: pointer; font-weight: 600;">
-          ⚙️ Ubah Parameter Model & Rentang Waktu (Filter)
+          Ubah Parameter Model & Rentang Waktu (Filter)
         </summary>
         <form id="evaluation-filter-form" style="margin-top: 1rem;">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="eval-select-location">📍 Lokasi</label>
+              <label class="form-label" for="eval-select-location">
+                <span class="form-label-num">01</span> Lokasi
+              </label>
               <select id="eval-select-location" name="location" class="form-control" required></select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="eval-select-pollutant">🧪 Polutan</label>
+              <label class="form-label" for="eval-select-pollutant">
+                <span class="form-label-num">02</span> Polutan
+              </label>
               <select id="eval-select-pollutant" name="pollutant" class="form-control" required></select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="eval-select-scenario">📐 Skenario</label>
+              <label class="form-label" for="eval-select-scenario">
+                <span class="form-label-num">03</span> Skenario
+              </label>
               <select id="eval-select-scenario" name="scenario" class="form-control" required></select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="eval-select-algorithm">🤖 Algoritma</label>
+              <label class="form-label" for="eval-select-algorithm">
+                <span class="form-label-num">04</span> Algoritma
+              </label>
               <select id="eval-select-algorithm" name="algorithm" class="form-control" required></select>
             </div>
           </div>
@@ -116,13 +124,13 @@
         <!-- Right Side: Model & Time Metadata -->
         <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; text-align: right;">
           <div style="color: #ffffff; font-weight: 600;" id="hero-loc-name">
-            📍 Jakarta Pusat
+            Jakarta Pusat
           </div>
           <div style="color: #94a3b8;" id="hero-model-name">
-            📈 LightGBM - Skenario 2
+            LightGBM · Skenario 2
           </div>
           <div style="color: #94a3b8;" id="hero-time-stamp">
-            ⏱️ 5 Agustus 2026 · 00:00 WIB
+            5 Agustus 2026 · 00:00 WIB
           </div>
         </div>
       </div>
@@ -161,7 +169,7 @@
           <span id="val-rmse">29,70</span>
           <span id="unit-rmse" class="metric-unit">µg/m³</span>
         </div>
-        <span class="metric-desc">Peka terhadap galat besar dan fluktuasi polusi ekstrem.</span>
+        <span class="metric-desc">Peka terhadap eror besar dan fluktuasi polusi ekstrem.</span>
       </article>
 
       <!-- 03 MAPE Card -->
@@ -175,7 +183,7 @@
           <span id="val-mape">4,80</span>
           <span class="metric-unit">%</span>
         </div>
-        <span class="metric-desc">Rata-rata persentase galat terhadap nilai riil.</span>
+        <span class="metric-desc">Rata-rata persentase eror terhadap nilai riil.</span>
       </article>
 
       <!-- 04 R2 Card -->
@@ -254,7 +262,7 @@
         <!-- Executive Summary Insight Box -->
         <div class="guide-card-info" style="margin-top: 1rem; border-radius: 8px; padding: 0.85rem 1rem;">
           <h4 style="font-size: 0.82rem; font-weight: 700; color: #1d4ed8; display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.25rem;">
-            💡 Kesimpulan Kinerja Model
+            Kesimpulan Kinerja Model
           </h4>
           <p id="eval-human-summary" style="font-size: 0.78rem; color: #1e40af; line-height: 1.45; margin: 0;">
             Model ini menunjukkan kinerja stabil dengan tingkat kecocokan pola historis yang tinggi.
@@ -263,7 +271,7 @@
 
         <!-- CTA Button to Interpretation -->
         <a id="btn-eval-goto-interp" href="/pages/interpretation.html" class="btn btn-primary" style="width: 100%; margin-top: 1rem; font-size: 0.84rem; padding: 0.6rem 1rem; text-decoration: none; justify-content: center; display: inline-flex;">
-          🔍 Telusuri Alasan Prediksi (SHAP) →
+          Telusuri Alasan Prediksi (SHAP) &rarr;
         </a>
 
         <p style="font-size: 0.74rem; color: #64748b; line-height: 1.45; margin-top: 0.75rem;">
