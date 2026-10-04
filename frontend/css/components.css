@@ -1127,23 +1127,19 @@
   gap: 4px;
 }
 
-/* Prediction Hero Grid */
-.pred-hero-grid {
-  display: grid;
-  grid-template-columns: 1.15fr 1fr;
-  gap: 1.5rem;
-  align-items: stretch;
-  margin-bottom: 1.75rem;
+/* Prediction Hero Container (Single Clear Forecast Block) */
+.pred-hero-container {
+  margin-bottom: 1.5rem;
 }
 
 .pred-hero-metric-wrap {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 1.5rem 1.75rem;
 }
 
 .pred-hero-label {
@@ -1454,46 +1450,179 @@
   margin-top: 0.25rem;
 }
 
-/* Feature Inputs List */
-.pred-features-section {
+/* Feature Inputs Accordion (Collapsible Dropdown & Structured List) */
+.pred-features-accordion {
+  margin-bottom: 1.5rem;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.pred-features-accordion summary::-webkit-details-marker {
+  display: none;
+}
+
+.pred-features-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.15rem;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.75rem;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.pred-features-header {
+.pred-features-summary:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.pred-features-accordion[open] .pred-features-summary {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+.pred-summary-content {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-}
-
-.pred-feature-chips-grid {
-  display: flex;
+  gap: 0.65rem;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.85rem;
 }
 
-.pred-feature-chip {
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  padding: 0.35rem 0.7rem;
-  font-size: 0.78rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
+.pred-summary-chevron {
+  color: #64748b;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0;
 }
 
-.pred-chip-label {
+.pred-features-accordion[open] .pred-summary-chevron {
+  transform: rotate(180deg);
+  color: var(--color-primary);
+}
+
+.pred-summary-title {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: #1e293b;
+}
+
+.pred-summary-hint {
+  font-size: 0.76rem;
   color: #64748b;
 }
 
-.pred-chip-val {
+.pred-summary-pill {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #475569;
+  background: #e2e8f0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  white-space: nowrap;
+}
+
+.pred-features-body {
+  border: 1px solid #cbd5e1;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  background: #ffffff;
+  padding: 0.5rem 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Structured List of Feature Items */
+.pred-feature-list-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.pred-feature-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: #ffffff;
+  border: 1px solid #f1f5f9;
+  border-radius: 6px;
+  transition: background-color 0.12s ease;
+  gap: 0.75rem;
+}
+
+.pred-feature-list-row:nth-child(even) {
+  background: #fbfcfe;
+}
+
+.pred-feature-list-row:hover {
+  background: #f1f5f9;
+}
+
+.pred-feature-list-info {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.pred-feature-list-idx {
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #0f172a;
+  color: #94a3b8;
+  width: 1.5rem;
+  flex-shrink: 0;
+}
+
+.pred-feature-list-meta {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.pred-feature-list-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.pred-feature-list-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.72rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.pred-feature-list-val-badge {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  background: #eff6ff;
+  border: 1px solid #dbeafe;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pred-feature-list-val {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #1d4ed8;
+}
+
+.pred-feature-list-unit {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #3b82f6;
 }
 
 /* Actions Footer */
@@ -1610,12 +1739,20 @@
     flex-wrap: wrap;
     gap: 0.5rem;
   }
-  .pred-features-section {
-    padding: 1rem;
+  .pred-summary-hint {
+    display: none;
   }
-  .pred-features-header {
-    flex-wrap: wrap;
+  .pred-summary-pill {
+    display: none;
+  }
+  .pred-feature-list-row {
+    flex-direction: column;
+    align-items: flex-start;
     gap: 0.35rem;
+    padding: 0.6rem 0.65rem;
+  }
+  .pred-feature-list-val-badge {
+    align-self: flex-end;
   }
   .pred-actions-footer {
     padding-top: 1rem;

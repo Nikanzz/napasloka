@@ -234,9 +234,8 @@
           </div>
         </div>
 
-        <!-- Primary Hero Metric & Inference Context Grid -->
-        <div class="pred-hero-grid">
-          <!-- Left: Hero Prediction Number & Delta Trend -->
+        <!-- Primary Hero Prediction Metric -->
+        <div class="pred-hero-container">
           <div class="pred-hero-metric-wrap">
             <span class="pred-hero-label">Konsentrasi Diproyeksikan</span>
             <div class="pred-hero-number-row">
@@ -255,33 +254,26 @@
               </div>
             </div>
           </div>
-
-          <!-- Right: Konteks & Karakteristik Inferensi (Eliminating Subjective Health/ISPU Claims) -->
-          <div class="pred-context-card">
-            <div class="pred-context-header">
-              <span class="pred-context-title">Karakteristik Inferensi</span>
-              <span class="pred-context-badge">1 Jam ke Depan</span>
-            </div>
-            <div class="pred-context-list">
-              <div class="pred-context-item">
-                <span class="pred-context-key">Horizon Waktu</span>
-                <span class="pred-context-val">t + 1 Jam (Prakiraan titik diskret)</span>
-              </div>
-              <div class="pred-context-item">
-                <span class="pred-context-key">Pendekatan</span>
-                <span class="pred-context-val">Supervised Autoregressive Regressor</span>
-              </div>
-              <div class="pred-context-item">
-                <span class="pred-context-key">Basis Fitur</span>
-                <span class="pred-context-val">Lag historis konsentrasi &amp; atmosfer</span>
-              </div>
-              <div class="pred-context-item">
-                <span class="pred-context-key">Sifat Estimasi</span>
-                <span class="pred-context-val">Estimasi konsentrasi murni tanpa klaim medis</span>
-              </div>
-            </div>
-          </div>
         </div>
+
+        <!-- Input Feature Vector (Collapsible Dropdown & Structured List) -->
+        <details class="pred-features-accordion">
+          <summary class="pred-features-summary">
+            <div class="pred-summary-content">
+              <svg class="pred-summary-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+              <span class="pred-summary-title">
+                Vektor Fitur Masukan Model (<span id="res-features-count">0</span> Fitur)
+              </span>
+              <span class="pred-summary-hint">Buka untuk melihat rincian nilai lag dan kondisi masukan</span>
+            </div>
+            <span class="pred-summary-pill">Rincian parameter</span>
+          </summary>
+          <div class="pred-features-body">
+            <div id="res-feature-chips" class="pred-feature-list-wrap"></div>
+          </div>
+        </details>
 
         <!-- Hidden compatibility elements for scripts and tests -->
         <div style="display: none;" aria-hidden="true">
@@ -290,42 +282,12 @@
           <span id="res-standard-ref"></span>
           <div id="res-meter-fill"></div>
           <div id="res-meter-labels"></div>
-        </div>
-
-        <!-- Multi-Model Benchmark (Counterpart Cross-Validation) -->
-        <div class="pred-counterpart-panel">
-          <div class="pred-counterpart-header">
-            <span class="pred-counterpart-title">Komparasi Antar Algoritma pada Titik Waktu Identik</span>
-            <span class="pred-counterpart-badge">Validasi Silang</span>
-          </div>
-          <div class="pred-counterpart-grid">
-            <div class="pred-algo-card current">
-              <div class="pred-algo-badge">Model Terpilih</div>
-              <div class="pred-algo-name" id="res-active-algo-name">LightGBM</div>
-              <div class="pred-algo-val" id="res-active-algo-val">-</div>
-            </div>
-            <div class="pred-algo-card">
-              <div class="pred-algo-badge comparison">Model Pembanding</div>
-              <div class="pred-algo-name" id="res-counterpart-label">XGBoost</div>
-              <div class="pred-algo-val" id="res-counterpart-val">-</div>
-            </div>
-            <div class="pred-algo-card">
-              <div class="pred-algo-badge delta">Selisih Antar Algoritma</div>
-              <div class="pred-algo-val" id="res-counterpart-delta">-</div>
-              <div class="pred-algo-sub" id="res-counterpart-agreement">Konsistensi proyeksi kedua model</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Input Feature Vector Inspection -->
-        <div class="pred-features-section">
-          <div class="pred-features-header">
-            <span style="font-weight: 700; font-size: 0.85rem; color: #1e293b;">
-              Vektor Fitur Masukan Model (<span id="res-features-count">0</span> Fitur)
-            </span>
-            <span style="font-size: 0.74rem; color: #64748b;">Kondisi lag observasi yang diinputkan ke model</span>
-          </div>
-          <div id="res-feature-chips" class="pred-feature-chips-grid"></div>
+          <span id="res-active-algo-name"></span>
+          <span id="res-active-algo-val"></span>
+          <span id="res-counterpart-label"></span>
+          <span id="res-counterpart-val"></span>
+          <span id="res-counterpart-delta"></span>
+          <span id="res-counterpart-agreement"></span>
         </div>
 
         <!-- Cross-Navigation Footer Buttons -->

@@ -504,14 +504,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (resFeatureChips) {
       resFeatureChips.innerHTML = "";
       if (res.feature_inputs && res.feature_inputs.length > 0) {
-        res.feature_inputs.forEach((item) => {
-          const chip = document.createElement("div");
-          chip.className = "pred-feature-chip";
-          chip.innerHTML = `<span class="pred-chip-label">${item.label}:</span> <span class="pred-chip-val">${Number(item.value).toLocaleString("id-ID", {
+        res.feature_inputs.forEach((item, idx) => {
+          const row = document.createElement("div");
+          row.className = "pred-feature-list-row";
+          const formattedVal = Number(item.value).toLocaleString("id-ID", {
             minimumFractionDigits: 1,
             maximumFractionDigits: 2,
-          })} ${item.unit}</span>`;
-          resFeatureChips.appendChild(chip);
+          });
+          row.innerHTML = `
+            <div class="pred-feature-list-info">
+              <span class="pred-feature-list-idx">${idx + 1}.</span>
+              <div class="pred-feature-list-meta">
+                <span class="pred-feature-list-label">${item.label}</span>
+                ${item.name ? `<span class="pred-feature-list-code">${item.name}</span>` : ""}
+              </div>
+            </div>
+            <div class="pred-feature-list-val-badge">
+              <span class="pred-feature-list-val">${formattedVal}</span>
+              <span class="pred-feature-list-unit">${item.unit}</span>
+            </div>
+          `;
+          resFeatureChips.appendChild(row);
         });
       }
     }
