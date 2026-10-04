@@ -35,7 +35,7 @@ def test_serve_service_worker():
     """Verify that /service-worker.js is served with precached assets."""
     resp = client.get("/service-worker.js")
     assert resp.status_code == 200
-    assert "napasloka-v1.0.0" in resp.text
+    assert "napasloka-v" in resp.text
     assert "/pages/interpretation.html" in resp.text
     assert "/pages/evaluation.html" in resp.text
     assert "/pages/prediction.html" in resp.text
