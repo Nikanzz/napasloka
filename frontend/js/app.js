@@ -30,19 +30,17 @@ document.querySelectorAll("[data-current-year]").forEach((element) => {
 });
 
 // 3. Online/Offline Network Status Indicator
-window.addEventListener("offline", () => {
-  const badge = document.querySelector(".status-indicator");
-  if (badge) {
-    badge.innerHTML = '<span style="color: #ef4444;">●</span> Mode Offline';
-  }
-});
-
-window.addEventListener("online", () => {
-  const badge = document.querySelector(".status-indicator");
-  if (badge) {
-    badge.innerHTML = '<span style="color: #10b981;">●</span> Sistem aktif';
-  }
-});
+function updateNetworkStatus(isOnline) {
+  document.querySelectorAll(".header-status, .status-indicator").forEach((badge) => {
+    if (isOnline) {
+      badge.innerHTML = '<span class="status-dot" style="background-color: var(--color-success, #10b981);"></span><span>Sistem aktif</span>';
+    } else {
+      badge.innerHTML = '<span class="status-dot" style="background-color: var(--color-danger, #ef4444);"></span><span>Mode Offline</span>';
+    }
+  });
+}
+window.addEventListener("offline", () => updateNetworkStatus(false));
+window.addEventListener("online", () => updateNetworkStatus(true));
 
 // 4. PWA Installation Prompt Stashing
 let deferredPrompt = null;
@@ -64,3 +62,61 @@ window.addEventListener("beforeinstallprompt", (e) => {
     });
   }
 });
+
+// 5. Mobile Navigation Hamburger Menu
+function initMobileNav() {
+  const toggleBtn = document.getElementById("btn-nav-toggle");
+  const nav = document.getElementById("primary-nav") || document.querySelector(".nav");
+  if (!toggleBtn || !nav) return;
+
+  function setNavOpen(isOpen) {
+    toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    toggleBtn.setAttribute("aria-label", isOpen ? "Tutup menu navigasi" : "Buka menu navigasi");
+    if (isOpen) {
+      nav.classList.add("is-open");
+    } else {
+      nav.classList.remove("is-open");
+    }
+  }
+
+  toggleBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isCurrentlyOpen = toggleBtn.getAttribute("aria-expanded") === "true";
+    setNavOpen(!isCurrentlyOpen);
+  });
+
+  // Close when clicking any nav link
+  nav.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => {
+      setNavOpen(false);
+    });
+  });
+
+  // Close when clicking outside header / nav
+  document.addEventListener("click", (e) => {
+    if (!nav.contains(e.target) && !toggleBtn.contains(e.target)) {
+      setNavOpen(false);
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && toggleBtn.getAttribute("aria-expanded") === "true") {
+      setNavOpen(false);
+      toggleBtn.focus();
+    }
+  });
+
+  // Reset if resized to desktop
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 640 && toggleBtn.getAttribute("aria-expanded") === "true") {
+      setNavOpen(false);
+    }
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initMobileNav);
+} else {
+  initMobileNav();
+}

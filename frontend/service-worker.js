@@ -1,7 +1,7 @@
 "use strict";
 
 // Cache version identifier
-const CACHE_NAME = "napasloka-v1.0.1";
+const CACHE_NAME = "napasloka-v1.0.2";
 
 const APP_SHELL = [
   "/",
