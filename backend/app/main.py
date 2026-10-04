@@ -40,6 +40,17 @@ def create_app() -> FastAPI:
     ):
         application.include_router(router, prefix=settings.api_v1_prefix)
 
+    # Middleware to ensure fresh service-worker.js and HTML pages are never stale-cached
+    @application.middleware("http")
+    async def add_cache_control_headers(request, call_next):
+        response = await call_next(request)
+        path = request.url.path
+        if path == "/service-worker.js":
+            response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        elif path.endswith(".html") or path in ("/app", "/index.html"):
+            response.headers["Cache-Control"] = "no-cache, must-revalidate"
+        return response
+
     # Mount static assets for frontend PWA
     frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
     if frontend_dir.is_dir():
@@ -52,17 +63,26 @@ def create_app() -> FastAPI:
         @application.get("/index.html", include_in_schema=False)
         def serve_app() -> FileResponse:
             """Serve PWA Home page."""
-            return FileResponse(frontend_dir / "index.html")
+            return FileResponse(
+                frontend_dir / "index.html",
+                headers={"Cache-Control": "no-cache, must-revalidate"}
+            )
 
         @application.get("/manifest.json", include_in_schema=False)
         def serve_manifest() -> FileResponse:
             """Serve PWA manifest."""
-            return FileResponse(frontend_dir / "manifest.json")
+            return FileResponse(
+                frontend_dir / "manifest.json",
+                headers={"Cache-Control": "no-cache, must-revalidate"}
+            )
 
         @application.get("/service-worker.js", include_in_schema=False)
         def serve_sw() -> FileResponse:
             """Serve PWA service worker."""
-            return FileResponse(frontend_dir / "service-worker.js")
+            return FileResponse(
+                frontend_dir / "service-worker.js",
+                headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
+            )
 
     @application.get("/", tags=["root"])
     def root() -> dict[str, str]:

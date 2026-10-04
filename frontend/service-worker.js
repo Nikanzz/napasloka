@@ -1,6 +1,7 @@
 "use strict";
 
-const CACHE_NAME = "napasloka-v1.0.0";
+// Cache version identifier
+const CACHE_NAME = "napasloka-v1.0.1";
 
 const APP_SHELL = [
   "/",
@@ -20,6 +21,8 @@ const APP_SHELL = [
   "/js/interpretation.js",
   "/manifest.json",
   "/assets/icons/icon.svg",
+  "/assets/icons/icon-192.png",
+  "/assets/icons/icon-512.png",
 ];
 
 // Install Event: Precaching App Shell
@@ -32,13 +35,14 @@ self.addEventListener("install", (event) => {
   );
 });
 
-// Activate Event: Clean up outdated caches
+// Activate Event: Purge old cache versions and claim immediate control
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
+            console.log("[ServiceWorker] Purging outdated cache version:", key);
             return caches.delete(key);
           }
         })
@@ -47,7 +51,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch Event: Routing Strategy
+// Fetch Event: Smart Routing
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
@@ -57,40 +61,43 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // 2. Cache-First with Network Fallback for App Shell and Static Assets
+  // 2. Network-First Strategy for HTML Navigation Requests (Latest UI and fallback to a cached version if offline)                                        
+  if (request.mode === "navigate" || request.headers.get("accept")?.includes("text/html")) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          // Offline fallback
+          return caches.match(request).then((cachedResponse) => {
+            return cachedResponse || caches.match("/index.html");
+          });
+        })
+    );
+    return;
+  }
+
+  // 3. Stale-While-Revalidate / Cache-First for static assets (CSS, JS, Icons)
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch in background to update cache (stale-while-revalidate for static files)
-        fetch(request)
-          .then((networkResponse) => {
-            if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
-              caches.open(CACHE_NAME).then((cache) => cache.put(request, networkResponse));
-            }
-          })
-          .catch(() => {
-            // Network failure is expected when offline; cached response is already returned
-          });
-        return cachedResponse;
-      }
-
-      return fetch(request).then((networkResponse) => {
-        if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== "basic") {
+      const fetchPromise = fetch(request)
+        .then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200 && networkResponse.type === "basic") {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+          }
           return networkResponse;
-        }
-
-        const responseToCache = networkResponse.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(request, responseToCache);
+        })
+        .catch(() => {
+          // If network fails, return cached response if available
         });
 
-        return networkResponse;
-      }).catch(() => {
-        // Offline fallback for HTML navigation
-        if (request.headers.get("accept")?.includes("text/html")) {
-          return caches.match("/index.html");
-        }
-      });
+      return cachedResponse || fetchPromise;
     })
   );
 });
