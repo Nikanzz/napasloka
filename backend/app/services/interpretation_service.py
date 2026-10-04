@@ -46,18 +46,34 @@ class InterpretationService:
 
     def interpret_prediction(self, request: InterpretationRequest) -> InterpretationResponse:
         """Calculate on-the-fly local TreeSHAP attribution and aggregate offline global importance."""
-        self.registry.validate_dimensions(
-            request.location,
-            request.pollutant,
-            request.scenario,
-            request.algorithm,
-        )
-
         loc_slug = slugify_component(request.location)
+        if loc_slug not in self.supported_locations:
+            valid_locs = ", ".join(self.supported_locations.keys())
+            raise ValueError(f"Unknown location '{request.location}'. Valid locations are: {valid_locs}")
+
+        # Lookup registered best model
+        best_entry = self.registry.get_best_model(loc_slug, request.pollutant, request.scenario)
+        best_algo = best_entry["best_algorithm"]
+
+        # Determine effective algorithm and model tier
+        requested_algo = request.algorithm
+        if requested_algo is None or requested_algo == "auto":
+            effective_algo = best_algo
+            is_final = True
+            model_status = "Final deployment model"
+        elif requested_algo == best_algo:
+            effective_algo = best_algo
+            is_final = True
+            model_status = "Final deployment model"
+        else:
+            effective_algo = requested_algo
+            is_final = False
+            model_status = "Experiment model (Diagnostic)"
+
         loc_info = self.supported_locations[loc_slug]
         pollutant_info = POLLUTANT_METADATA[request.pollutant]
         scenario_info = SCENARIO_METADATA[request.scenario]
-        algorithm_info = ALGORITHM_METADATA[request.algorithm]
+        algorithm_info = ALGORITHM_METADATA[effective_algo]
 
         # 1. Build input feature vector
         X_df, meta = self.data_service.build_next_hour_features(
@@ -67,19 +83,27 @@ class InterpretationService:
             reference_datetime=request.reference_datetime,
         )
 
-        # 2. Load model estimator
-        model = self.registry.load_estimator(
-            loc_slug,
-            request.pollutant,
-            request.scenario,
-            request.algorithm,
-        )
+        # 2. Load model estimator (final model if best_algo, else experiment model)
+        if is_final:
+            model = self.registry.load_final_estimator(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+            )
+        else:
+            model = self.registry.load_estimator(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+                effective_algo,
+            )
 
         # 3. Compute TreeSHAP
         explainer = shap.TreeExplainer(model)
         shap_raw = explainer.shap_values(X_df)
         if isinstance(shap_raw, list):
             shap_raw = shap_raw[0]
+
 
         shap_array = np.asarray(shap_raw).flatten()
         base_val_raw = (
@@ -147,18 +171,30 @@ class InterpretationService:
         # 6. Collate global feature importance from saved artifacts
         global_importance: list[GlobalFeatureItem] = []
         try:
-            raw_gain = self.registry.get_feature_importance(
-                loc_slug,
-                request.pollutant,
-                request.scenario,
-                request.algorithm,
-            )
-            raw_shap = self.registry.get_global_shap(
-                loc_slug,
-                request.pollutant,
-                request.scenario,
-                request.algorithm,
-            )
+            if is_final:
+                raw_gain = self.registry.get_final_feature_importance(
+                    loc_slug,
+                    request.pollutant,
+                    request.scenario,
+                )
+                raw_shap = self.registry.get_final_global_shap(
+                    loc_slug,
+                    request.pollutant,
+                    request.scenario,
+                )
+            else:
+                raw_gain = self.registry.get_feature_importance(
+                    loc_slug,
+                    request.pollutant,
+                    request.scenario,
+                    effective_algo,
+                )
+                raw_shap = self.registry.get_global_shap(
+                    loc_slug,
+                    request.pollutant,
+                    request.scenario,
+                    effective_algo,
+                )
             shap_map = {row["feature"]: float(row["mean_absolute_shap"]) for row in raw_shap}
 
             for row in raw_gain:
@@ -186,7 +222,7 @@ class InterpretationService:
         )
 
         interpretation_summary = (
-            f"Model {algorithm_info['name']} menghasilkan prediksi {pred_value:.2f} {pollutant_info['unit']} "
+            f"Model {algorithm_info['name']} ({model_status}) menghasilkan prediksi {pred_value:.2f} {pollutant_info['unit']} "
             f"dari nilai dasar (base value) {base_value:.2f} {pollutant_info['unit']}. "
             f"Faktor pendorong lokal terbesar pada jam ini adalah '{top_contributor.label}' dengan nilai aktual "
             f"{top_contributor.feature_value:.2f} {top_contributor.unit}, yang memberikan kontribusi "
@@ -198,7 +234,7 @@ class InterpretationService:
             loc_slug,
             request.pollutant,
             request.scenario,
-            request.algorithm,
+            effective_algo,
         )
 
         return InterpretationResponse(
@@ -211,7 +247,7 @@ class InterpretationService:
             pollutant_unit=pollutant_info["unit"],
             scenario=request.scenario,
             scenario_label=scenario_info["label"],
-            algorithm=request.algorithm,
+            algorithm=effective_algo,
             algorithm_label=algorithm_info["label"],
             predicted_value=pred_value,
             base_value=base_value,
@@ -223,6 +259,9 @@ class InterpretationService:
             global_importance=global_importance,
             scientific_disclaimer=SCIENTIFIC_DISCLAIMER,
             interpretation_summary=interpretation_summary,
+            model_status=model_status,
+            is_final_model=is_final,
+            best_algorithm=best_algo,
         )
 
 

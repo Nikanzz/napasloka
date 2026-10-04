@@ -1,0 +1,38 @@
+{
+  "model_name": "Sistem NapasLoka Final Deployment Model",
+  "model_status": "final_deployment",
+  "model_version": "1.0.0",
+  "creation_timestamp": "2026-10-04T18:07:02.956719+00:00",
+  "location": "kaliabang-tengah",
+  "pollutant": "co2",
+  "scenario": "scenario_1",
+  "algorithm": "lightgbm",
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "target_variable": "carbon_dioxide",
+  "features": [
+    "carbon_dioxide_lag_3h",
+    "carbon_dioxide_lag_2h",
+    "carbon_dioxide_lag_1h"
+  ],
+  "n_features": 3,
+  "n_train_samples": 15542,
+  "training_data_type": "full_historical_dataset",
+  "data_start": "2024-10-26T10:00:00+07:00",
+  "data_end": "2026-08-04T23:00:00+07:00",
+  "training_time_seconds": 0.3698,
+  "experiment_id": "kaliabang-tengah__co2__scenario_1__lightgbm",
+  "experiment_metrics": {
+    "mae": 1.5435,
+    "rmse": 2.1546,
+    "mape": 0.3317,
+    "r2": 0.9808,
+    "training_time_seconds": 5.3093,
+    "prediction_time_seconds": 0.0192
+  },
+  "selection_rule": "lowest_mae_then_rmse",
+  "academic_note": "Model final ini dilatih menggunakan 100% data historis yang tersedia (hingga cutoff deployment) khusus untuk kebutuhan prediksi operasional aplikasi. Evaluasi komparatif skripsi (MAE/RMSE/MAPE/R2) tetap dibekukan dari model eksperimen hold-out 80:20."
+}

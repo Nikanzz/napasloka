@@ -136,18 +136,34 @@ class PredictionService:
 
     def predict_next_hour(self, request: PredictionRequest) -> NextHourPredictionResponse:
         """Generate next-hour forecast (t+1) based on latest observations up to t."""
-        self.registry.validate_dimensions(
-            request.location,
-            request.pollutant,
-            request.scenario,
-            request.algorithm,
-        )
-
         loc_slug = slugify_component(request.location)
+        if loc_slug not in self.supported_locations:
+            valid_locs = ", ".join(self.supported_locations.keys())
+            raise ValueError(f"Unknown location '{request.location}'. Valid locations are: {valid_locs}")
+
+        # Lookup registered best model
+        best_entry = self.registry.get_best_model(loc_slug, request.pollutant, request.scenario)
+        best_algo = best_entry["best_algorithm"]
+
+        # Determine effective algorithm and model tier
+        requested_algo = request.algorithm
+        if requested_algo is None or requested_algo == "auto":
+            effective_algo = best_algo
+            is_final = True
+            model_status = "Final deployment model"
+        elif requested_algo == best_algo:
+            effective_algo = best_algo
+            is_final = True
+            model_status = "Final deployment model"
+        else:
+            effective_algo = requested_algo
+            is_final = False
+            model_status = "Experiment model (Diagnostic)"
+
         loc_info = self.supported_locations[loc_slug]
         pollutant_info = POLLUTANT_METADATA[request.pollutant]
         scenario_info = SCENARIO_METADATA[request.scenario]
-        algorithm_info = ALGORITHM_METADATA[request.algorithm]
+        algorithm_info = ALGORITHM_METADATA[effective_algo]
 
         # 1. Build input feature vector from latest observations
         reference_time = request.reference_datetime or request.end_datetime
@@ -158,13 +174,21 @@ class PredictionService:
             reference_datetime=reference_time,
         )
 
-        # 2. Load model estimator from memory cache and run inference
-        model = self.registry.load_estimator(
-            loc_slug,
-            request.pollutant,
-            request.scenario,
-            request.algorithm,
-        )
+        # 2. Load model estimator (final model if best_algo, else experiment model)
+        if is_final:
+            model = self.registry.load_final_estimator(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+            )
+        else:
+            model = self.registry.load_estimator(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+                effective_algo,
+            )
+
         pred_raw = float(model.predict(X_df)[0])
         pred_value = round(pred_raw, 2)
 
@@ -197,7 +221,7 @@ class PredictionService:
             )
 
         # 6. Counterpart algorithm prediction for the identical next hour
-        counterpart_algo = self.registry.get_counterpart_algorithm(request.algorithm)
+        counterpart_algo = self.registry.get_counterpart_algorithm(effective_algo)
         counterpart_meta = ALGORITHM_METADATA.get(counterpart_algo, {})
         cp_pred_value: float | None = None
         cp_delta: float | None = None
@@ -222,7 +246,7 @@ class PredictionService:
             loc_slug,
             request.pollutant,
             request.scenario,
-            request.algorithm,
+            effective_algo,
         )
 
         return NextHourPredictionResponse(
@@ -237,7 +261,7 @@ class PredictionService:
             pollutant_unit=pollutant_info["unit"],
             scenario=request.scenario,
             scenario_label=scenario_info["label"],
-            algorithm=request.algorithm,
+            algorithm=effective_algo,
             algorithm_label=algorithm_info["label"],
             predicted_value=pred_value,
             target_time=target_ts.isoformat(),
@@ -254,6 +278,9 @@ class PredictionService:
             counterpart_label=counterpart_meta.get("label", counterpart_algo.upper()),
             counterpart_predicted_value=cp_pred_value,
             counterpart_delta=cp_delta,
+            model_status=model_status,
+            is_final_model=is_final,
+            best_algorithm=best_algo,
         )
 
 

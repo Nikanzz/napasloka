@@ -1,0 +1,16 @@
+feature,mean_absolute_shap
+carbon_dioxide_lag_1h,11.816875415597625
+carbon_dioxide_lag_2h,3.3493607130945997
+carbon_dioxide_lag_3h,0.615427021235697
+temperature_2m_lag_1h,0.4039641931130905
+temperature_2m_lag_3h,0.2631981313975318
+wind_speed_100m_lag_1h,0.24899553649342776
+relative_humidity_2m_lag_1h,0.18951084970147195
+relative_humidity_2m_lag_3h,0.13516725654006834
+temperature_2m_lag_2h,0.11020003548499388
+relative_humidity_2m_lag_2h,0.09249501768326336
+rain_lag_1h,0.08535550539189897
+wind_speed_100m_lag_2h,0.049134530154686745
+rain_lag_3h,0.044873555055256885
+wind_speed_100m_lag_3h,0.04446290623003046
+rain_lag_2h,0.009617028679250501

@@ -86,7 +86,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const initialLoc = urlParams.get("location") || localStorage.getItem("napasloka_selected_location") || "petamburan-perkantoran-transjakarta";
     const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co";
     const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_2";
-    const initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
+    let initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
+    if (!initialAlgo || initialAlgo === "auto") {
+      initialAlgo = "lightgbm";
+    }
 
     if (selectLoc.querySelector(`option[value="${initialLoc}"]`)) selectLoc.value = initialLoc;
     if (selectPol.querySelector(`option[value="${initialPol}"]`)) selectPol.value = initialPol;
@@ -191,8 +194,20 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (heroPredUnit) heroPredUnit.textContent = res.pollutant_unit;
     if (heroLocName) heroLocName.textContent = res.location_name;
-    if (heroModelName) heroModelName.textContent = `${res.algorithm_label} · ${res.scenario_label}`;
-    if (heroTimeStamp) heroTimeStamp.textContent = `${formatDateDisplay(res.time_range.end)} WIB`;
+
+    const algoShortName = res.algorithm === "xgboost" ? "XGBoost" : "LightGBM";
+    const scenShortName = res.scenario === "scenario_1" ? "Skenario 1" : "Skenario 2";
+    if (heroModelName) heroModelName.textContent = `${algoShortName} · ${scenShortName}`;
+
+    if (heroTimeStamp) {
+      try {
+        const d = new Date(res.time_range.end);
+        d.setHours(d.getHours() + 1);
+        heroTimeStamp.textContent = `${formatDateDisplay(d.toISOString())} WIB`;
+      } catch {
+        heroTimeStamp.textContent = `${formatDateDisplay(res.time_range.end)} WIB`;
+      }
+    }
 
     // 2. 4 Metric Cards (Mockup 3)
     if (valMae) valMae.textContent = res.metrics.mae.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -272,7 +287,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (cpAlgoRmse && res.comparison) {
       cpAlgoRmse.textContent = `RMSE ${res.comparison.counterpart_metrics.rmse.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
+
+    const bestModelPill = document.getElementById("eval-best-model-pill");
+    if (bestModelPill && res.best_model_label) {
+      bestModelPill.textContent = `⭐ Model Terbaik: ${res.best_model_label}`;
+      bestModelPill.title = "Algoritma dengan nilai MAE terendah yang terpilih sebagai final deployment model";
+    }
   }
+
 
   function renderPlotlyChart(res) {
     if (!chartContainer) return;

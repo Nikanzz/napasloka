@@ -1,0 +1,50 @@
+{
+  "model_name": "Sistem NapasLoka Final Deployment Model",
+  "model_status": "final_deployment",
+  "model_version": "1.0.0",
+  "creation_timestamp": "2026-10-04T18:07:18.011442+00:00",
+  "location": "pancoran-mas",
+  "pollutant": "co",
+  "scenario": "scenario_2",
+  "algorithm": "lightgbm",
+  "best_params": {
+    "n_estimators": 500,
+    "max_depth": 9,
+    "learning_rate": 0.05
+  },
+  "target_variable": "carbon_monoxide",
+  "features": [
+    "carbon_monoxide_lag_3h",
+    "carbon_monoxide_lag_2h",
+    "carbon_monoxide_lag_1h",
+    "temperature_2m_lag_3h",
+    "temperature_2m_lag_2h",
+    "temperature_2m_lag_1h",
+    "relative_humidity_2m_lag_3h",
+    "relative_humidity_2m_lag_2h",
+    "relative_humidity_2m_lag_1h",
+    "rain_lag_3h",
+    "rain_lag_2h",
+    "rain_lag_1h",
+    "wind_speed_100m_lag_3h",
+    "wind_speed_100m_lag_2h",
+    "wind_speed_100m_lag_1h"
+  ],
+  "n_features": 15,
+  "n_train_samples": 15542,
+  "training_data_type": "full_historical_dataset",
+  "data_start": "2024-10-26T10:00:00+07:00",
+  "data_end": "2026-08-04T23:00:00+07:00",
+  "training_time_seconds": 0.6406,
+  "experiment_id": "pancoran-mas__co__scenario_2__lightgbm",
+  "experiment_metrics": {
+    "mae": 122.5292,
+    "rmse": 194.0274,
+    "mape": 7.3934,
+    "r2": 0.9764,
+    "training_time_seconds": 7.5887,
+    "prediction_time_seconds": 0.0237
+  },
+  "selection_rule": "lowest_mae_then_rmse",
+  "academic_note": "Model final ini dilatih menggunakan 100% data historis yang tersedia (hingga cutoff deployment) khusus untuk kebutuhan prediksi operasional aplikasi. Evaluasi komparatif skripsi (MAE/RMSE/MAPE/R2) tetap dibekukan dari model eksperimen hold-out 80:20."
+}

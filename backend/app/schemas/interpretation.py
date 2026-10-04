@@ -13,7 +13,10 @@ class InterpretationRequest(BaseModel):
     location: str = Field(..., min_length=1, description="Location slug identifier")
     pollutant: PollutantType = Field(..., description="Target pollutant ('co' or 'co2')")
     scenario: ScenarioType = Field(..., description="Scenario identifier ('scenario_1' or 'scenario_2')")
-    algorithm: AlgorithmType = Field(..., description="Selected algorithm ('xgboost' or 'lightgbm')")
+    algorithm: AlgorithmType | Literal["auto"] | None = Field(
+        default="auto",
+        description="Selected algorithm ('xgboost', 'lightgbm', or 'auto' for best final deployment model)",
+    )
     reference_datetime: datetime | str | None = Field(
         default=None,
         description="Observation timestamp to interpret (defaults to latest available observation)",
@@ -79,3 +82,9 @@ class InterpretationResponse(BaseModel):
     # Scientific integrity notice
     scientific_disclaimer: str = Field(..., description="Formal non-causality disclosure statement")
     interpretation_summary: str = Field(..., description="Human-readable synthesis of model drivers")
+
+    # Model deployment & research status
+    model_status: str = Field(default="Final deployment model", description="Status of the model used")
+    is_final_model: bool = Field(default=True, description="True if using retrained final deployment model")
+    best_algorithm: str = Field(default="lightgbm", description="Winning algorithm for this combination")
+

@@ -1,0 +1,1387 @@
+{
+  "version": 1,
+  "selection_rule": "lowest_mae_then_rmse",
+  "total_combinations": 60,
+  "best_models": {
+    "cibinong__co__scenario_1": {
+      "key": "cibinong__co__scenario_1",
+      "location": "cibinong",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "cibinong__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 77.2248,
+        "rmse": 114.7982,
+        "mape": 6.633,
+        "r2": 0.9793,
+        "training_time_seconds": 4.8518,
+        "prediction_time_seconds": 0.0198
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/cibinong/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/cibinong/co/scenario_1"
+    },
+    "cibinong__co__scenario_2": {
+      "key": "cibinong__co__scenario_2",
+      "location": "cibinong",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "cibinong__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 75.8622,
+        "rmse": 116.9801,
+        "mape": 6.4705,
+        "r2": 0.9785,
+        "training_time_seconds": 8.1781,
+        "prediction_time_seconds": 0.0207
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/cibinong/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/cibinong/co/scenario_2"
+    },
+    "cibinong__co2__scenario_1": {
+      "key": "cibinong__co2__scenario_1",
+      "location": "cibinong",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "cibinong__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 2.3043,
+        "rmse": 3.2525,
+        "mape": 0.4799,
+        "r2": 0.9871,
+        "training_time_seconds": 4.8226,
+        "prediction_time_seconds": 0.0194
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/cibinong/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/cibinong/co2/scenario_1"
+    },
+    "cibinong__co2__scenario_2": {
+      "key": "cibinong__co2__scenario_2",
+      "location": "cibinong",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "cibinong__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 2.19,
+        "rmse": 3.0978,
+        "mape": 0.4555,
+        "r2": 0.9883,
+        "training_time_seconds": 7.3601,
+        "prediction_time_seconds": 0.0209
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/cibinong/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/cibinong/co2/scenario_2"
+    },
+    "daerah-pelabuhan-tanjung-priuk__co__scenario_1": {
+      "key": "daerah-pelabuhan-tanjung-priuk__co__scenario_1",
+      "location": "daerah-pelabuhan-tanjung-priuk",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "daerah-pelabuhan-tanjung-priuk__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 77.9104,
+        "rmse": 119.0021,
+        "mape": 7.2468,
+        "r2": 0.981,
+        "training_time_seconds": 6.1055,
+        "prediction_time_seconds": 0.0202
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/daerah-pelabuhan-tanjung-priuk/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/daerah-pelabuhan-tanjung-priuk/co/scenario_1"
+    },
+    "daerah-pelabuhan-tanjung-priuk__co__scenario_2": {
+      "key": "daerah-pelabuhan-tanjung-priuk__co__scenario_2",
+      "location": "daerah-pelabuhan-tanjung-priuk",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "daerah-pelabuhan-tanjung-priuk__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 79.9242,
+        "rmse": 123.5758,
+        "mape": 7.4867,
+        "r2": 0.9795,
+        "training_time_seconds": 7.4033,
+        "prediction_time_seconds": 0.0214
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/daerah-pelabuhan-tanjung-priuk/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/daerah-pelabuhan-tanjung-priuk/co/scenario_2"
+    },
+    "daerah-pelabuhan-tanjung-priuk__co2__scenario_1": {
+      "key": "daerah-pelabuhan-tanjung-priuk__co2__scenario_1",
+      "location": "daerah-pelabuhan-tanjung-priuk",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "daerah-pelabuhan-tanjung-priuk__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.2274,
+        "rmse": 1.7283,
+        "mape": 0.2675,
+        "r2": 0.9799,
+        "training_time_seconds": 4.8855,
+        "prediction_time_seconds": 0.0201
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/daerah-pelabuhan-tanjung-priuk/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/daerah-pelabuhan-tanjung-priuk/co2/scenario_1"
+    },
+    "daerah-pelabuhan-tanjung-priuk__co2__scenario_2": {
+      "key": "daerah-pelabuhan-tanjung-priuk__co2__scenario_2",
+      "location": "daerah-pelabuhan-tanjung-priuk",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "daerah-pelabuhan-tanjung-priuk__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.2537,
+        "rmse": 1.7687,
+        "mape": 0.2729,
+        "r2": 0.979,
+        "training_time_seconds": 6.4845,
+        "prediction_time_seconds": 0.0202
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/daerah-pelabuhan-tanjung-priuk/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/daerah-pelabuhan-tanjung-priuk/co2/scenario_2"
+    },
+    "jl-tol-jagorawi__co__scenario_1": {
+      "key": "jl-tol-jagorawi__co__scenario_1",
+      "location": "jl-tol-jagorawi",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "jl-tol-jagorawi__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 98.503,
+        "rmse": 143.4517,
+        "mape": 7.4763,
+        "r2": 0.9793,
+        "training_time_seconds": 4.3576,
+        "prediction_time_seconds": 0.0212
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/jl-tol-jagorawi/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/jl-tol-jagorawi/co/scenario_1"
+    },
+    "jl-tol-jagorawi__co__scenario_2": {
+      "key": "jl-tol-jagorawi__co__scenario_2",
+      "location": "jl-tol-jagorawi",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "jl-tol-jagorawi__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 97.3023,
+        "rmse": 144.5371,
+        "mape": 7.4875,
+        "r2": 0.979,
+        "training_time_seconds": 8.4602,
+        "prediction_time_seconds": 0.0203
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/jl-tol-jagorawi/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/jl-tol-jagorawi/co/scenario_2"
+    },
+    "jl-tol-jagorawi__co2__scenario_1": {
+      "key": "jl-tol-jagorawi__co2__scenario_1",
+      "location": "jl-tol-jagorawi",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "jl-tol-jagorawi__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.8831,
+        "rmse": 2.6269,
+        "mape": 0.3982,
+        "r2": 0.9816,
+        "training_time_seconds": 4.7326,
+        "prediction_time_seconds": 0.0192
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/jl-tol-jagorawi/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/jl-tol-jagorawi/co2/scenario_1"
+    },
+    "jl-tol-jagorawi__co2__scenario_2": {
+      "key": "jl-tol-jagorawi__co2__scenario_2",
+      "location": "jl-tol-jagorawi",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "jl-tol-jagorawi__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.8797,
+        "rmse": 2.5822,
+        "mape": 0.3976,
+        "r2": 0.9823,
+        "training_time_seconds": 7.1484,
+        "prediction_time_seconds": 0.0206
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/jl-tol-jagorawi/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/jl-tol-jagorawi/co2/scenario_2"
+    },
+    "kaliabang-tengah__co__scenario_1": {
+      "key": "kaliabang-tengah__co__scenario_1",
+      "location": "kaliabang-tengah",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "kaliabang-tengah__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 103.6829,
+        "rmse": 160.4389,
+        "mape": 8.7806,
+        "r2": 0.9795,
+        "training_time_seconds": 6.0015,
+        "prediction_time_seconds": 0.0188
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/kaliabang-tengah/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/kaliabang-tengah/co/scenario_1"
+    },
+    "kaliabang-tengah__co__scenario_2": {
+      "key": "kaliabang-tengah__co__scenario_2",
+      "location": "kaliabang-tengah",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "kaliabang-tengah__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 104.4918,
+        "rmse": 172.6024,
+        "mape": 8.3609,
+        "r2": 0.9763,
+        "training_time_seconds": 6.6917,
+        "prediction_time_seconds": 0.0196
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/kaliabang-tengah/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/kaliabang-tengah/co/scenario_2"
+    },
+    "kaliabang-tengah__co2__scenario_1": {
+      "key": "kaliabang-tengah__co2__scenario_1",
+      "location": "kaliabang-tengah",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "kaliabang-tengah__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.5435,
+        "rmse": 2.1546,
+        "mape": 0.3317,
+        "r2": 0.9808,
+        "training_time_seconds": 5.3093,
+        "prediction_time_seconds": 0.0192
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/kaliabang-tengah/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/kaliabang-tengah/co2/scenario_1"
+    },
+    "kaliabang-tengah__co2__scenario_2": {
+      "key": "kaliabang-tengah__co2__scenario_2",
+      "location": "kaliabang-tengah",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "kaliabang-tengah__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.5469,
+        "rmse": 2.1721,
+        "mape": 0.3322,
+        "r2": 0.9805,
+        "training_time_seconds": 7.0683,
+        "prediction_time_seconds": 0.0198
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/kaliabang-tengah/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/kaliabang-tengah/co2/scenario_2"
+    },
+    "metland-cyberpuri__co__scenario_1": {
+      "key": "metland-cyberpuri__co__scenario_1",
+      "location": "metland-cyberpuri",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "metland-cyberpuri__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 161.6665,
+        "rmse": 285.1797,
+        "mape": 7.9912,
+        "r2": 0.9724,
+        "training_time_seconds": 4.5678,
+        "prediction_time_seconds": 0.0201
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/metland-cyberpuri/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/metland-cyberpuri/co/scenario_1"
+    },
+    "metland-cyberpuri__co__scenario_2": {
+      "key": "metland-cyberpuri__co__scenario_2",
+      "location": "metland-cyberpuri",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "metland-cyberpuri__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 167.0867,
+        "rmse": 336.605,
+        "mape": 8.0304,
+        "r2": 0.9616,
+        "training_time_seconds": 7.2884,
+        "prediction_time_seconds": 0.0207
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/metland-cyberpuri/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/metland-cyberpuri/co/scenario_2"
+    },
+    "metland-cyberpuri__co2__scenario_1": {
+      "key": "metland-cyberpuri__co2__scenario_1",
+      "location": "metland-cyberpuri",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "metland-cyberpuri__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.9179,
+        "rmse": 2.8729,
+        "mape": 0.4024,
+        "r2": 0.9782,
+        "training_time_seconds": 4.755,
+        "prediction_time_seconds": 0.0196
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/metland-cyberpuri/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/metland-cyberpuri/co2/scenario_1"
+    },
+    "metland-cyberpuri__co2__scenario_2": {
+      "key": "metland-cyberpuri__co2__scenario_2",
+      "location": "metland-cyberpuri",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "metland-cyberpuri__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.9291,
+        "rmse": 2.9327,
+        "mape": 0.4045,
+        "r2": 0.9772,
+        "training_time_seconds": 6.2924,
+        "prediction_time_seconds": 0.0218
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/metland-cyberpuri/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/metland-cyberpuri/co2/scenario_2"
+    },
+    "mustikasari__co__scenario_1": {
+      "key": "mustikasari__co__scenario_1",
+      "location": "mustikasari",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "mustikasari__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 79.9258,
+        "rmse": 121.6911,
+        "mape": 7.207,
+        "r2": 0.9811,
+        "training_time_seconds": 6.287,
+        "prediction_time_seconds": 0.0192
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/mustikasari/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/mustikasari/co/scenario_1"
+    },
+    "mustikasari__co__scenario_2": {
+      "key": "mustikasari__co__scenario_2",
+      "location": "mustikasari",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "mustikasari__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 80.5941,
+        "rmse": 126.739,
+        "mape": 7.2362,
+        "r2": 0.9795,
+        "training_time_seconds": 6.7528,
+        "prediction_time_seconds": 0.0198
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/mustikasari/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/mustikasari/co/scenario_2"
+    },
+    "mustikasari__co2__scenario_1": {
+      "key": "mustikasari__co2__scenario_1",
+      "location": "mustikasari",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "mustikasari__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.5742,
+        "rmse": 2.1988,
+        "mape": 0.3367,
+        "r2": 0.9824,
+        "training_time_seconds": 4.2995,
+        "prediction_time_seconds": 0.019
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/mustikasari/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/mustikasari/co2/scenario_1"
+    },
+    "mustikasari__co2__scenario_2": {
+      "key": "mustikasari__co2__scenario_2",
+      "location": "mustikasari",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "mustikasari__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.6022,
+        "rmse": 2.2549,
+        "mape": 0.3427,
+        "r2": 0.9815,
+        "training_time_seconds": 7.2008,
+        "prediction_time_seconds": 0.0203
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/mustikasari/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/mustikasari/co2/scenario_2"
+    },
+    "pancoran-mas__co__scenario_1": {
+      "key": "pancoran-mas__co__scenario_1",
+      "location": "pancoran-mas",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pancoran-mas__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 119.1635,
+        "rmse": 185.55,
+        "mape": 7.2001,
+        "r2": 0.9784,
+        "training_time_seconds": 5.5268,
+        "prediction_time_seconds": 0.0198
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pancoran-mas/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pancoran-mas/co/scenario_1"
+    },
+    "pancoran-mas__co__scenario_2": {
+      "key": "pancoran-mas__co__scenario_2",
+      "location": "pancoran-mas",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pancoran-mas__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 122.5292,
+        "rmse": 194.0274,
+        "mape": 7.3934,
+        "r2": 0.9764,
+        "training_time_seconds": 7.5887,
+        "prediction_time_seconds": 0.0237
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pancoran-mas/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pancoran-mas/co/scenario_2"
+    },
+    "pancoran-mas__co2__scenario_1": {
+      "key": "pancoran-mas__co2__scenario_1",
+      "location": "pancoran-mas",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pancoran-mas__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 2.2488,
+        "rmse": 3.1754,
+        "mape": 0.4664,
+        "r2": 0.9842,
+        "training_time_seconds": 4.9482,
+        "prediction_time_seconds": 0.0191
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pancoran-mas/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pancoran-mas/co2/scenario_1"
+    },
+    "pancoran-mas__co2__scenario_2": {
+      "key": "pancoran-mas__co2__scenario_2",
+      "location": "pancoran-mas",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pancoran-mas__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 2.1653,
+        "rmse": 3.0236,
+        "mape": 0.4495,
+        "r2": 0.9857,
+        "training_time_seconds": 6.4227,
+        "prediction_time_seconds": 0.0211
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pancoran-mas/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pancoran-mas/co2/scenario_2"
+    },
+    "pantai-makmur__co__scenario_1": {
+      "key": "pantai-makmur__co__scenario_1",
+      "location": "pantai-makmur",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pantai-makmur__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 61.4505,
+        "rmse": 99.8962,
+        "mape": 7.1479,
+        "r2": 0.9815,
+        "training_time_seconds": 4.9163,
+        "prediction_time_seconds": 0.0192
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pantai-makmur/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pantai-makmur/co/scenario_1"
+    },
+    "pantai-makmur__co__scenario_2": {
+      "key": "pantai-makmur__co__scenario_2",
+      "location": "pantai-makmur",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pantai-makmur__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 63.2395,
+        "rmse": 104.5327,
+        "mape": 7.1187,
+        "r2": 0.9797,
+        "training_time_seconds": 6.6442,
+        "prediction_time_seconds": 0.0199
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pantai-makmur/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pantai-makmur/co/scenario_2"
+    },
+    "pantai-makmur__co2__scenario_1": {
+      "key": "pantai-makmur__co2__scenario_1",
+      "location": "pantai-makmur",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pantai-makmur__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.2332,
+        "rmse": 1.7344,
+        "mape": 0.2687,
+        "r2": 0.981,
+        "training_time_seconds": 4.2895,
+        "prediction_time_seconds": 0.0193
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pantai-makmur/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pantai-makmur/co2/scenario_1"
+    },
+    "pantai-makmur__co2__scenario_2": {
+      "key": "pantai-makmur__co2__scenario_2",
+      "location": "pantai-makmur",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pantai-makmur__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.2298,
+        "rmse": 1.7652,
+        "mape": 0.2678,
+        "r2": 0.9803,
+        "training_time_seconds": 5.6165,
+        "prediction_time_seconds": 0.0205
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pantai-makmur/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pantai-makmur/co2/scenario_2"
+    },
+    "pelabuhan-muara-baru__co__scenario_1": {
+      "key": "pelabuhan-muara-baru__co__scenario_1",
+      "location": "pelabuhan-muara-baru",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pelabuhan-muara-baru__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 98.0167,
+        "rmse": 151.1073,
+        "mape": 7.4805,
+        "r2": 0.9792,
+        "training_time_seconds": 6.0402,
+        "prediction_time_seconds": 0.0202
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pelabuhan-muara-baru/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pelabuhan-muara-baru/co/scenario_1"
+    },
+    "pelabuhan-muara-baru__co__scenario_2": {
+      "key": "pelabuhan-muara-baru__co__scenario_2",
+      "location": "pelabuhan-muara-baru",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pelabuhan-muara-baru__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 99.241,
+        "rmse": 155.6553,
+        "mape": 7.7291,
+        "r2": 0.9779,
+        "training_time_seconds": 6.6371,
+        "prediction_time_seconds": 0.0211
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pelabuhan-muara-baru/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pelabuhan-muara-baru/co/scenario_2"
+    },
+    "pelabuhan-muara-baru__co2__scenario_1": {
+      "key": "pelabuhan-muara-baru__co2__scenario_1",
+      "location": "pelabuhan-muara-baru",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pelabuhan-muara-baru__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.3339,
+        "rmse": 1.8337,
+        "mape": 0.2889,
+        "r2": 0.9804,
+        "training_time_seconds": 5.8098,
+        "prediction_time_seconds": 0.0204
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pelabuhan-muara-baru/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/pelabuhan-muara-baru/co2/scenario_1"
+    },
+    "pelabuhan-muara-baru__co2__scenario_2": {
+      "key": "pelabuhan-muara-baru__co2__scenario_2",
+      "location": "pelabuhan-muara-baru",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "pelabuhan-muara-baru__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.36,
+        "rmse": 1.9114,
+        "mape": 0.2945,
+        "r2": 0.9788,
+        "training_time_seconds": 6.8852,
+        "prediction_time_seconds": 0.0213
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/pelabuhan-muara-baru/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/pelabuhan-muara-baru/co2/scenario_2"
+    },
+    "perumahan-dekat-tol-depok-antasari__co__scenario_1": {
+      "key": "perumahan-dekat-tol-depok-antasari__co__scenario_1",
+      "location": "perumahan-dekat-tol-depok-antasari",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "perumahan-dekat-tol-depok-antasari__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 181.2198,
+        "rmse": 320.3545,
+        "mape": 8.3602,
+        "r2": 0.9715,
+        "training_time_seconds": 6.2211,
+        "prediction_time_seconds": 0.0203
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/perumahan-dekat-tol-depok-antasari/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/perumahan-dekat-tol-depok-antasari/co/scenario_1"
+    },
+    "perumahan-dekat-tol-depok-antasari__co__scenario_2": {
+      "key": "perumahan-dekat-tol-depok-antasari__co__scenario_2",
+      "location": "perumahan-dekat-tol-depok-antasari",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "perumahan-dekat-tol-depok-antasari__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 193.1228,
+        "rmse": 368.6022,
+        "mape": 8.6485,
+        "r2": 0.9623,
+        "training_time_seconds": 6.7275,
+        "prediction_time_seconds": 0.0211
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/perumahan-dekat-tol-depok-antasari/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/perumahan-dekat-tol-depok-antasari/co/scenario_2"
+    },
+    "perumahan-dekat-tol-depok-antasari__co2__scenario_1": {
+      "key": "perumahan-dekat-tol-depok-antasari__co2__scenario_1",
+      "location": "perumahan-dekat-tol-depok-antasari",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "perumahan-dekat-tol-depok-antasari__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 2.2856,
+        "rmse": 3.4023,
+        "mape": 0.4717,
+        "r2": 0.979,
+        "training_time_seconds": 5.4225,
+        "prediction_time_seconds": 0.0208
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/perumahan-dekat-tol-depok-antasari/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/perumahan-dekat-tol-depok-antasari/co2/scenario_1"
+    },
+    "perumahan-dekat-tol-depok-antasari__co2__scenario_2": {
+      "key": "perumahan-dekat-tol-depok-antasari__co2__scenario_2",
+      "location": "perumahan-dekat-tol-depok-antasari",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "perumahan-dekat-tol-depok-antasari__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 2.3351,
+        "rmse": 3.4897,
+        "mape": 0.4809,
+        "r2": 0.9779,
+        "training_time_seconds": 7.071,
+        "prediction_time_seconds": 0.0215
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/perumahan-dekat-tol-depok-antasari/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/perumahan-dekat-tol-depok-antasari/co2/scenario_2"
+    },
+    "petamburan-perkantoran-transjakarta__co__scenario_1": {
+      "key": "petamburan-perkantoran-transjakarta__co__scenario_1",
+      "location": "petamburan-perkantoran-transjakarta",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "petamburan-perkantoran-transjakarta__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 179.2655,
+        "rmse": 291.5548,
+        "mape": 8.1576,
+        "r2": 0.9755,
+        "training_time_seconds": 4.3927,
+        "prediction_time_seconds": 0.0206
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/petamburan-perkantoran-transjakarta/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/petamburan-perkantoran-transjakarta/co/scenario_1"
+    },
+    "petamburan-perkantoran-transjakarta__co__scenario_2": {
+      "key": "petamburan-perkantoran-transjakarta__co__scenario_2",
+      "location": "petamburan-perkantoran-transjakarta",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "petamburan-perkantoran-transjakarta__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 182.3707,
+        "rmse": 326.1478,
+        "mape": 8.2753,
+        "r2": 0.9693,
+        "training_time_seconds": 7.6697,
+        "prediction_time_seconds": 0.0218
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/petamburan-perkantoran-transjakarta/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/petamburan-perkantoran-transjakarta/co/scenario_2"
+    },
+    "petamburan-perkantoran-transjakarta__co2__scenario_1": {
+      "key": "petamburan-perkantoran-transjakarta__co2__scenario_1",
+      "location": "petamburan-perkantoran-transjakarta",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "petamburan-perkantoran-transjakarta__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.9266,
+        "rmse": 2.7941,
+        "mape": 0.4036,
+        "r2": 0.9801,
+        "training_time_seconds": 4.4396,
+        "prediction_time_seconds": 0.0206
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/petamburan-perkantoran-transjakarta/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/petamburan-perkantoran-transjakarta/co2/scenario_1"
+    },
+    "petamburan-perkantoran-transjakarta__co2__scenario_2": {
+      "key": "petamburan-perkantoran-transjakarta__co2__scenario_2",
+      "location": "petamburan-perkantoran-transjakarta",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "petamburan-perkantoran-transjakarta__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.9894,
+        "rmse": 2.9096,
+        "mape": 0.4172,
+        "r2": 0.9784,
+        "training_time_seconds": 7.6282,
+        "prediction_time_seconds": 0.0216
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/petamburan-perkantoran-transjakarta/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/petamburan-perkantoran-transjakarta/co2/scenario_2"
+    },
+    "smpn-92-jakarta-timur__co__scenario_1": {
+      "key": "smpn-92-jakarta-timur__co__scenario_1",
+      "location": "smpn-92-jakarta-timur",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "smpn-92-jakarta-timur__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 164.6641,
+        "rmse": 244.8038,
+        "mape": 9.127,
+        "r2": 0.979,
+        "training_time_seconds": 4.8632,
+        "prediction_time_seconds": 0.0203
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/smpn-92-jakarta-timur/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/smpn-92-jakarta-timur/co/scenario_1"
+    },
+    "smpn-92-jakarta-timur__co__scenario_2": {
+      "key": "smpn-92-jakarta-timur__co__scenario_2",
+      "location": "smpn-92-jakarta-timur",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "smpn-92-jakarta-timur__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 162.5908,
+        "rmse": 249.8605,
+        "mape": 8.8454,
+        "r2": 0.9782,
+        "training_time_seconds": 6.1384,
+        "prediction_time_seconds": 0.0207
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/smpn-92-jakarta-timur/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/smpn-92-jakarta-timur/co/scenario_2"
+    },
+    "smpn-92-jakarta-timur__co2__scenario_1": {
+      "key": "smpn-92-jakarta-timur__co2__scenario_1",
+      "location": "smpn-92-jakarta-timur",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "smpn-92-jakarta-timur__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.815,
+        "rmse": 2.6022,
+        "mape": 0.3829,
+        "r2": 0.9811,
+        "training_time_seconds": 5.2371,
+        "prediction_time_seconds": 0.0204
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/smpn-92-jakarta-timur/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/smpn-92-jakarta-timur/co2/scenario_1"
+    },
+    "smpn-92-jakarta-timur__co2__scenario_2": {
+      "key": "smpn-92-jakarta-timur__co2__scenario_2",
+      "location": "smpn-92-jakarta-timur",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "smpn-92-jakarta-timur__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.8767,
+        "rmse": 2.6922,
+        "mape": 0.396,
+        "r2": 0.9798,
+        "training_time_seconds": 6.4355,
+        "prediction_time_seconds": 0.0213
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/smpn-92-jakarta-timur/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/smpn-92-jakarta-timur/co2/scenario_2"
+    },
+    "taman-kamal__co__scenario_1": {
+      "key": "taman-kamal__co__scenario_1",
+      "location": "taman-kamal",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "taman-kamal__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 94.6884,
+        "rmse": 160.2242,
+        "mape": 7.5719,
+        "r2": 0.9795,
+        "training_time_seconds": 5.0762,
+        "prediction_time_seconds": 0.0201
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/taman-kamal/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/taman-kamal/co/scenario_1"
+    },
+    "taman-kamal__co__scenario_2": {
+      "key": "taman-kamal__co__scenario_2",
+      "location": "taman-kamal",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "taman-kamal__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 100.0099,
+        "rmse": 175.1758,
+        "mape": 8.0469,
+        "r2": 0.9754,
+        "training_time_seconds": 7.587,
+        "prediction_time_seconds": 0.0252
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/taman-kamal/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/taman-kamal/co/scenario_2"
+    },
+    "taman-kamal__co2__scenario_1": {
+      "key": "taman-kamal__co2__scenario_1",
+      "location": "taman-kamal",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "taman-kamal__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.3998,
+        "rmse": 1.9852,
+        "mape": 0.3017,
+        "r2": 0.9822,
+        "training_time_seconds": 4.5181,
+        "prediction_time_seconds": 0.0196
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/taman-kamal/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/taman-kamal/co2/scenario_1"
+    },
+    "taman-kamal__co2__scenario_2": {
+      "key": "taman-kamal__co2__scenario_2",
+      "location": "taman-kamal",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "taman-kamal__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 1.4337,
+        "rmse": 2.0648,
+        "mape": 0.3087,
+        "r2": 0.9808,
+        "training_time_seconds": 5.965,
+        "prediction_time_seconds": 0.0214
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/taman-kamal/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/taman-kamal/co2/scenario_2"
+    },
+    "tmii__co__scenario_1": {
+      "key": "tmii__co__scenario_1",
+      "location": "tmii",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tmii__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 170.3038,
+        "rmse": 293.3128,
+        "mape": 8.8199,
+        "r2": 0.9705,
+        "training_time_seconds": 4.7092,
+        "prediction_time_seconds": 0.0195
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tmii/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/tmii/co/scenario_1"
+    },
+    "tmii__co__scenario_2": {
+      "key": "tmii__co__scenario_2",
+      "location": "tmii",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tmii__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 172.2559,
+        "rmse": 323.3964,
+        "mape": 8.8186,
+        "r2": 0.9642,
+        "training_time_seconds": 7.2663,
+        "prediction_time_seconds": 0.0203
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tmii/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/tmii/co/scenario_2"
+    },
+    "tmii__co2__scenario_1": {
+      "key": "tmii__co2__scenario_1",
+      "location": "tmii",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tmii__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 2.0525,
+        "rmse": 3.0304,
+        "mape": 0.4265,
+        "r2": 0.9798,
+        "training_time_seconds": 4.6424,
+        "prediction_time_seconds": 0.0196
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tmii/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/tmii/co2/scenario_1"
+    },
+    "tmii__co2__scenario_2": {
+      "key": "tmii__co2__scenario_2",
+      "location": "tmii",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tmii__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 2.1575,
+        "rmse": 3.1455,
+        "mape": 0.4489,
+        "r2": 0.9783,
+        "training_time_seconds": 7.8919,
+        "prediction_time_seconds": 0.0221
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tmii/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/tmii/co2/scenario_2"
+    },
+    "tol-serpong-interchange__co__scenario_1": {
+      "key": "tol-serpong-interchange__co__scenario_1",
+      "location": "tol-serpong-interchange",
+      "pollutant": "co",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tol-serpong-interchange__co__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 122.0575,
+        "rmse": 222.4123,
+        "mape": 7.4067,
+        "r2": 0.9693,
+        "training_time_seconds": 4.6276,
+        "prediction_time_seconds": 0.0192
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tol-serpong-interchange/co/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/tol-serpong-interchange/co/scenario_1"
+    },
+    "tol-serpong-interchange__co__scenario_2": {
+      "key": "tol-serpong-interchange__co__scenario_2",
+      "location": "tol-serpong-interchange",
+      "pollutant": "co",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tol-serpong-interchange__co__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 127.2642,
+        "rmse": 249.4721,
+        "mape": 7.6858,
+        "r2": 0.9614,
+        "training_time_seconds": 5.9079,
+        "prediction_time_seconds": 0.0211
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tol-serpong-interchange/co/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/tol-serpong-interchange/co/scenario_2"
+    },
+    "tol-serpong-interchange__co2__scenario_1": {
+      "key": "tol-serpong-interchange__co2__scenario_1",
+      "location": "tol-serpong-interchange",
+      "pollutant": "co2",
+      "scenario": "scenario_1",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tol-serpong-interchange__co2__scenario_1__lightgbm",
+      "metrics": {
+        "mae": 1.9947,
+        "rmse": 2.9103,
+        "mape": 0.4188,
+        "r2": 0.9806,
+        "training_time_seconds": 6.1508,
+        "prediction_time_seconds": 0.0198
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tol-serpong-interchange/co2/scenario_1/lightgbm",
+      "final_model_dir": "artifacts/final/tol-serpong-interchange/co2/scenario_1"
+    },
+    "tol-serpong-interchange__co2__scenario_2": {
+      "key": "tol-serpong-interchange__co2__scenario_2",
+      "location": "tol-serpong-interchange",
+      "pollutant": "co2",
+      "scenario": "scenario_2",
+      "best_algorithm": "lightgbm",
+      "experiment_id": "tol-serpong-interchange__co2__scenario_2__lightgbm",
+      "metrics": {
+        "mae": 2.0014,
+        "rmse": 2.936,
+        "mape": 0.4198,
+        "r2": 0.9803,
+        "training_time_seconds": 6.4701,
+        "prediction_time_seconds": 0.0211
+      },
+      "best_params": {
+        "n_estimators": 500,
+        "max_depth": 9,
+        "learning_rate": 0.05
+      },
+      "experiment_artifact_dir": "artifacts/experiments/tol-serpong-interchange/co2/scenario_2/lightgbm",
+      "final_model_dir": "artifacts/final/tol-serpong-interchange/co2/scenario_2"
+    }
+  }
+}
