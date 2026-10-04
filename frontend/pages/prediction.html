@@ -29,23 +29,17 @@
         <a href="/pages/interpretation.html">Interpretasi</a>
         <a href="/pages/information.html">Informasi</a>
       </nav>
-      <div class="header-right">
-        <div class="header-status">
-          <span class="status-dot"></span>
-          <span>Sistem aktif</span>
-        </div>
-        <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
-          <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
+      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -72,7 +66,7 @@
       <form id="prediction-form" class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
           <span class="page-tag" style="margin-bottom: 0;">Parameter prediksi</span>
-          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">5 masukan</span>
+          <span style="font-size: 0.8rem; color: #94a3b8; font-weight: 600;">3 parameter konfigurasi</span>
         </div>
 
         <h2 style="font-size: 1.35rem; font-weight: 700; margin-bottom: 1.5rem; color: #0f172a;">
@@ -113,34 +107,36 @@
             <span class="form-hint" id="scenario-hint-text">Fitur lag polutan digabungkan dengan kondisi meteorologis.</span>
           </div>
 
-          <!-- 04 Algoritma prediksi -->
-          <div class="form-group">
+          <!-- 04 Algoritma prediksi (Otomatis / Hidden) -->
+          <div class="form-group" style="display: none;">
             <label class="form-label" for="select-algorithm">
               <span class="form-label-num">04</span> Algoritma prediksi
             </label>
-            <select id="select-algorithm" name="algorithm" class="form-control" required></select>
+            <select id="select-algorithm" name="algorithm" class="form-control" disabled style="background-color: var(--color-surface-subtle); cursor: not-allowed; opacity: 0.9;"></select>
+            <span class="form-hint" id="algorithm-hint-text">
+              <span style="color: var(--color-primary); font-weight: 600;">✓ Mode Otomatis Aktif</span> &mdash; Sistem secara default menggunakan Model Final Terbaik (LightGBM/XGBoost) hasil evaluasi komparatif.
+            </span>
           </div>
 
-          <!-- 05 Waktu Observasi Acuan (t) -->
-          <div class="form-group">
+          <!-- 05 Waktu Observasi Acuan (t) (Otomatis / Hidden) -->
+          <div class="form-group" style="display: none;">
             <label class="form-label" for="input-ref-time">
               <span class="form-label-num">05</span> Waktu Observasi Acuan (t)
             </label>
             <div class="ref-time-row">
-              <input id="input-ref-time" name="reference_datetime" type="datetime-local" class="form-control" value="2026-08-04T23:00" step="3600">
-              <button type="button" id="btn-use-latest-obs" class="btn-ref-preset" title="Gunakan data observasi paling mutakhir">Observasi Terkini</button>
+              <input id="input-ref-time" name="reference_datetime" type="datetime-local" class="form-control" value="2026-08-04T23:00" step="3600" disabled style="background-color: var(--color-surface-subtle); cursor: not-allowed; opacity: 0.9;">
+              <span class="badge-status-final" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.85rem; font-size: 0.825rem; font-weight: 600; background-color: rgba(16, 185, 129, 0.12); color: #059669; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25); white-space: nowrap;">● Observasi Terkini</span>
             </div>
-            <span class="form-hint" id="ref-time-hint">Model memproyeksikan konsentrasi 1 jam ke depan (t+1) berdasarkan kondisi pada waktu acuan (t).</span>
+            <span class="form-hint" id="ref-time-hint">
+              <span style="color: var(--color-primary); font-weight: 600;">✓ Waktu Otomatis Aktif</span> &mdash; Memproyeksikan konsentrasi 1 jam ke depan (5 Agustus 2026, 00:00 WIB) berdasarkan observasi sensor mutakhir.
+            </span>
             <!-- Hidden inputs for evaluation range backwards compatibility -->
             <input id="eval-start-date" type="hidden" value="2026-07-29">
             <input id="eval-end-date" type="hidden" value="2026-08-04">
           </div>
         </div>
 
-        <div class="form-footer-bar">
-          <span class="form-footer-note">
-            <span>&#9432;</span> Koordinat dan nilai konsentrasi tidak dimasukkan secara manual.
-          </span>
+        <div class="form-footer-bar" style="justify-content: flex-end;">
           <button id="btn-submit-prediction" type="submit" class="btn btn-primary">
             <span>Proses prediksi &rarr;</span>
           </button>
@@ -170,6 +166,10 @@
             <span class="navy-table-value" id="summary-algorithm">LightGBM</span>
           </div>
           <div class="navy-table-row">
+            <span class="navy-table-label">Status</span>
+            <span class="navy-table-value" id="summary-model-status" style="color: #6ee7b7; font-weight: 600;">Final deployment model</span>
+          </div>
+          <div class="navy-table-row">
             <span class="navy-table-label">Observasi (t)</span>
             <span class="navy-table-value" id="summary-ref-time">04 Agu 2026, 23:00 WIB</span>
           </div>
@@ -177,11 +177,6 @@
             <span class="navy-table-label">Target (t+1)</span>
             <span class="navy-table-value" id="summary-target-time">05 Agu 2026, 00:00 WIB</span>
           </div>
-        </div>
-
-        <div class="navy-note-box">
-          <span style="font-size: 1rem;">&#9432;</span>
-          <span>Sistem memilih artefak model yang sesuai dengan kombinasi masukan pengguna.</span>
         </div>
 
         <!-- Hidden elements for test compatibility -->
@@ -242,7 +237,8 @@
               <span id="res-predicted-val" class="pred-hero-number">-</span>
               <span id="res-unit" class="pred-hero-unit">-</span>
             </div>
-            <div class="pred-dynamics-row">
+            <!-- Dynamics row hidden per user request -->
+            <div class="pred-dynamics-row" style="display: none;">
               <span id="res-trend-badge" class="pred-trend-pill trend-stabil">
                 <span id="res-trend-icon">&#9679;</span>
                 <span id="res-trend-label">Stabil</span>

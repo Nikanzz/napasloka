@@ -84,3 +84,7 @@ class EvaluationResponse(BaseModel):
     metrics: ModelMetrics
     comparison: ComparisonMetrics | None = None
     chart_data: EvaluationChartSeries
+    best_model_algorithm: str | None = None
+    best_model_label: str | None = None
+    is_best_model: bool = False
+

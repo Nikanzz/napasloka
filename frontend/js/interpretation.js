@@ -126,34 +126,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       const s = urlParams.get("scenario").toLowerCase();
       if (selectScen.querySelector(`option[value="${s}"]`)) selectScen.value = s;
     }
-    if (urlParams.has("algorithm") && selectAlgo) {
-      const a = urlParams.get("algorithm").toLowerCase();
-      if (selectAlgo.querySelector(`option[value="${a}"]`)) selectAlgo.value = a;
+    if (selectAlgo) {
+      selectAlgo.value = "auto";
     }
     if (urlParams.has("top_k") && selectTopK) {
       const k = urlParams.get("top_k");
       if (["5", "10", "15"].includes(k)) selectTopK.value = k;
     }
-    if (urlParams.has("datetime") && inputDatetime) {
+    if (urlParams.has("reference_datetime") && inputDatetime) {
+      const rdt = urlParams.get("reference_datetime");
+      inputDatetime.value = rdt.includes("T") ? rdt.substring(0, 16) : `${rdt}T23:00`;
+    } else if (urlParams.has("datetime") && inputDatetime) {
       const dt = urlParams.get("datetime");
-      try {
-        const d = new Date(dt);
-        if (!isNaN(d.getTime())) {
-          inputDatetime.value = d.toISOString().slice(0, 16);
-        }
-      } catch {
-        // ignore format error
-      }
+      inputDatetime.value = dt.includes("T") ? dt.substring(0, 16) : `${dt}T23:00`;
     } else if (urlParams.has("end_date") && inputDatetime) {
       const ed = urlParams.get("end_date");
-      try {
-        const d = new Date(`${ed}T23:00:00`);
-        if (!isNaN(d.getTime())) {
-          inputDatetime.value = d.toISOString().slice(0, 16);
-        }
-      } catch {
-        // ignore format error
-      }
+      inputDatetime.value = `${ed}T23:00`;
     }
   } catch (err) {
     showError(err.message || "Gagal menginisialisasi opsi lokasi dari backend.");
@@ -245,16 +233,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     const location = selectLoc ? selectLoc.value : "mustikasari";
     const pollutant = selectPol ? selectPol.value : "co";
     const scenario = selectScen ? selectScen.value : "scenario_2";
-    const algorithm = selectAlgo ? selectAlgo.value : "lightgbm";
+    const algorithm = "auto";
     const topK = selectTopK ? (parseInt(selectTopK.value, 10) || 5) : 5;
 
     let refDatetime = null;
     if (inputDatetime && inputDatetime.value) {
-      try {
-        refDatetime = new Date(inputDatetime.value).toISOString();
-      } catch {
-        refDatetime = null;
-      }
+      refDatetime = inputDatetime.value.includes("T") ? inputDatetime.value : `${inputDatetime.value}T23:00`;
     }
 
     // Update Quick Links query parameters
@@ -280,7 +264,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
       if (refPredVal) refPredVal.textContent = formatNumber(data.predicted_value, 1);
       if (refPredUnit) refPredUnit.textContent = data.pollutant_unit;
-      if (refModelBadge) refModelBadge.textContent = `${data.algorithm_label} · ${data.scenario_label}`;
+      if (refModelBadge) {
+        refModelBadge.textContent = `${data.algorithm_label} · ${data.scenario_label} (${data.model_status})`;
+      }
       if (refBaseValuePill) {
         refBaseValuePill.innerHTML = `Base E[f(X)]: <strong>${formatNumber(data.base_value, 1)} ${data.pollutant_unit}</strong>`;
       }

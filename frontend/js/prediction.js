@@ -79,6 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   let appOptions = null;
+  let bestModelsRegistry = null;
   let latestObsTimestamp = "2026-08-04T23:00";
 
   // Helper: Format ISO string to Indonesian display timestamp
@@ -113,9 +114,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     return `${yr}-${mo}-${da}T${ho}:${mi}`;
   }
 
+  // Helper: Update disabled algorithm select option with current winning model
+  function updateAlgorithmDisplay() {
+    const loc = selectLoc ? selectLoc.value : "";
+    const pol = selectPol ? selectPol.value : "";
+    const scen = selectScen ? selectScen.value : "";
+    const key = `${loc}__${pol}__${scen}`;
+    let winnerAlgo = "LightGBM";
+    if (bestModelsRegistry && bestModelsRegistry.best_models && bestModelsRegistry.best_models[key]) {
+      const entry = bestModelsRegistry.best_models[key];
+      winnerAlgo = entry.best_algorithm && entry.best_algorithm.toLowerCase() === "xgboost" ? "XGBoost" : "LightGBM";
+    }
+
+    if (selectAlgo) {
+      selectAlgo.innerHTML = `<option value="auto" selected>Otomatis: ${winnerAlgo} (Model Terbaik — Final Deployment)</option>`;
+      selectAlgo.disabled = true;
+    }
+    return winnerAlgo;
+  }
+
   // 1. Load options and populate dropdowns
   try {
     appOptions = await window.NapasLokaApi.getOptions();
+
+    // Load best models registry
+    try {
+      bestModelsRegistry = await window.NapasLokaApi.getBestModels();
+    } catch (regErr) {
+      console.warn("Could not load best models registry:", regErr);
+    }
 
     // Populate Location
     selectLoc.innerHTML = "";
@@ -144,21 +171,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       selectScen.appendChild(opt);
     });
 
-    // Populate Algorithm
-    selectAlgo.innerHTML = "";
-    appOptions.algorithms.forEach((algo) => {
-      const opt = document.createElement("option");
-      opt.value = algo.id;
-      opt.textContent = algo.name || algo.label;
-      selectAlgo.appendChild(opt);
-    });
+    // Lock Algorithm select to Auto (Best Model)
+    updateAlgorithmDisplay();
 
     // 2. Pre-select values from URL parameters or localStorage
     const urlParams = new URLSearchParams(window.location.search);
     const initialLoc = urlParams.get("location") || localStorage.getItem("napasloka_selected_location") || "petamburan-perkantoran-transjakarta";
     const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co2";
     const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_2";
-    const initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
     const initialRefTime = urlParams.get("reference_datetime") || urlParams.get("end_date");
 
     if (selectLoc.querySelector(`option[value="${initialLoc}"]`)) selectLoc.value = initialLoc;
@@ -170,8 +190,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     }
     if (selectScen.querySelector(`option[value="${initialScen}"]`)) selectScen.value = initialScen;
-    if (selectAlgo.querySelector(`option[value="${initialAlgo}"]`)) selectAlgo.value = initialAlgo;
 
+    updateAlgorithmDisplay();
     await syncDatasetBounds();
 
     if (initialRefTime && inputRefTime) {
@@ -188,8 +208,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   // Update summary card on any select change
-  [selectLoc, selectPol, selectScen, selectAlgo].forEach((el) => {
+  [selectLoc, selectPol, selectScen].forEach((el) => {
     el.addEventListener("change", () => {
+      updateAlgorithmDisplay();
       updateSummaryCard();
     });
   });
@@ -245,11 +266,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         latestObsTimestamp = maxIso;
 
         if (inputRefTime) {
-          inputRefTime.min = minIso;
-          inputRefTime.max = maxIso;
-          if (!inputRefTime.value || inputRefTime.value > maxIso || inputRefTime.value < minIso) {
-            inputRefTime.value = maxIso;
-          }
+          inputRefTime.value = maxIso;
+          inputRefTime.disabled = true;
+        }
+
+        const refHint = document.getElementById("ref-time-hint");
+        if (refHint) {
+          const targetIso = calculateTargetIso(maxIso);
+          refHint.innerHTML = `<span style="color: var(--color-primary); font-weight: 600;">✓ Waktu Otomatis Aktif</span> &mdash; Memproyeksikan konsentrasi 1 jam ke depan (${formatIndoTime(targetIso)}) berdasarkan observasi sensor mutakhir (${formatIndoTime(maxIso)}).`;
         }
 
         if (evalStartDate) {
@@ -291,9 +315,10 @@ document.addEventListener("DOMContentLoaded", async () => {
           : "Fitur lag polutan digabungkan dengan kondisi meteorologis.";
       }
     }
-    if (algoObj && summaryAlgo) {
-      summaryAlgo.textContent = algoObj.name || algoObj.label;
-    }
+    const winnerAlgo = updateAlgorithmDisplay();
+    const summaryModelStatus = document.getElementById("summary-model-status");
+    if (summaryAlgo) summaryAlgo.textContent = `${winnerAlgo} (Model Terbaik)`;
+    if (summaryModelStatus) summaryModelStatus.textContent = "Final deployment model";
 
     const currentRefVal = inputRefTime && inputRefTime.value ? inputRefTime.value : latestObsTimestamp;
     if (summaryRefTime) {
@@ -316,14 +341,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     const loc = selectLoc.value;
     const pol = selectPol.value;
     const scen = selectScen.value;
-    const algo = selectAlgo.value;
-    const refTime = (inputRefTime && inputRefTime.value) ? inputRefTime.value : null;
+    const algo = "auto";
+    const refTime = latestObsTimestamp || (inputRefTime && inputRefTime.value ? inputRefTime.value : null);
 
     // Save to localStorage
     localStorage.setItem("napasloka_selected_location", loc);
     localStorage.setItem("napasloka_selected_pollutant", pol);
     localStorage.setItem("napasloka_selected_scenario", scen);
-    localStorage.setItem("napasloka_selected_algorithm", algo);
+    localStorage.setItem("napasloka_selected_algorithm", "auto");
 
     // Set button loading state
     submitBtn.disabled = true;
@@ -457,7 +482,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // 5. Counterpart Benchmark
     if (resActiveAlgoName) {
-      resActiveAlgoName.textContent = res.algorithm_label;
+      resActiveAlgoName.textContent = `${res.algorithm_label} (${res.model_status})`;
+    }
+    const summaryModelStatus = document.getElementById("summary-model-status");
+    if (summaryModelStatus) {
+      summaryModelStatus.textContent = res.model_status;
+    }
+    if (summaryAlgo) {
+      summaryAlgo.textContent = `${res.algorithm_label} (${res.is_final_model ? "Model Terbaik" : "Komparasi"})`;
     }
     if (resActiveAlgoVal) {
       resActiveAlgoVal.textContent = `${Number(res.predicted_value).toLocaleString("id-ID", {
@@ -532,7 +564,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 7. Update Quick Links to Evaluation and Interpretation
     const startVal = evalStartDate ? evalStartDate.value : "2026-07-29";
     const endVal = evalEndDate ? evalEndDate.value : "2026-08-04";
-    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}`;
+    const refVal = res.latest_observation_time || "2026-08-04T23:00";
+    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&reference_datetime=${encodeURIComponent(refVal)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}`;
     if (btnGotoEvaluation) btnGotoEvaluation.href = `/pages/evaluation.html?${queryParams}`;
     if (btnGotoInterpretation) btnGotoInterpretation.href = `/pages/interpretation.html?${queryParams}`;
 

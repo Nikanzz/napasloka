@@ -42,7 +42,10 @@ class RegistryService:
     def __init__(self) -> None:
         self.experiments_dir = settings.experiments_dir
         self.registry_dir = settings.registry_dir
+        self.final_models_dir = settings.final_models_dir
+        self.best_models_file = settings.best_models_file
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
+        self._best_models_cache: dict[str, Any] | None = None
 
     def validate_dimensions(
         self,
@@ -333,6 +336,150 @@ class RegistryService:
             "models": models_list,
         }
 
+    def load_best_models_registry(self, force_reload: bool = False) -> dict[str, Any]:
+        """Load the best models registry mapping (60 entries). Auto-generate if missing."""
+        if self._best_models_cache is not None and not force_reload:
+            return self._best_models_cache
+
+        if not self.best_models_file.is_file():
+            logger.info("best_models.json not found, selecting best models from summary_metrics.csv...")
+            from ml_pipeline.experiments.best_model import select_best_models
+            registry_data = select_best_models(
+                registry_output_path=self.best_models_file,
+                primary_metric="mae",
+            )
+            self._best_models_cache = registry_data
+            return registry_data
+
+        with open(self.best_models_file, "r", encoding="utf-8") as f:
+            registry_data = json.load(f)
+            self._best_models_cache = registry_data
+            return registry_data
+
+    def get_best_model(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> dict[str, Any]:
+        """Retrieve winning model entry for a specific (location, pollutant, scenario)."""
+        loc_slug = slugify_component(location)
+        if loc_slug not in self.supported_locations:
+            valid_locs = ", ".join(self.supported_locations.keys())
+            raise ValueError(f"Unknown location '{location}'. Valid locations are: {valid_locs}")
+        if pollutant.lower() not in SUPPORTED_POLLUTANTS:
+            raise ValueError(f"Unknown pollutant '{pollutant}'. Valid pollutants are: {SUPPORTED_POLLUTANTS}")
+        if scenario.lower() not in SUPPORTED_SCENARIOS:
+            raise ValueError(f"Unknown scenario '{scenario}'. Valid scenarios are: {SUPPORTED_SCENARIOS}")
+
+        registry = self.load_best_models_registry()
+        key = f"{loc_slug}__{pollutant.lower()}__{scenario.lower()}"
+        best_models = registry.get("best_models", {})
+        if key not in best_models:
+            raise KeyError(f"No best model registered for combination: {key}")
+        return best_models[key]
+
+    def get_all_best_models(self) -> dict[str, Any]:
+        """Return the dictionary of all 60 best models."""
+        return self.load_best_models_registry()
+
+    def get_final_artifact_directory(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> Path:
+        """Return the artifact directory for a retrained final deployment model."""
+        loc_slug = slugify_component(location)
+        return self.final_models_dir.joinpath(loc_slug, pollutant.lower(), scenario.lower())
+
+    def load_final_estimator(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> Any:
+        """Load retrained final deployment model with in-memory caching.
+        Falls back to winning experiment estimator if final model file is not present.
+        """
+        loc_slug = slugify_component(location)
+        cache_key = f"final__{loc_slug}__{pollutant.lower()}__{scenario.lower()}"
+        cached = model_cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+        final_dir = self.get_final_artifact_directory(loc_slug, pollutant, scenario)
+        final_model_path = final_dir / "model.joblib"
+
+        if final_model_path.is_file():
+            logger.info("Loading final deployment estimator from: %s", final_model_path)
+            estimator = joblib.load(final_model_path)
+            model_cache.set(cache_key, estimator)
+            return estimator
+
+        # Fallback to winning experiment model
+        best_entry = self.get_best_model(location, pollutant, scenario)
+        logger.warning(
+            "Final model not found at %s. Falling back to winning experiment model (%s).",
+            final_model_path,
+            best_entry["best_algorithm"],
+        )
+        return self.load_estimator(
+            location,
+            pollutant,
+            scenario,
+            best_entry["best_algorithm"],
+        )
+
+    def get_final_metadata(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> dict[str, Any]:
+        """Read and return final_metadata.json for a deployment model."""
+        final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
+        meta_file = final_dir / "final_metadata.json"
+        if meta_file.is_file():
+            with open(meta_file, "r", encoding="utf-8") as f:
+                return json.load(f)
+
+        # Fallback to best_model registry entry
+        return self.get_best_model(location, pollutant, scenario)
+
+    def get_final_feature_importance(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> list[dict[str, Any]]:
+        """Read Gain-based feature importance from final model directory."""
+        final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
+        fi_path = final_dir / "feature_importance.csv"
+        if fi_path.is_file():
+            df = pd.read_csv(fi_path)
+            return df.to_dict(orient="records")
+
+        best_entry = self.get_best_model(location, pollutant, scenario)
+        return self.get_feature_importance(location, pollutant, scenario, best_entry["best_algorithm"])
+
+    def get_final_global_shap(
+        self,
+        location: str,
+        pollutant: str,
+        scenario: str,
+    ) -> list[dict[str, Any]]:
+        """Read global mean absolute SHAP from final model directory."""
+        final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
+        shap_path = final_dir / "shap_global.csv"
+        if shap_path.is_file():
+            df = pd.read_csv(shap_path)
+            return df.to_dict(orient="records")
+
+        best_entry = self.get_best_model(location, pollutant, scenario)
+        return self.get_global_shap(location, pollutant, scenario, best_entry["best_algorithm"])
+
 
 # Singleton service instance
 registry_service = RegistryService()
+

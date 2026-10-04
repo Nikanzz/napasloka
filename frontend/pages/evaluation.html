@@ -31,23 +31,17 @@
         <a href="/pages/interpretation.html">Interpretasi</a>
         <a href="/pages/information.html">Informasi</a>
       </nav>
-      <div class="header-right">
-        <div class="header-status">
-          <span class="status-dot"></span>
-          <span>Sistem aktif</span>
-        </div>
-        <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
-          <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <line x1="3" y1="12" x2="21" y2="12"></line>
-            <line x1="3" y1="18" x2="21" y2="18"></line>
-          </svg>
-          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
+      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
     </div>
   </header>
 
@@ -114,46 +108,6 @@
 
     <!-- Error/Status Container -->
     <div id="eval-status-container" style="display: none; margin-bottom: 1.5rem;"></div>
-
-    <!-- Top Hero Banner (Deep Navy Card #0c1445 from Mockup 3) -->
-    <section class="navy-card" style="margin-bottom: 1.5rem; padding: 1.5rem 2rem;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
-        <!-- Left Side: Prediction Value -->
-        <div>
-          <span class="navy-pill" style="margin-bottom: 0.5rem;">Hasil prediksi</span>
-          <p id="hero-headline-sub" style="font-size: 0.88rem; color: #94a3b8; margin-bottom: 0.35rem;">
-            Prediksi CO satu jam berikutnya
-          </p>
-          <div style="display: flex; align-items: baseline; gap: 0.35rem;">
-            <span id="hero-pred-val" style="font-size: 2.75rem; font-weight: 800; color: #ffffff; letter-spacing: -0.02em; line-height: 1.1;">
-              642,3
-            </span>
-            <span id="hero-pred-unit" style="font-size: 1.05rem; font-weight: 600; color: #94a3b8;">
-              µg/m³
-            </span>
-          </div>
-        </div>
-
-        <!-- Right Side: Model & Time Metadata -->
-        <div style="display: flex; flex-direction: column; gap: 0.4rem; font-size: 0.88rem; text-align: right;">
-          <div style="color: #ffffff; font-weight: 600;" id="hero-loc-name">
-            Jakarta Pusat
-          </div>
-          <div style="color: #94a3b8;" id="hero-model-name">
-            LightGBM · Skenario 2
-          </div>
-          <div style="color: #94a3b8;" id="hero-time-stamp">
-            5 Agustus 2026 · 00:00 WIB
-          </div>
-        </div>
-      </div>
-
-      <!-- Hidden compatibility elements for existing logic -->
-      <span id="hero-model-title" style="display:none;"></span>
-      <span id="hero-model-subtitle" style="display:none;"></span>
-      <span id="hero-time-range-badge" style="display:none;"></span>
-      <span id="hero-samples-badge" style="display:none;"></span>
-    </section>
 
     <!-- 4 Metric Cards Grid (Mockup 3: 01 MAE, 02 RMSE, 03 MAPE, 04 R2) -->
     <section class="grid-4" style="margin-bottom: 1.75rem;" aria-label="Metrik kinerja model">
@@ -249,10 +203,14 @@
 
       <!-- Column 2: Model Comparison (Card ~35%) -->
       <aside class="card">
-        <span class="page-tag" style="margin-bottom: 0.5rem;">Perbandingan model</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
+          <span class="page-tag" style="margin-bottom: 0;">Perbandingan model</span>
+          <span id="eval-best-model-pill" class="badge badge-emerald" style="font-size: 0.75rem; font-weight: 700;">⭐ Model Terbaik</span>
+        </div>
         <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 1.25rem; color: #0f172a;">
           Model pada konfigurasi ini
         </h3>
+
 
         <!-- Selected Model Box (Highlight Blue Border) -->
         <div class="model-box-highlight">

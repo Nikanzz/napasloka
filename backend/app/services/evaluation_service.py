@@ -241,6 +241,19 @@ class EvaluationService:
             request.algorithm,
         )
 
+        # Lookup registered best model for this combination
+        best_algo = None
+        best_algo_label = None
+        is_best = False
+        try:
+            best_entry = self.registry.get_best_model(loc_slug, request.pollutant, request.scenario)
+            best_algo = best_entry["best_algorithm"]
+            best_meta = ALGORITHM_METADATA.get(best_algo, {})
+            best_algo_label = best_meta.get("label", best_algo.upper())
+            is_best = (request.algorithm == best_algo)
+        except Exception as e:
+            logger.warning("Could not determine best model for evaluation: %s", e)
+
         return EvaluationResponse(
             experiment_id=experiment_id,
             location=loc_slug,
@@ -257,8 +270,12 @@ class EvaluationService:
             metrics=primary_metrics,
             comparison=comparison,
             chart_data=chart_data,
+            best_model_algorithm=best_algo,
+            best_model_label=best_algo_label,
+            is_best_model=is_best,
         )
 
 
 # Singleton service instance
 evaluation_service = EvaluationService()
+

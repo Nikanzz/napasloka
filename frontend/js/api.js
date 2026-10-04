@@ -46,6 +46,11 @@ window.NapasLokaApi = {
     return this.request("/config/models");
   },
 
+  async getBestModels() {
+    return this.request("/config/best-models");
+  },
+
+
   async getEvaluationRange(location, pollutant) {
     return this.request(`/evaluation/range?location=${encodeURIComponent(location)}&pollutant=${encodeURIComponent(pollutant)}`);
   },

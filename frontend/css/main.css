@@ -163,29 +163,6 @@ a:hover {
   border-radius: 2px;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.header-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: #334155;
-  white-space: nowrap;
-}
-
-.status-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background-color: var(--color-success);
-}
-
 .nav-toggle-btn {
   display: none;
 }
@@ -400,15 +377,6 @@ h1 {
   }
   .brand-system-label {
     font-size: 7.5px;
-  }
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-  .header-status {
-    font-size: 0.75rem;
-  }
   .nav-toggle-btn {
     display: inline-flex;
     align-items: center;
@@ -524,11 +492,5 @@ h1 {
   }
   .footer-info {
     text-align: left;
-  }
-}
-
-@media (max-width: 380px) {
-  .header-status span:last-child {
-    display: none;
   }
 }

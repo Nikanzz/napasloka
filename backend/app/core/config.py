@@ -107,6 +107,8 @@ class Settings:
     artifacts_dir: Path = ARTIFACTS_DIR
     experiments_dir: Path = EXPERIMENTS_DIR
     registry_dir: Path = REGISTRY_DIR
+    final_models_dir: Path = ARTIFACTS_DIR / "final"
+    best_models_file: Path = REGISTRY_DIR / "best_models.json"
 
     allowed_origins: list[str] = field(default_factory=lambda: [
         "http://localhost:5500",

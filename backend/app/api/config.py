@@ -28,3 +28,10 @@ def configuration_options() -> dict[str, Any]:
 def get_all_models_summary() -> dict[str, Any]:
     """Return inventory summary of all 120 trained models in the registry."""
     return registry_service.get_all_models_summary()
+
+
+@router.get("/best-models")
+def get_best_models_registry() -> dict[str, Any]:
+    """Return registry of 60 winning models per location x pollutant x scenario."""
+    return registry_service.get_all_best_models()
+

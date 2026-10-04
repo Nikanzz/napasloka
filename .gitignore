@@ -18,6 +18,7 @@ data/processed/*
 #artifacts/experiments/*
 !artifacts/experiments/.gitkeep
 artifacts/registry/*.json
+!artifacts/registry/best_models.json
 !artifacts/registry/.gitkeep
 
 #*.joblib
