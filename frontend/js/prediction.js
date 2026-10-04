@@ -1,7 +1,7 @@
 "use strict";
 
 /**
- * Controller for Konfigurasi Prediksi (Precision Matching Chapter 3 Mockup 1).
+ * Controller for Konfigurasi Prediksi (Precision Matching Chapter 3 Mockup 1 + Rich Foresight Result Panel).
  */
 document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("prediction-form");
@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const selectScen = document.getElementById("select-scenario");
   const selectAlgo = document.getElementById("select-algorithm");
   const inputRefTime = document.getElementById("input-ref-time");
+  const btnUseLatestObs = document.getElementById("btn-use-latest-obs");
   const evalStartDate = document.getElementById("eval-start-date");
   const evalEndDate = document.getElementById("eval-end-date");
   const scenarioHintText = document.getElementById("scenario-hint-text");
@@ -23,14 +24,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   const summaryPol = document.getElementById("summary-pollutant");
   const summaryScen = document.getElementById("summary-scenario");
   const summaryAlgo = document.getElementById("summary-algorithm");
+  const summaryRefTime = document.getElementById("summary-ref-time");
+  const summaryTargetTime = document.getElementById("summary-target-time");
 
-  // Result card elements
+  // Result card elements: Header & timeline
   const resPollutantTitle = document.getElementById("res-pollutant-title");
-  const resTargetTimeBadge = document.getElementById("res-target-time-badge");
   const resAssessmentBadge = document.getElementById("res-assessment-badge");
+  const resLatestTime = document.getElementById("res-latest-time");
+  const resLatestVal = document.getElementById("res-latest-val");
+  const resLatestUnit = document.getElementById("res-latest-unit");
+  const resTargetTimeBadge = document.getElementById("res-target-time-badge");
+  const resTargetSummaryVal = document.getElementById("res-target-summary-val");
+  const resTargetSummaryUnit = document.getElementById("res-target-summary-unit");
+
+  // Result card elements: Hero metric & dynamics
   const resPredictedVal = document.getElementById("res-predicted-val");
   const resUnit = document.getElementById("res-unit");
+  const resTrendBadge = document.getElementById("res-trend-badge");
+  const resTrendIcon = document.getElementById("res-trend-icon");
+  const resTrendLabel = document.getElementById("res-trend-label");
+  const resDeltaVal = document.getElementById("res-delta-val");
+  const resDeltaPct = document.getElementById("res-delta-pct");
+
+  // Result card elements: Health & Standards
+  const resStandardRef = document.getElementById("res-standard-ref");
   const resAssessmentDesc = document.getElementById("res-assessment-desc");
+  const resMeterFill = document.getElementById("res-meter-fill");
+  const resMeterLabels = document.getElementById("res-meter-labels");
+
+  // Result card elements: Counterpart benchmark
+  const resActiveAlgoName = document.getElementById("res-active-algo-name");
+  const resActiveAlgoVal = document.getElementById("res-active-algo-val");
+  const resCounterpartLabel = document.getElementById("res-counterpart-label");
+  const resCounterpartVal = document.getElementById("res-counterpart-val");
+  const resCounterpartDelta = document.getElementById("res-counterpart-delta");
+  const resCounterpartAgreement = document.getElementById("res-counterpart-agreement");
+
+  // Result card elements: Features & Navigation
+  const resFeaturesCount = document.getElementById("res-features-count");
+  const resFeatureChips = document.getElementById("res-feature-chips");
   const btnGotoEvaluation = document.getElementById("btn-goto-evaluation");
   const btnGotoInterpretation = document.getElementById("btn-goto-interpretation");
 
@@ -47,6 +79,39 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   let appOptions = null;
+  let latestObsTimestamp = "2026-08-04T23:00";
+
+  // Helper: Format ISO string to Indonesian display timestamp
+  function formatIndoTime(isoStr) {
+    if (!isoStr) return "-";
+    try {
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return isoStr;
+      const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+      const day = String(d.getDate()).padStart(2, "0");
+      const month = months[d.getMonth()];
+      const year = d.getFullYear();
+      const hours = String(d.getHours()).padStart(2, "0");
+      const mins = String(d.getMinutes()).padStart(2, "0");
+      return `${day} ${month} ${year}, ${hours}:${mins} WIB`;
+    } catch {
+      return isoStr;
+    }
+  }
+
+  // Helper: Calculate Target Time (t + 1 hour)
+  function calculateTargetIso(isoStr) {
+    if (!isoStr) return "";
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return "";
+    d.setHours(d.getHours() + 1);
+    const yr = d.getFullYear();
+    const mo = String(d.getMonth() + 1).padStart(2, "0");
+    const da = String(d.getDate()).padStart(2, "0");
+    const ho = String(d.getHours()).padStart(2, "0");
+    const mi = String(d.getMinutes()).padStart(2, "0");
+    return `${yr}-${mo}-${da}T${ho}:${mi}`;
+  }
 
   // 1. Load options and populate dropdowns
   try {
@@ -94,6 +159,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co2";
     const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_2";
     const initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
+    const initialRefTime = urlParams.get("reference_datetime") || urlParams.get("end_date");
 
     if (selectLoc.querySelector(`option[value="${initialLoc}"]`)) selectLoc.value = initialLoc;
     if (selectPol.querySelector(`option[value="${initialPol}"]`)) {
@@ -106,8 +172,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (selectScen.querySelector(`option[value="${initialScen}"]`)) selectScen.value = initialScen;
     if (selectAlgo.querySelector(`option[value="${initialAlgo}"]`)) selectAlgo.value = initialAlgo;
 
-    updateSummaryCard();
     await syncDatasetBounds();
+
+    if (initialRefTime && inputRefTime) {
+      const formattedInitialTime = initialRefTime.includes("T") ? initialRefTime.substring(0, 16) : `${initialRefTime}T23:00`;
+      inputRefTime.value = formattedInitialTime;
+    }
+
+    updateSummaryCard();
 
     // 3. Automatically perform initial prediction
     executePrediction();
@@ -126,34 +198,70 @@ document.addEventListener("DOMContentLoaded", async () => {
   selectLoc.addEventListener("change", syncDatasetBounds);
   selectPol.addEventListener("change", syncDatasetBounds);
 
-  if (evalEndDate) {
-    evalEndDate.addEventListener("change", () => {
-      if (evalEndDate.value && inputRefTime) {
-        inputRefTime.value = `${evalEndDate.value}T23:00:00`;
+  if (inputRefTime) {
+    inputRefTime.addEventListener("change", () => {
+      syncDatesFromInputRefTime();
+      updateSummaryCard();
+    });
+  }
+
+  if (btnUseLatestObs) {
+    btnUseLatestObs.addEventListener("click", () => {
+      if (inputRefTime) {
+        inputRefTime.value = latestObsTimestamp;
+        syncDatesFromInputRefTime();
+        updateSummaryCard();
+        executePrediction();
       }
     });
+  }
+
+  function syncDatesFromInputRefTime() {
+    if (!inputRefTime || !inputRefTime.value) return;
+    const datePart = inputRefTime.value.substring(0, 10);
+    if (evalEndDate) evalEndDate.value = datePart;
+
+    // Calculate 6 days prior for 7-day evaluation window
+    try {
+      const d = new Date(datePart);
+      d.setDate(d.getDate() - 6);
+      const yr = d.getFullYear();
+      const mo = String(d.getMonth() + 1).padStart(2, "0");
+      const da = String(d.getDate()).padStart(2, "0");
+      if (evalStartDate) evalStartDate.value = `${yr}-${mo}-${da}`;
+    } catch {
+      if (evalStartDate) evalStartDate.value = "2026-07-29";
+    }
   }
 
   async function syncDatasetBounds() {
     try {
       const bounds = await window.NapasLokaApi.getEvaluationRange(selectLoc.value, selectPol.value);
-      if (bounds && evalStartDate && evalEndDate) {
+      if (bounds) {
         const startDay = bounds.start.substring(0, 10);
         const endDay = bounds.end.substring(0, 10);
-        evalStartDate.min = startDay;
-        evalStartDate.max = endDay;
-        evalEndDate.min = startDay;
-        evalEndDate.max = endDay;
+        const maxIso = `${endDay}T23:00`;
+        const minIso = `${startDay}T00:00`;
+        latestObsTimestamp = maxIso;
 
-        if (!evalEndDate.value || evalEndDate.value > endDay || evalEndDate.value < startDay) {
-          evalEndDate.value = endDay;
-        }
-        if (!evalStartDate.value || evalStartDate.value < startDay || evalStartDate.value > evalEndDate.value) {
-          evalStartDate.value = "2026-07-29";
-        }
         if (inputRefTime) {
-          inputRefTime.value = `${evalEndDate.value}T23:00:00`;
+          inputRefTime.min = minIso;
+          inputRefTime.max = maxIso;
+          if (!inputRefTime.value || inputRefTime.value > maxIso || inputRefTime.value < minIso) {
+            inputRefTime.value = maxIso;
+          }
         }
+
+        if (evalStartDate) {
+          evalStartDate.min = startDay;
+          evalStartDate.max = endDay;
+        }
+        if (evalEndDate) {
+          evalEndDate.min = startDay;
+          evalEndDate.max = endDay;
+        }
+
+        syncDatesFromInputRefTime();
       }
     } catch (e) {
       console.warn("Could not sync evaluation range bounds:", e);
@@ -185,6 +293,15 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     if (algoObj && summaryAlgo) {
       summaryAlgo.textContent = algoObj.name || algoObj.label;
+    }
+
+    const currentRefVal = inputRefTime && inputRefTime.value ? inputRefTime.value : latestObsTimestamp;
+    if (summaryRefTime) {
+      summaryRefTime.textContent = formatIndoTime(currentRefVal);
+    }
+    if (summaryTargetTime) {
+      const targetIso = calculateTargetIso(currentRefVal);
+      summaryTargetTime.textContent = formatIndoTime(targetIso);
     }
   }
 
@@ -237,33 +354,169 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderPredictionResult(res) {
     resultSection.style.display = "block";
 
-    // Header info
+    // 1. Header info & Badge
     if (resPollutantTitle) {
       resPollutantTitle.textContent = `Prediksi ${res.pollutant_label} di ${res.location_name}`;
     }
-    if (resTargetTimeBadge) {
-      resTargetTimeBadge.textContent = `Target: ${res.target_time_display}`;
-    }
-
-    // Assessment badge & color
     if (resAssessmentBadge) {
       resAssessmentBadge.textContent = res.assessment.category;
       resAssessmentBadge.style.backgroundColor = res.assessment.color || "#10b981";
       resAssessmentBadge.style.color = "#ffffff";
     }
-    if (resAssessmentDesc) {
-      resAssessmentDesc.textContent = `${res.assessment.description} (${res.assessment.standard})`;
+
+    // 2. Timeline Bar (Observation t -> Target t+1)
+    if (resLatestTime) {
+      resLatestTime.textContent = res.latest_observation_display || formatIndoTime(res.latest_observation_time);
+    }
+    if (resLatestVal) {
+      resLatestVal.textContent = Number(res.latest_observation_value).toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 2,
+      });
+    }
+    if (resLatestUnit) {
+      resLatestUnit.textContent = res.pollutant_unit;
+    }
+    if (resTargetTimeBadge) {
+      resTargetTimeBadge.textContent = res.target_time_display || formatIndoTime(res.target_time);
+    }
+    if (resTargetSummaryVal) {
+      resTargetSummaryVal.textContent = Number(res.predicted_value).toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 2,
+      });
+    }
+    if (resTargetSummaryUnit) {
+      resTargetSummaryUnit.textContent = res.pollutant_unit;
     }
 
-    // Main prediction values
+    // 3. Hero Metric & Dynamics
     if (resPredictedVal) {
-      resPredictedVal.textContent = res.predicted_value.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+      resPredictedVal.textContent = Number(res.predicted_value).toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 2,
+      });
     }
     if (resUnit) {
       resUnit.textContent = res.pollutant_unit;
     }
 
-    // Update Quick Links to Evaluation and Interpretation
+    // Delta & Trend
+    const deltaSign = res.delta_value > 0 ? "+" : "";
+    if (resDeltaVal) {
+      resDeltaVal.textContent = `${deltaSign}${Number(res.delta_value).toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 2,
+      })} ${res.pollutant_unit}`;
+    }
+    const pctSign = res.delta_percentage > 0 ? "+" : "";
+    if (resDeltaPct) {
+      resDeltaPct.textContent = `(${pctSign}${Number(res.delta_percentage).toFixed(2)}%)`;
+    }
+
+    if (resTrendBadge) {
+      resTrendBadge.className = `pred-trend-pill trend-${res.trend}`;
+      if (resTrendLabel) {
+        resTrendLabel.textContent = res.trend.charAt(0).toUpperCase() + res.trend.slice(1);
+      }
+      if (resTrendIcon) {
+        if (res.trend === "naik") {
+          resTrendIcon.innerHTML = "&#9650;";
+        } else if (res.trend === "turun") {
+          resTrendIcon.innerHTML = "&#9660;";
+        } else {
+          resTrendIcon.innerHTML = "&#9679;";
+        }
+      }
+    }
+
+    // 4. Assessment Card & Standard Meter
+    if (resStandardRef) {
+      resStandardRef.textContent = res.assessment.standard || "Baku Mutu ISPU";
+    }
+    if (resAssessmentDesc) {
+      resAssessmentDesc.textContent = res.assessment.description;
+    }
+
+    if (resMeterFill) {
+      let fillPct = 50;
+      if (res.pollutant === "co") {
+        fillPct = Math.min(100, Math.max(5, (res.predicted_value / 15000) * 100));
+        if (resMeterLabels) {
+          resMeterLabels.innerHTML = "<span>Baik (&le; 4.000)</span><span>Sedang (8.000)</span><span>Tidak Sehat (15.000+)</span>";
+        }
+      } else {
+        fillPct = Math.min(100, Math.max(5, ((res.predicted_value - 380) / (700 - 380)) * 100));
+        if (resMeterLabels) {
+          resMeterLabels.innerHTML = "<span>Normal (&le; 450)</span><span>Terakumulasi (600)</span><span>Tinggi (650+ ppm)</span>";
+        }
+      }
+      resMeterFill.style.width = `${fillPct.toFixed(1)}%`;
+      resMeterFill.style.backgroundColor = res.assessment.color || "#10b981";
+    }
+
+    // 5. Counterpart Benchmark
+    if (resActiveAlgoName) {
+      resActiveAlgoName.textContent = res.algorithm_label;
+    }
+    if (resActiveAlgoVal) {
+      resActiveAlgoVal.textContent = `${Number(res.predicted_value).toLocaleString("id-ID", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 2,
+      })} ${res.pollutant_unit}`;
+    }
+    if (resCounterpartLabel) {
+      resCounterpartLabel.textContent = res.counterpart_label;
+    }
+    if (res.counterpart_predicted_value != null) {
+      if (resCounterpartVal) {
+        resCounterpartVal.textContent = `${Number(res.counterpart_predicted_value).toLocaleString("id-ID", {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        })} ${res.pollutant_unit}`;
+      }
+      const cpDeltaSign = res.counterpart_delta > 0 ? "+" : "";
+      if (resCounterpartDelta) {
+        resCounterpartDelta.textContent = `Selisih: ${cpDeltaSign}${Number(res.counterpart_delta).toLocaleString("id-ID", {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 2,
+        })} ${res.pollutant_unit}`;
+      }
+      if (resCounterpartAgreement) {
+        const absDiff = Math.abs(res.counterpart_delta);
+        const pctDiff = (absDiff / (res.predicted_value || 1)) * 100;
+        if (pctDiff < 2) {
+          resCounterpartAgreement.textContent = `Deviasi ${pctDiff.toFixed(1)}% · Konsensus kedua model sangat tinggi`;
+        } else {
+          resCounterpartAgreement.textContent = `Deviasi ${pctDiff.toFixed(1)}% · Terdapat variasi estimasi antar model`;
+        }
+      }
+    } else {
+      if (resCounterpartVal) resCounterpartVal.textContent = "-";
+      if (resCounterpartDelta) resCounterpartDelta.textContent = "-";
+      if (resCounterpartAgreement) resCounterpartAgreement.textContent = "Data pembanding tidak tersedia";
+    }
+
+    // 6. Feature Inputs Inspection
+    if (resFeaturesCount) {
+      resFeaturesCount.textContent = res.feature_inputs ? res.feature_inputs.length : 0;
+    }
+    if (resFeatureChips) {
+      resFeatureChips.innerHTML = "";
+      if (res.feature_inputs && res.feature_inputs.length > 0) {
+        res.feature_inputs.forEach((item) => {
+          const chip = document.createElement("div");
+          chip.className = "pred-feature-chip";
+          chip.innerHTML = `<span class="pred-chip-label">${item.label}:</span> <span class="pred-chip-val">${Number(item.value).toLocaleString("id-ID", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 2,
+          })} ${item.unit}</span>`;
+          resFeatureChips.appendChild(chip);
+        });
+      }
+    }
+
+    // 7. Update Quick Links to Evaluation and Interpretation
     const startVal = evalStartDate ? evalStartDate.value : "2026-07-29";
     const endVal = evalEndDate ? evalEndDate.value : "2026-08-04";
     const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}`;

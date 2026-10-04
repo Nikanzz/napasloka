@@ -57,30 +57,38 @@
     <div style="margin-bottom: 1.25rem;">
       <details style="background: #ffffff; border: 1px solid var(--color-border); border-radius: 8px; padding: 0.6rem 1rem; font-size: 0.82rem; color: #475569;">
         <summary style="cursor: pointer; font-weight: 600;">
-          ⚙️ Ubah Parameter Observasi & Algoritma (Filter)
+          Ubah Parameter Observasi & Algoritma (Filter)
         </summary>
         <form id="interpretation-filter-form" style="margin-top: 1rem;">
           <div id="filter-inputs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
             <div class="form-group">
-              <label class="form-label" for="interp-select-location">📍 Lokasi</label>
+              <label class="form-label" for="interp-select-location">
+                <span class="form-label-num">01</span> Lokasi
+              </label>
               <select id="interp-select-location" name="location" class="form-control" required></select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="interp-select-pollutant">🧪 Polutan</label>
+              <label class="form-label" for="interp-select-pollutant">
+                <span class="form-label-num">02</span> Polutan
+              </label>
               <select id="interp-select-pollutant" name="pollutant" class="form-control" required>
                 <option value="co">CO</option>
                 <option value="co2">CO₂</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="interp-select-scenario">📐 Skenario</label>
+              <label class="form-label" for="interp-select-scenario">
+                <span class="form-label-num">03</span> Skenario
+              </label>
               <select id="interp-select-scenario" name="scenario" class="form-control" required>
                 <option value="scenario_2">S2 · Polutan + meteorologi</option>
                 <option value="scenario_1">S1 · Historis polutan</option>
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="interp-select-algorithm">🤖 Algoritma</label>
+              <label class="form-label" for="interp-select-algorithm">
+                <span class="form-label-num">04</span> Algoritma
+              </label>
               <select id="interp-select-algorithm" name="algorithm" class="form-control" required>
                 <option value="lightgbm">LightGBM</option>
                 <option value="xgboost">XGBoost</option>
@@ -202,10 +210,10 @@
         <!-- Quick Nav to Prediction & Evaluation -->
         <div style="margin-top: 1.25rem; border-top: 1px solid var(--color-border-subtle); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
           <a id="btn-goto-prediction" href="/pages/prediction.html" class="btn" style="background: #f1f5f9; color: #334155; font-size: 0.8rem; justify-content: flex-start;">
-            ← Kembali ke Konfigurasi Prediksi
+            &larr; Kembali ke Konfigurasi Prediksi
           </a>
           <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn" style="background: #f1f5f9; color: #334155; font-size: 0.8rem; justify-content: flex-start;">
-            📈 Lihat Evaluasi Model & Grafik
+            Lihat Evaluasi Model & Grafik &rarr;
           </a>
         </div>
       </aside>

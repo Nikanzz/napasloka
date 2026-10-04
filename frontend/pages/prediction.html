@@ -108,22 +108,19 @@
             <select id="select-algorithm" name="algorithm" class="form-control" required></select>
           </div>
 
-          <!-- 05 Rentang waktu evaluasi -->
+          <!-- 05 Waktu Observasi Acuan (t) -->
           <div class="form-group">
-            <label class="form-label" for="eval-start-date">
-              <span class="form-label-num">05</span> Rentang waktu evaluasi
+            <label class="form-label" for="input-ref-time">
+              <span class="form-label-num">05</span> Waktu Observasi Acuan (t)
             </label>
-            <div class="date-range-row">
-              <div class="date-input-wrap">
-                <input id="eval-start-date" type="date" class="form-control" value="2026-07-29" min="2026-03-28" max="2026-08-04" title="Tanggal Mulai Evaluasi">
-              </div>
-              <span class="date-arrow">&rarr;</span>
-              <div class="date-input-wrap">
-                <input id="eval-end-date" type="date" class="form-control" value="2026-08-04" min="2026-03-28" max="2026-08-04" title="Tanggal Akhir Evaluasi">
-              </div>
+            <div class="ref-time-row">
+              <input id="input-ref-time" name="reference_datetime" type="datetime-local" class="form-control" value="2026-08-04T23:00" step="3600">
+              <button type="button" id="btn-use-latest-obs" class="btn-ref-preset" title="Gunakan data observasi paling mutakhir">Observasi Terkini</button>
             </div>
-            <!-- Hidden reference datetime for backend inference -->
-            <input id="input-ref-time" name="reference_datetime" type="hidden">
+            <span class="form-hint" id="ref-time-hint">Model memproyeksikan konsentrasi 1 jam ke depan (t+1) berdasarkan kondisi pada waktu acuan (t).</span>
+            <!-- Hidden inputs for evaluation range backwards compatibility -->
+            <input id="eval-start-date" type="hidden" value="2026-07-29">
+            <input id="eval-end-date" type="hidden" value="2026-08-04">
           </div>
         </div>
 
@@ -160,8 +157,12 @@
             <span class="navy-table-value" id="summary-algorithm">LightGBM</span>
           </div>
           <div class="navy-table-row">
-            <span class="navy-table-label">Horizon</span>
-            <span class="navy-table-value">1 jam berikutnya</span>
+            <span class="navy-table-label">Observasi (t)</span>
+            <span class="navy-table-value" id="summary-ref-time">04 Agu 2026, 23:00 WIB</span>
+          </div>
+          <div class="navy-table-row">
+            <span class="navy-table-label">Target (t+1)</span>
+            <span class="navy-table-value" id="summary-target-time">05 Agu 2026, 00:00 WIB</span>
           </div>
         </div>
 
@@ -184,45 +185,150 @@
     <!-- Prediction Result Panel (Appears dynamically upon clicking Proses Prediksi) -->
     <section id="prediction-result-section" style="display: none; margin-bottom: 3rem;" aria-labelledby="result-heading">
       <div class="card" style="border-left: 4px solid var(--color-primary); background: #ffffff;">
-        <div class="card-header">
+        <!-- Card Header -->
+        <div class="card-header" style="margin-bottom: 1.25rem;">
           <div>
             <span class="page-tag" id="res-pollutant-title">Hasil Prediksi Polutan</span>
             <h2 id="result-heading" style="font-size: 1.35rem; font-weight: 700; margin-top: 0.25rem;">
               Estimasi Konsentrasi 1 Jam ke Depan
             </h2>
           </div>
-          <span class="page-tag" id="res-assessment-badge" style="background: #eff6ff; color: #1d4ed8; font-weight: 700;">
-            Kategori
+          <span class="page-tag" id="res-horizon-badge" style="background: #eff6ff; color: #1d4ed8; font-weight: 700;">
+            Estimasi Horizon (t+1)
           </span>
         </div>
 
-        <div style="display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 1rem;">
-          <span id="res-predicted-val" style="font-size: 3rem; font-weight: 800; color: #0f172a; letter-spacing: -0.02em;">-</span>
-          <span id="res-unit" style="font-size: 1.25rem; font-weight: 600; color: #64748b;">-</span>
+        <!-- Visual Timeline Banner (Observation t -> Target t+1) -->
+        <div class="pred-timeline-box">
+          <div class="pred-timeline-node">
+            <span class="pred-timeline-tag">OBSERVASI TERAKHIR (t)</span>
+            <span class="pred-timeline-time" id="res-latest-time">-</span>
+            <div class="pred-timeline-value">
+              <span id="res-latest-val">-</span> <span class="pred-timeline-unit-sub" id="res-latest-unit">-</span>
+            </div>
+          </div>
+          <div class="pred-timeline-connector">
+            <span class="pred-connector-line"></span>
+            <span class="pred-connector-badge">+1 Jam Proyeksi &rarr;</span>
+            <span class="pred-connector-line"></span>
+          </div>
+          <div class="pred-timeline-node">
+            <span class="pred-timeline-tag highlight">TARGET PREDIKSI (t+1)</span>
+            <span class="pred-timeline-time" id="res-target-time-badge">-</span>
+            <div class="pred-timeline-value highlight">
+              <span id="res-target-summary-val">-</span> <span class="pred-timeline-unit-sub" id="res-target-summary-unit">-</span>
+            </div>
+          </div>
         </div>
 
-        <p id="res-assessment-desc" style="font-size: 0.9rem; color: #64748b; margin-bottom: 1.5rem; line-height: 1.5;">-</p>
+        <!-- Primary Hero Metric & Inference Context Grid -->
+        <div class="pred-hero-grid">
+          <!-- Left: Hero Prediction Number & Delta Trend -->
+          <div class="pred-hero-metric-wrap">
+            <span class="pred-hero-label">Konsentrasi Diproyeksikan</span>
+            <div class="pred-hero-number-row">
+              <span id="res-predicted-val" class="pred-hero-number">-</span>
+              <span id="res-unit" class="pred-hero-unit">-</span>
+            </div>
+            <div class="pred-dynamics-row">
+              <span id="res-trend-badge" class="pred-trend-pill trend-stabil">
+                <span id="res-trend-icon">&#9679;</span>
+                <span id="res-trend-label">Stabil</span>
+              </span>
+              <div class="pred-delta-text">
+                <span id="res-delta-val" class="pred-delta-val">-</span>
+                <span id="res-delta-pct" class="pred-delta-pct">(-)</span>
+                <span class="pred-delta-note">vs observasi sebelumnya</span>
+              </div>
+            </div>
+          </div>
 
-        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-          <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-primary">
-            Lihat Grafik & Evaluasi &rarr;
-          </a>
-          <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
-            Telusuri Kontribusi SHAP &rarr;
-          </a>
+          <!-- Right: Konteks & Karakteristik Inferensi (Eliminating Subjective Health/ISPU Claims) -->
+          <div class="pred-context-card">
+            <div class="pred-context-header">
+              <span class="pred-context-title">Karakteristik Inferensi</span>
+              <span class="pred-context-badge">1 Jam ke Depan</span>
+            </div>
+            <div class="pred-context-list">
+              <div class="pred-context-item">
+                <span class="pred-context-key">Horizon Waktu</span>
+                <span class="pred-context-val">t + 1 Jam (Prakiraan titik diskret)</span>
+              </div>
+              <div class="pred-context-item">
+                <span class="pred-context-key">Pendekatan</span>
+                <span class="pred-context-val">Supervised Autoregressive Regressor</span>
+              </div>
+              <div class="pred-context-item">
+                <span class="pred-context-key">Basis Fitur</span>
+                <span class="pred-context-val">Lag historis konsentrasi &amp; atmosfer</span>
+              </div>
+              <div class="pred-context-item">
+                <span class="pred-context-key">Sifat Estimasi</span>
+                <span class="pred-context-val">Estimasi konsentrasi murni tanpa klaim medis</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- Hidden result holders for JS/test compatibility -->
-        <span id="res-target-time-badge" style="display:none;"></span>
-        <span id="res-latest-val" style="display:none;"></span>
-        <span id="res-latest-time" style="display:none;"></span>
-        <span id="res-delta-val" style="display:none;"></span>
-        <span id="res-delta-pct" style="display:none;"></span>
-        <span id="res-trend-badge" style="display:none;"></span>
-        <span id="res-counterpart-label" style="display:none;"></span>
-        <span id="res-counterpart-val" style="display:none;"></span>
-        <span id="res-counterpart-delta" style="display:none;"></span>
-        <div id="res-feature-chips" style="display:none;"></div>
+        <!-- Hidden compatibility elements for scripts and tests -->
+        <div style="display: none;" aria-hidden="true">
+          <span id="res-assessment-badge"></span>
+          <span id="res-assessment-desc"></span>
+          <span id="res-standard-ref"></span>
+          <div id="res-meter-fill"></div>
+          <div id="res-meter-labels"></div>
+        </div>
+
+        <!-- Multi-Model Benchmark (Counterpart Cross-Validation) -->
+        <div class="pred-counterpart-panel">
+          <div class="pred-counterpart-header">
+            <span class="pred-counterpart-title">Komparasi Antar Algoritma pada Titik Waktu Identik</span>
+            <span class="pred-counterpart-badge">Validasi Silang</span>
+          </div>
+          <div class="pred-counterpart-grid">
+            <div class="pred-algo-card current">
+              <div class="pred-algo-badge">Model Terpilih</div>
+              <div class="pred-algo-name" id="res-active-algo-name">LightGBM</div>
+              <div class="pred-algo-val" id="res-active-algo-val">-</div>
+            </div>
+            <div class="pred-algo-card">
+              <div class="pred-algo-badge comparison">Model Pembanding</div>
+              <div class="pred-algo-name" id="res-counterpart-label">XGBoost</div>
+              <div class="pred-algo-val" id="res-counterpart-val">-</div>
+            </div>
+            <div class="pred-algo-card">
+              <div class="pred-algo-badge delta">Selisih Antar Algoritma</div>
+              <div class="pred-algo-val" id="res-counterpart-delta">-</div>
+              <div class="pred-algo-sub" id="res-counterpart-agreement">Konsistensi proyeksi kedua model</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Input Feature Vector Inspection -->
+        <div class="pred-features-section">
+          <div class="pred-features-header">
+            <span style="font-weight: 700; font-size: 0.85rem; color: #1e293b;">
+              Vektor Fitur Masukan Model (<span id="res-features-count">0</span> Fitur)
+            </span>
+            <span style="font-size: 0.74rem; color: #64748b;">Kondisi lag observasi yang diinputkan ke model</span>
+          </div>
+          <div id="res-feature-chips" class="pred-feature-chips-grid"></div>
+        </div>
+
+        <!-- Cross-Navigation Footer Buttons -->
+        <div class="pred-actions-footer">
+          <div class="pred-actions-note">
+            <span>&#9432;</span> Ingin mengamati performa historis 7 hari atau memeriksa faktor pengaruh fitur?
+          </div>
+          <div class="pred-actions-buttons">
+            <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-primary">
+              Lihat Grafik & Evaluasi &rarr;
+            </a>
+            <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
+              Telusuri Kontribusi SHAP &rarr;
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   </main>
