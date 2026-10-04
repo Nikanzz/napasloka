@@ -107,6 +107,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
+  min-width: 0;
 }
 
 .form-label {
@@ -125,6 +126,8 @@
 
 .form-control {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   padding: 0.55rem 0.85rem;
@@ -1157,14 +1160,16 @@
   align-items: baseline;
   gap: 0.4rem;
   margin-bottom: 0.85rem;
+  flex-wrap: wrap;
 }
 
 .pred-hero-number {
-  font-size: 3.25rem;
+  font-size: clamp(2.25rem, 7vw, 3.25rem);
   font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.03em;
   line-height: 1;
+  word-break: break-word;
 }
 
 .pred-hero-unit {
@@ -1541,4 +1546,112 @@
     align-items: stretch;
   }
 }
+
+@media (max-width: 640px) {
+  .card, .navy-card {
+    padding: 1.15rem 1rem;
+    border-radius: 12px;
+  }
+  .card-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .ref-time-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .btn-ref-preset {
+    width: 100%;
+    text-align: center;
+    padding: 0.6rem 0.85rem;
+  }
+  .pred-timeline-box {
+    padding: 1rem;
+  }
+  .pred-timeline-node {
+    text-align: center;
+  }
+  .pred-timeline-value {
+    justify-content: center;
+  }
+  .pred-hero-metric-wrap {
+    padding: 1.15rem 1rem;
+  }
+  .pred-hero-number {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+  .pred-hero-number-row {
+    flex-wrap: wrap;
+  }
+  .pred-dynamics-row {
+    gap: 0.5rem;
+  }
+  .pred-delta-text {
+    flex-wrap: wrap;
+    font-size: 0.8rem;
+  }
+  .pred-context-card {
+    padding: 1.15rem 1rem;
+  }
+  .pred-context-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+  .pred-context-val {
+    text-align: left;
+  }
+  .pred-counterpart-panel {
+    padding: 1.15rem 1rem;
+  }
+  .pred-counterpart-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pred-features-section {
+    padding: 1rem;
+  }
+  .pred-features-header {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .pred-actions-footer {
+    padding-top: 1rem;
+    gap: 0.75rem;
+  }
+  .pred-actions-note {
+    font-size: 0.76rem;
+  }
+  .pred-actions-buttons {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pred-actions-buttons .btn {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+  .form-footer-bar {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  #btn-submit-prediction {
+    width: 100%;
+  }
+  .navy-table-row {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .page-header-row {
+    margin-bottom: 1.25rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+}
+
 
