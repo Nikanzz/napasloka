@@ -6,8 +6,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from ml_pipeline.experiments.experiment import ExperimentSpec
-from ml_pipeline.experiments.registry import ExperimentRegistry, ExperimentStatus
+from src.experiments.experiment import ExperimentSpec
+from src.experiments.registry import ExperimentRegistry, ExperimentStatus
 
 
 ExperimentExecutor = Callable[[ExperimentSpec, Path], dict[str, Any]]

@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-import ml_pipeline.interpretation.shap_analysis  # Sets up Windows SAC protection
+import src.interpretation.shap_analysis  # Sets up Windows SAC protection
 import shap
 
 from backend.app.core.config import (
@@ -24,7 +24,7 @@ from backend.app.schemas.interpretation import (
 from backend.app.services.data_service import data_service
 from backend.app.services.prediction_service import format_indo_timestamp, get_feature_display_info
 from backend.app.services.registry_service import registry_service
-from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
+from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
 

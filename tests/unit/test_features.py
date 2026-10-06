@@ -1,6 +1,6 @@
 """Feature schema invariants."""
 
-from ml_pipeline.features.scenarios import get_feature_names
+from src.features.scenarios import get_feature_names
 
 
 def test_scenario_1_has_three_features() -> None:

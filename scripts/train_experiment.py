@@ -8,9 +8,9 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from ml_pipeline.experiments.executor import execute_single_experiment
-from ml_pipeline.experiments.experiment import ExperimentSpec, build_experiment_matrix
-from ml_pipeline.experiments.runner import ExperimentRunner
+from src.experiments.executor import execute_single_experiment
+from src.experiments.experiment import ExperimentSpec, build_experiment_matrix
+from src.experiments.runner import ExperimentRunner
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 

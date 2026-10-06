@@ -5,10 +5,10 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from ml_pipeline.utils.paths import DATA_DIR
-from ml_pipeline.features.scenarios import resolve_scenario
-from ml_pipeline.features.lag_features import create_lag_features
-from ml_pipeline.data.preprocessing import chronological_train_test_split
+from src.utils.paths import DATA_DIR
+from src.features.scenarios import resolve_scenario
+from src.features.lag_features import create_lag_features
+from src.data.preprocessing import chronological_train_test_split
 
 def main():
     print("=== MVG Tahap 1: Verifikasi Pipeline Data ===")
@@ -69,9 +69,9 @@ def main():
 
     print("\n=== MVG Tahap 2: Pelatihan dan Evaluasi 1 Model XGBoost ===")
 
-    from ml_pipeline.modeling.training import create_estimator, train_model
-    from ml_pipeline.modeling.prediction import predict
-    from ml_pipeline.evaluation.metrics import calculate_regression_metrics
+    from src.modeling.training import create_estimator, train_model
+    from src.modeling.prediction import predict
+    from src.evaluation.metrics import calculate_regression_metrics
 
     # Model training & evaluation (XGBoost baseline)
     target_col = "carbon_monoxide"
@@ -105,7 +105,7 @@ def main():
     print("\nVerifikasi Tahap 2 Selesai! Model XGBoost berhasil dilatih dan dievaluasi dari ujung ke ujung.")
 
     print("\n=== MVG Tahap 3: Interpretasi Model dengan SHAP (Explainable AI) ===")
-    from ml_pipeline.interpretation.shap_analysis import calculate_tree_shap, mean_absolute_shap
+    from src.interpretation.shap_analysis import calculate_tree_shap, mean_absolute_shap
 
     # SHAP analysis
     print("\n8. Menghitung SHAP Values untuk Data Uji (Test)...")
@@ -119,7 +119,7 @@ def main():
     print("\nVerifikasi Tahap 3 Selesai! Explainable AI (SHAP) berhasil diterapkan dan membuktikan fitur mana yang paling penting.")
 
     print("\n=== MVG Tahap 4: Hyperparameter Tuning (RandomizedSearchCV + TimeSeriesSplit) ===")
-    from ml_pipeline.modeling.tuning import tune_on_training_set
+    from src.modeling.tuning import tune_on_training_set
 
     # Hyperparameter tuning
     print("\n10. Menjalankan RandomizedSearchCV (3-fold TimeSeriesSplit) pada Data Latih...")

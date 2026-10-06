@@ -4,7 +4,7 @@ from typing import Any
 
 import httpx
 
-from ml_pipeline.utils.config import load_yaml_config
+from src.utils.config import load_yaml_config
 
 
 WEATHER_VARIABLES = (

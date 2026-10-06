@@ -8,8 +8,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any
 
-from ml_pipeline.experiments.experiment import ExperimentSpec
-from ml_pipeline.utils.paths import REGISTRY_DIR
+from src.experiments.experiment import ExperimentSpec
+from src.utils.paths import REGISTRY_DIR
 
 
 class ExperimentStatus(StrEnum):

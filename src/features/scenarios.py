@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from ml_pipeline.utils.config import load_yaml_config
+from src.utils.config import load_yaml_config
 
 
 POLLUTANT_COLUMNS = {

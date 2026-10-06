@@ -5,7 +5,7 @@ from typing import Any
 
 import yaml
 
-from ml_pipeline.utils.paths import CONFIG_DIR
+from src.utils.paths import CONFIG_DIR
 
 
 def load_yaml_config(relative_path: str | Path) -> dict[str, Any]:

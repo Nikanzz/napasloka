@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Any
 import pandas as pd
 
-from ml_pipeline.utils.identifiers import slugify_component
-from ml_pipeline.utils.paths import ARTIFACTS_DIR
+from src.utils.identifiers import slugify_component
+from src.utils.paths import ARTIFACTS_DIR
 
 
 def select_best_models(

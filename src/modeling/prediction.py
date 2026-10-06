@@ -5,7 +5,7 @@ from typing import Any
 
 import numpy as np
 
-from ml_pipeline.evaluation.timing import PerformanceTimer
+from src.evaluation.timing import PerformanceTimer
 
 
 @dataclass(frozen=True)

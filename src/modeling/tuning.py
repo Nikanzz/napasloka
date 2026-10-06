@@ -4,7 +4,7 @@ from typing import Any
 
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, TimeSeriesSplit
 
-from ml_pipeline.utils.config import load_yaml_config
+from src.utils.config import load_yaml_config
 
 
 def build_search_cv(estimator: Any, algorithm: str) -> GridSearchCV | RandomizedSearchCV:
