@@ -3,9 +3,9 @@
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
-from ml_pipeline.utils.paths import EXPERIMENTS_DIR
-from ml_pipeline.utils.config import load_yaml_config
+from src.utils.identifiers import build_experiment_id, slugify_component
+from src.utils.paths import EXPERIMENTS_DIR
+from src.utils.config import load_yaml_config
 
 
 SUPPORTED_POLLUTANTS = {"co", "co2"}

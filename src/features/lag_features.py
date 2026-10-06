@@ -2,8 +2,8 @@
 
 import pandas as pd
 
-from ml_pipeline.features.scenarios import resolve_scenario
-from ml_pipeline.utils.config import load_yaml_config
+from src.features.scenarios import resolve_scenario
+from src.utils.config import load_yaml_config
 
 
 def create_lag_features(

@@ -2,7 +2,7 @@
 
 import pytest
 
-from ml_pipeline.evaluation.metrics import calculate_regression_metrics
+from src.evaluation.metrics import calculate_regression_metrics
 
 
 def test_regression_metrics_are_callable() -> None:

@@ -8,8 +8,8 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 import sys
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from ml_pipeline.utils.paths import EXPERIMENTS_DIR, ARTIFACTS_DIR
-from ml_pipeline.experiments.experiment import build_experiment_matrix
+from src.utils.paths import EXPERIMENTS_DIR, ARTIFACTS_DIR
+from src.experiments.experiment import build_experiment_matrix
 
 
 def main() -> None:

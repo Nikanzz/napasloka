@@ -21,8 +21,8 @@ from backend.app.schemas.evaluation import (
 )
 from backend.app.schemas.registry import ModelMetrics
 from backend.app.services.registry_service import registry_service
-from ml_pipeline.evaluation.metrics import calculate_regression_metrics
-from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
+from src.evaluation.metrics import calculate_regression_metrics
+from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
 

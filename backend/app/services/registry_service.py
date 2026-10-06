@@ -25,13 +25,13 @@ from backend.app.schemas.registry import (
     PollutantType,
     ScenarioType,
 )
-from ml_pipeline.experiments.experiment import (
+from src.experiments.experiment import (
     SUPPORTED_ALGORITHMS,
     SUPPORTED_POLLUTANTS,
     SUPPORTED_SCENARIOS,
     build_experiment_matrix,
 )
-from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
+from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
 
@@ -343,7 +343,7 @@ class RegistryService:
 
         if not self.best_models_file.is_file():
             logger.info("best_models.json not found, selecting best models from summary_metrics.csv...")
-            from ml_pipeline.experiments.best_model import select_best_models
+            from src.experiments.best_model import select_best_models
             registry_data = select_best_models(
                 registry_output_path=self.best_models_file,
                 primary_metric="mae",

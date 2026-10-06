@@ -6,8 +6,8 @@ from typing import Any
 import pandas as pd
 
 from backend.app.core.config import settings
-from ml_pipeline.features.scenarios import resolve_scenario
-from ml_pipeline.utils.identifiers import slugify_component
+from src.features.scenarios import resolve_scenario
+from src.utils.identifiers import slugify_component
 
 logger = logging.getLogger(__name__)
 

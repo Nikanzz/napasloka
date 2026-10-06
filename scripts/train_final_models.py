@@ -14,16 +14,16 @@ import pandas as pd
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from ml_pipeline.data.preprocessing import chronological_train_test_split
-from ml_pipeline.experiments.best_model import select_best_models
-from ml_pipeline.experiments.executor import _get_coordinate_id, _get_dataset
-from ml_pipeline.features.lag_features import create_lag_features
-from ml_pipeline.features.scenarios import resolve_scenario
-from ml_pipeline.interpretation.feature_importance import gain_feature_importance
-from ml_pipeline.interpretation.shap_analysis import calculate_tree_shap, mean_absolute_shap
-from ml_pipeline.modeling.training import create_estimator
-from ml_pipeline.utils.identifiers import slugify_component
-from ml_pipeline.utils.paths import ARTIFACTS_DIR
+from src.data.preprocessing import chronological_train_test_split
+from src.experiments.best_model import select_best_models
+from src.experiments.executor import _get_coordinate_id, _get_dataset
+from src.features.lag_features import create_lag_features
+from src.features.scenarios import resolve_scenario
+from src.interpretation.feature_importance import gain_feature_importance
+from src.interpretation.shap_analysis import calculate_tree_shap, mean_absolute_shap
+from src.modeling.training import create_estimator
+from src.utils.identifiers import slugify_component
+from src.utils.paths import ARTIFACTS_DIR
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("train_final_models")

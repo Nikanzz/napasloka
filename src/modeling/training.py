@@ -3,9 +3,9 @@
 from dataclasses import dataclass
 from typing import Any
 
-from ml_pipeline.evaluation.timing import PerformanceTimer
-from ml_pipeline.modeling.lightgbm_model import create_lightgbm_regressor
-from ml_pipeline.modeling.xgboost_model import create_xgboost_regressor
+from src.evaluation.timing import PerformanceTimer
+from src.modeling.lightgbm_model import create_lightgbm_regressor
+from src.modeling.xgboost_model import create_xgboost_regressor
 
 
 @dataclass(frozen=True)

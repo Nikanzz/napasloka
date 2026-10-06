@@ -4,8 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from ml_pipeline.utils.config import load_yaml_config
-from ml_pipeline.utils.paths import ARTIFACTS_DIR, CONFIG_DIR, DATA_DIR, EXPERIMENTS_DIR, PROJECT_ROOT, REGISTRY_DIR
+from src.utils.config import load_yaml_config
+from src.utils.paths import ARTIFACTS_DIR, CONFIG_DIR, DATA_DIR, EXPERIMENTS_DIR, PROJECT_ROOT, REGISTRY_DIR
 
 
 # Administrative region mapping for the 15 Jabodetabek observation points

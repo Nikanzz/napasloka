@@ -1,6 +1,6 @@
 """Experiment identifier determinism."""
 
-from ml_pipeline.utils.identifiers import build_experiment_id
+from src.utils.identifiers import build_experiment_id
 
 
 def test_experiment_id_is_deterministic() -> None:

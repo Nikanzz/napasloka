@@ -19,7 +19,7 @@ from backend.app.schemas.prediction import (
 )
 from backend.app.services.data_service import data_service
 from backend.app.services.registry_service import registry_service
-from ml_pipeline.utils.identifiers import build_experiment_id, slugify_component
+from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
 
