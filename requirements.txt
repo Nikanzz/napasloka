@@ -1,6 +1,7 @@
 pandas
 numpy
 matplotlib
+seaborn
 scikit-learn
 xgboost
 lightgbm
@@ -12,6 +13,7 @@ pyyaml
 joblib
 httpx
 pytest
+ipykernel
 
 openmeteo-requests
 requests-cache
