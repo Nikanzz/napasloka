@@ -1,28 +1,44 @@
-"""Primary TreeSHAP interpretation interface with Windows SAC DLL protection."""
+"""Model interpretation and Explainable AI (XAI): Gain Feature Importance and TreeSHAP."""
 
-from typing import Any
+import importlib.machinery
 import sys
 from types import ModuleType
+from typing import Any
 from unittest.mock import MagicMock
+
+import numpy as np
+import pandas as pd
+
+
+# ==============================================================================
+# Windows SAC (Smart App Control) Protection & Matplotlib Isolation for SHAP
+# ==============================================================================
 
 class MockModule(MagicMock):
     __path__ = []
     __version__ = "3.9.0"
 
+
 class MatplotlibMockImporter:
     """Mock importer to catch all matplotlib submodule imports dynamically."""
+
     def find_spec(self, fullname, path, target=None):
         if fullname == "matplotlib" or fullname.startswith("matplotlib."):
+
             class MockLoader:
+
                 def create_module(self, spec):
                     return MockModule(name=fullname)
+
                 def exec_module(self, module):
                     pass
+
             return importlib.machinery.ModuleSpec(fullname, MockLoader())
         return None
 
-import importlib.machinery
-sys.meta_path.insert(0, MatplotlibMockImporter())
+
+if not any(isinstance(hook, MatplotlibMockImporter) for hook in sys.meta_path):
+    sys.meta_path.insert(0, MatplotlibMockImporter())
 
 # Prevent Windows Smart App Control (SAC) from blocking unused Cython BLAS extensions
 if "sklearn.cluster" not in sys.modules:
@@ -52,8 +68,40 @@ if "shap.explainers._linear" not in sys.modules:
     sys.modules["shap.explainers._linear"] = m_linear
 
 import shap
-import pandas as pd
-import numpy as np
+
+
+# ==============================================================================
+# Feature Importance & SHAP Analysis Functions
+# ==============================================================================
+
+def gain_feature_importance(
+    model: Any,
+    feature_names: list[str],
+    *,
+    normalize: bool = True,
+) -> pd.DataFrame:
+    """Return gain importance in a common two-column representation, sorted descending."""
+    if hasattr(model, "get_booster"):
+        raw = model.get_booster().get_score(importance_type="total_gain")
+        values = np.array(
+            [float(raw.get(name, raw.get(f"f{index}", 0.0))) for index, name in enumerate(feature_names)],
+            dtype=float,
+        )
+    elif hasattr(model, "booster_"):
+        values = np.array(
+            [float(value) for value in model.booster_.feature_importance(importance_type="gain")],
+            dtype=float,
+        )
+    elif hasattr(model, "feature_importances_"):
+        values = np.array(model.feature_importances_, dtype=float)
+    else:
+        raise TypeError("Model does not expose supported gain importance")
+
+    if normalize and values.sum() > 0:
+        values = values / values.sum()
+
+    df = pd.DataFrame({"feature": feature_names, "importance": values})
+    return df.sort_values(by="importance", ascending=False).reset_index(drop=True)
 
 
 def calculate_tree_shap(model: Any, features: pd.DataFrame) -> Any:
@@ -69,7 +117,7 @@ def mean_absolute_shap(shap_values: Any, feature_names: list[str]) -> pd.DataFra
 
     df_importance = pd.DataFrame({
         "feature": feature_names,
-        "mean_absolute_shap": mean_abs_shap
+        "mean_absolute_shap": mean_abs_shap,
     })
 
     df_importance = df_importance.sort_values(by="mean_absolute_shap", ascending=False).reset_index(drop=True)
