@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-import src.interpretation.shap_analysis  # Sets up Windows SAC protection
+import src.models.interpretation  # Sets up Windows SAC protection
 import shap
 
 from backend.app.core.config import (

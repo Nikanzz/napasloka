@@ -35,16 +35,46 @@ Copy-Item .env.example .env
 ## Menjalankan test
 
 ```powershell
-python -m pytest
+pytest
 ```
 
-## Menjalankan FastAPI
+## Menjalankan FastAPI Server
 
 ```powershell
-python scripts/run_api.py
+python run_api.py
 ```
 
 API tersedia di `http://127.0.0.1:8000`; dokumentasi interaktif berada di `http://127.0.0.1:8000/docs`.
+
+## Menjalankan Pipeline Machine Learning (`src/`)
+
+Seluruh alur eksekusi Machine Learning mengacu pada best practice arsitektur modular (`src/`):
+
+1. **Unduh Data Mentah (Open-Meteo)**:
+   ```powershell
+   python -m src.data.fetch_data
+   ```
+2. **Pembersihan, Validasi, & Integrasi Data**:
+   ```powershell
+   python -m src.data.clean_data
+   ```
+3. **Training Model**:
+   - Eksperimen Riset (120 model):
+     ```powershell
+     python -m src.models.train_model --mode experiment --all
+     ```
+   - Retraining Model Produksi (60 best deployment models):
+     ```powershell
+     python -m src.models.train_model --mode final --all
+     ```
+4. **Evaluasi & Rekapitulasi Metrik Skripsi**:
+   ```powershell
+   python -m src.models.evaluate_model
+   ```
+5. **Inferensi / Prediksi Offline**:
+   ```powershell
+   python -m src.models.predict_model --location taman-kamal --pollutant co --scenario scenario_1 --demo
+   ```
 
 Endpoint Phase 0:
 
