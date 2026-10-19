@@ -7,7 +7,7 @@ import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, TimeSeriesSplit
 
 from src.utils.config import load_yaml_config
-from src.utils.timing import PerformanceTimer
+from src.utils.metrics import PerformanceTimer
 
 
 # ==============================================================================

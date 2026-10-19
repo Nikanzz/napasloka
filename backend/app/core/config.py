@@ -4,8 +4,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
-from src.utils.config import load_yaml_config
-from src.utils.paths import ARTIFACTS_DIR, CONFIG_DIR, DATA_DIR, EXPERIMENTS_DIR, PROJECT_ROOT, REGISTRY_DIR
+from src.utils.config import (
+    ARTIFACTS_DIR,
+    CONFIG_DIR,
+    DATA_DIR,
+    EXPERIMENTS_DIR,
+    PROJECT_ROOT,
+    REGISTRY_DIR,
+    load_yaml_config,
+)
 
 
 # Administrative region mapping for the 15 Jabodetabek observation points

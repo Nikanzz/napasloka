@@ -19,7 +19,7 @@ if str(PROJECT_ROOT) not in sys.path:
 from src.features.lag_features import create_lag_features
 from src.features.scenarios import resolve_scenario
 from src.utils.identifiers import slugify_component
-from src.utils.paths import ARTIFACTS_DIR, DATA_DIR
+from src.utils.config import ARTIFACTS_DIR, DATA_DIR
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("predict_model")

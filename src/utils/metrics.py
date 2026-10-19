@@ -1,14 +1,28 @@
-"""Regression metrics used consistently across both algorithms (Pure NumPy Implementation)."""
-
 from collections.abc import Sequence
+from dataclasses import dataclass, field
+from time import perf_counter
 import numpy as np
+
+
+@dataclass
+class PerformanceTimer:
+    elapsed_seconds: float | None = field(default=None, init=False)
+    _started_at: float | None = field(default=None, init=False, repr=False)
+
+    def __enter__(self) -> "PerformanceTimer":
+        self._started_at = perf_counter()
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        if self._started_at is None:
+            raise RuntimeError("Timer was not started")
+        self.elapsed_seconds = perf_counter() - self._started_at
 
 
 def mean_absolute_percentage_error_percent(
     y_true: Sequence[float],
     y_pred: Sequence[float],
 ) -> float:
-    """Return MAPE in percent and reject undefined zero-valued actuals."""
     actual = np.asarray(y_true, dtype=float)
     predicted = np.asarray(y_pred, dtype=float)
     if actual.shape != predicted.shape:
@@ -23,7 +37,6 @@ def calculate_regression_metrics(
     y_true: Sequence[float],
     y_pred: Sequence[float],
 ) -> dict[str, float]:
-    """Calculate MAE, RMSE, MAPE (percent), and R² using pure NumPy."""
     actual = np.asarray(y_true, dtype=float)
     predicted = np.asarray(y_pred, dtype=float)
     if actual.shape != predicted.shape:

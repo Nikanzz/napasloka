@@ -41,7 +41,7 @@ from src.models.interpretation import (
     mean_absolute_shap,
 )
 from src.utils.identifiers import slugify_component
-from src.utils.paths import ARTIFACTS_DIR
+from src.utils.config import ARTIFACTS_DIR
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("train_model")
