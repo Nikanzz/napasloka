@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "taman-kamal",
+    "pollutant": "co2",
+    "scenario": "scenario_1",
+    "algorithm": "xgboost"
+  },
+  "created_at": "2026-10-26T11:08:24.677070+00:00",
+  "details": {
+    "metrics": {
+      "mae": 1.1875595031842734,
+      "rmse": 1.6543351631108927,
+      "mape": 0.2557701410030231,
+      "r2": 0.9820269922628679,
+      "training_time_seconds": 1.5286479999995208,
+      "prediction_time_seconds": 0.006891500001074746
+    },
+    "best_params": {
+      "n_estimators": 300,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_dioxide_lag_3h",
+      "carbon_dioxide_lag_2h",
+      "carbon_dioxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}

@@ -50,8 +50,8 @@ def test_post_evaluation_sliced_date_range() -> None:
                     "pollutant": "co2",
                     "scenario": "scenario_2",
                     "algorithm": "lightgbm",
-                    "start_datetime": "2026-05-01T00:00:00+07:00",
-                    "end_datetime": "2026-05-15T00:00:00+07:00",
+                    "start_datetime": "2026-07-01T00:00:00+07:00",
+                    "end_datetime": "2026-07-15T00:00:00+07:00",
                 },
             )
 
@@ -100,4 +100,4 @@ def test_get_evaluation_range_endpoint() -> None:
 
     assert "start" in data
     assert "end" in data
-    assert data["total_samples"] == 3109
+    assert data["total_samples"] == 3506

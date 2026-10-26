@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "mustikasari",
+    "pollutant": "co",
+    "scenario": "scenario_1",
+    "algorithm": "lightgbm"
+  },
+  "created_at": "2026-10-26T11:21:36.230474+00:00",
+  "details": {
+    "metrics": {
+      "mae": 70.26255578969304,
+      "rmse": 101.7101902733655,
+      "mape": 7.174177507022393,
+      "r2": 0.9815377893335094,
+      "training_time_seconds": 5.935533399999258,
+      "prediction_time_seconds": 0.021588099996733945
+    },
+    "best_params": {
+      "n_estimators": 500,
+      "max_depth": 9,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_monoxide_lag_3h",
+      "carbon_monoxide_lag_2h",
+      "carbon_monoxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}

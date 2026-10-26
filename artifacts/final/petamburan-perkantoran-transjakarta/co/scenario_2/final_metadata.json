@@ -2,7 +2,7 @@
   "model_name": "Sistem NapasLoka Final Deployment Model",
   "model_status": "final_deployment",
   "model_version": "1.0.0",
-  "creation_timestamp": "2026-10-04T18:07:39.686764+00:00",
+  "creation_timestamp": "2026-10-26T11:34:28.768800+00:00",
   "location": "petamburan-perkantoran-transjakarta",
   "pollutant": "co",
   "scenario": "scenario_2",
@@ -31,11 +31,11 @@
     "wind_speed_100m_lag_1h"
   ],
   "n_features": 15,
-  "n_train_samples": 15542,
+  "n_train_samples": 17529,
   "training_data_type": "full_historical_dataset",
   "data_start": "2024-10-26T10:00:00+07:00",
-  "data_end": "2026-08-04T23:00:00+07:00",
-  "training_time_seconds": 0.6585,
+  "data_end": "2026-10-26T18:00:00+07:00",
+  "training_time_seconds": 0.5742,
   "experiment_id": "petamburan-perkantoran-transjakarta__co__scenario_2__lightgbm",
   "experiment_metrics": {
     "mae": 182.3707,

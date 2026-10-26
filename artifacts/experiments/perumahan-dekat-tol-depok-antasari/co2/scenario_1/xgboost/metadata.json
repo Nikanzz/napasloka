@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "perumahan-dekat-tol-depok-antasari",
+    "pollutant": "co2",
+    "scenario": "scenario_1",
+    "algorithm": "xgboost"
+  },
+  "created_at": "2026-10-26T11:13:45.143006+00:00",
+  "details": {
+    "metrics": {
+      "mae": 1.982738140169308,
+      "rmse": 2.886969049660954,
+      "mape": 0.4107863222647905,
+      "r2": 0.9793742772400437,
+      "training_time_seconds": 1.6051580999992439,
+      "prediction_time_seconds": 0.005326500002411194
+    },
+    "best_params": {
+      "n_estimators": 300,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_dioxide_lag_3h",
+      "carbon_dioxide_lag_2h",
+      "carbon_dioxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}

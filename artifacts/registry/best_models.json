@@ -728,8 +728,8 @@
         "rmse": 1.7652,
         "mape": 0.2678,
         "r2": 0.9803,
-        "training_time_seconds": 5.6165,
-        "prediction_time_seconds": 0.0205
+        "training_time_seconds": null,
+        "prediction_time_seconds": null
       },
       "best_params": {
         "n_estimators": 500,

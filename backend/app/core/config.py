@@ -127,8 +127,8 @@ class Settings:
         "*",
     ])
 
-    default_test_start: str = "2026-03-28T11:00:00+07:00"
-    default_test_end: str = "2026-08-04T23:00:00+07:00"
+    default_test_start: str = "2026-06-02T17:00:00+07:00"
+    default_test_end: str = "2026-10-26T18:00:00+07:00"
 
     def get_locations(self) -> list[dict[str, Any]]:
         """Return enriched list of configured Jabodetabek monitoring locations."""

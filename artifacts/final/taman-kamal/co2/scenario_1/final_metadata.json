@@ -2,7 +2,7 @@
   "model_name": "Sistem NapasLoka Final Deployment Model",
   "model_status": "final_deployment",
   "model_version": "1.0.0",
-  "creation_timestamp": "2026-10-04T18:07:51.589732+00:00",
+  "creation_timestamp": "2026-10-26T11:34:40.930050+00:00",
   "location": "taman-kamal",
   "pollutant": "co2",
   "scenario": "scenario_1",
@@ -19,11 +19,11 @@
     "carbon_dioxide_lag_1h"
   ],
   "n_features": 3,
-  "n_train_samples": 15542,
+  "n_train_samples": 17529,
   "training_data_type": "full_historical_dataset",
   "data_start": "2024-10-26T10:00:00+07:00",
-  "data_end": "2026-08-04T23:00:00+07:00",
-  "training_time_seconds": 0.3598,
+  "data_end": "2026-10-26T18:00:00+07:00",
+  "training_time_seconds": 0.343,
   "experiment_id": "taman-kamal__co2__scenario_1__lightgbm",
   "experiment_metrics": {
     "mae": 1.3998,
