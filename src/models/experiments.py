@@ -20,11 +20,9 @@ from src.features.lag_features import create_lag_features
 from src.features.scenarios import resolve_scenario
 from src.models.estimators import create_estimator, predict, tune_on_training_set
 from src.models.interpretation import calculate_tree_shap, gain_feature_importance, mean_absolute_shap
-from src.utils.config import load_yaml_config
+from src.utils.config import ARTIFACTS_DIR, DATA_DIR, EXPERIMENTS_DIR, REGISTRY_DIR, load_yaml_config
 from src.utils.identifiers import build_experiment_id, slugify_component
-from src.utils.metrics import calculate_regression_metrics
-from src.utils.paths import ARTIFACTS_DIR, DATA_DIR, EXPERIMENTS_DIR, REGISTRY_DIR
-from src.utils.timing import PerformanceTimer
+from src.utils.metrics import PerformanceTimer, calculate_regression_metrics
 
 logger = logging.getLogger("experiments")
 

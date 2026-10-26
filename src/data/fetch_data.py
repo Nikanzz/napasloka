@@ -16,8 +16,7 @@ if str(PROJECT_ROOT) not in sys.path:
 import numpy as np
 from typing import Any, cast
 
-from src.utils.config import load_yaml_config
-from src.utils.paths import DATA_DIR
+from src.utils.config import DATA_DIR, load_yaml_config
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
