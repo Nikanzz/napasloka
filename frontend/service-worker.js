@@ -1,7 +1,7 @@
 "use strict";
 
 // Cache version identifier
-const CACHE_NAME = "napasloka-v1.0.4";
+const CACHE_NAME = "napasloka-v1.0.6";
 
 const APP_SHELL = [
   "/",
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "/pages/evaluation.html",
   "/pages/interpretation.html",
   "/pages/information.html",
+  "/pages/about.html",
   "/css/main.css",
   "/css/components.css",
   "/js/app.js",

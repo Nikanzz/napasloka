@@ -39,6 +39,7 @@ def test_serve_service_worker():
     assert "/pages/interpretation.html" in resp.text
     assert "/pages/evaluation.html" in resp.text
     assert "/pages/prediction.html" in resp.text
+    assert "/pages/about.html" in resp.text
 
 
 def test_serve_all_frontend_pages():
@@ -48,6 +49,7 @@ def test_serve_all_frontend_pages():
         ("/pages/evaluation.html", "Grafik dan Evaluasi"),
         ("/pages/interpretation.html", "Lihat alasan di balik keluaran model."),
         ("/pages/information.html", "Informasi"),
+        ("/pages/about.html", "Tentang Peneliti"),
     ]
     for url, keyword in pages:
         resp = client.get(url)

@@ -109,7 +109,7 @@ function initMobileNav() {
 
   // Reset if resized to desktop
   window.addEventListener("resize", () => {
-    if (window.innerWidth > 640 && toggleBtn.getAttribute("aria-expanded") === "true") {
+    if (window.innerWidth > 768 && toggleBtn.getAttribute("aria-expanded") === "true") {
       setNavOpen(false);
     }
   });

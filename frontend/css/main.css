@@ -176,7 +176,7 @@ main {
   flex: 1;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   main {
     width: 100%;
     max-width: 100%;
@@ -281,7 +281,7 @@ h1 {
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .grid-3 {
     grid-template-columns: 1fr;
   }
@@ -351,7 +351,7 @@ h1 {
   margin-top: 2px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .site-header {
     padding: 0.65rem 1rem;
     position: sticky;
@@ -377,6 +377,7 @@ h1 {
   }
   .brand-system-label {
     font-size: 7.5px;
+  }
   .nav-toggle-btn {
     display: inline-flex;
     align-items: center;

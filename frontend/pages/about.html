@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="icon" href="/assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <title>Tentang Peneliti — Sistem NapasLoka</title>
+</head>
+<body>
+  <!-- Header / Navbar PWA -->
+  <header class="site-header">
+    <div class="header-container">
+      <div class="brand-wrapper">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka Logo" class="brand-logo">
+        <div class="brand-text-block">
+          <span class="brand-system-label">SISTEM PREDIKSI POLUTAN</span>
+          <a class="brand-title" href="/index.html">NapasLoka</a>
+        </div>
+      </div>
+      <nav class="nav" id="primary-nav" aria-label="Navigasi utama">
+        <a href="/index.html">Beranda</a>
+        <a href="/pages/prediction.html">Prediksi</a>
+        <a href="/pages/evaluation.html">Evaluasi</a>
+        <a href="/pages/interpretation.html">Interpretasi</a>
+        <a href="/pages/information.html">Informasi</a>
+        <a href="/pages/about.html" aria-current="page">Tentang</a>
+      </nav>
+      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <!-- Header Halaman & Breadcrumb -->
+    <div class="page-header-row">
+      <div class="page-header-text">
+        <span class="page-tag">Tentang Sistem & Peneliti</span>
+        <h1>Konteks Akademik & Tim Penelitian</h1>
+        <p class="lead">
+          Sistem NapasLoka dikembangkan sebagai luaran tugas akhir/skripsi Sarjana Ilmu Komputer yang mengintegrasikan pemodelan deret waktu polutan atmosferik dengan transparansi berbasis Explainable AI (TreeSHAP).
+        </p>
+      </div>
+      <div class="breadcrumb-badge">
+        <span>NapasLoka</span>
+        <span style="color: #94a3b8;">&rsaquo;</span>
+        <span class="active">Tentang</span>
+      </div>
+    </div>
+
+    <!-- Hero Card Riset Skripsi (Deep Midnight Navy #0c1445) -->
+    <div class="navy-card" style="margin-bottom: 2rem; border: 1px solid rgba(255, 255, 255, 0.1);">
+      <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+        <span class="navy-pill">Karya Tugas Akhir / Skripsi S1</span>
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 800; line-height: 1.5; color: #ffffff; margin-bottom: 1.25rem; max-width: 900px;">
+        Pengembangan Sistem Prediksi Konsentrasi CO dan CO₂ Berbasis Explainable AI dengan XGBoost dan LightGBM Menggunakan Data Historis Polutan dan Meteorologi di Wilayah Jabodetabek
+      </h2>
+      
+      <!-- 3 Pilar Informasi dalam Hero -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.15); font-size: 0.85rem;">
+        <div>
+          <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-family: monospace; font-weight: 700;">Fokus Metodologis</div>
+          <div style="font-weight: 700; color: #ffffff; margin-top: 0.25rem;">Explainable AI (TreeSHAP)</div>
+          <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.2rem;">XGBoost vs LightGBM Regression</div>
+        </div>
+        <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); padding-left: 1rem;">
+          <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-family: monospace; font-weight: 700;">Wilayah & Resolusi</div>
+          <div style="font-weight: 700; color: #ffffff; margin-top: 0.25rem;">15 Lokasi Grid Jabodetabek</div>
+          <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.2rem;">Horizon +1 Jam (Lag 1–3 Jam)</div>
+        </div>
+        <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); padding-left: 1rem;">
+          <div style="font-size: 0.72rem; color: #94a3b8; text-transform: uppercase; font-family: monospace; font-weight: 700;">Sumber Observasi</div>
+          <div style="font-weight: 700; color: #ffffff; margin-top: 0.25rem;">Open-Meteo API</div>
+          <div style="font-size: 0.78rem; color: #cbd5e1; margin-top: 0.2rem;">Air Quality & Weather Historical</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grid 2 Kolom: Peneliti (Kiri) & Tim Dosen Pembimbing (Kanan) -->
+    <div class="grid-2" style="margin-bottom: 3.5rem; gap: 1.5rem;">
+      
+      <!-- Kartu Mahasiswa Peneliti -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-header" style="margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.75rem;">
+            <div>
+              <span style="display: inline-block; padding: 0.2rem 0.5rem; background: #eff6ff; color: #1d4ed8; font-size: 0.72rem; font-weight: 700; border-radius: 4px; text-transform: uppercase;">
+                Peneliti Utama / Pengembang
+              </span>
+              <h3 class="card-title" style="margin-top: 0.4rem;">Profil Mahasiswa</h3>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--color-text-light); font-family: monospace;">Program Sarjana (S1)</span>
+          </div>
+
+          <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem;">
+            <!-- Avatar Bulat -->
+            <div style="width: 58px; height: 58px; border-radius: 50%; background: #0f172a; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; shrink-0; border: 2px solid #2563eb; box-shadow: var(--shadow-sm);">
+              MHS
+            </div>
+            <div>
+              <div style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-main);">Jeremia Pinnywan Immanuel</div>
+              <div style="font-size: 0.82rem; color: var(--color-text-muted); font-family: monospace; margin-top: 0.15rem;">NIM: 535210095</div>
+              <div style="font-size: 0.85rem; color: var(--color-text-main); font-weight: 500; margin-top: 0.35rem;">Program Studi Teknik Informatika</div>
+              <div style="font-size: 0.8rem; color: var(--color-text-muted);">Fakultas Teknologi Informasi, Universitas Tarumanagara</div>
+            </div>
+          </div>
+
+          <div style="padding-top: 0.85rem; border-top: 1px solid var(--color-border-subtle);">
+            <span style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-light); text-transform: uppercase; font-family: monospace;">Fokus Peminatan Riset:</span>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.4rem;">
+              <span style="padding: 0.25rem 0.55rem; background: var(--color-border-subtle); border-radius: 4px; font-size: 0.75rem; color: var(--color-text-main); font-weight: 500;">Machine Learning</span>
+              <span style="padding: 0.25rem 0.55rem; background: var(--color-border-subtle); border-radius: 4px; font-size: 0.75rem; color: var(--color-text-main); font-weight: 500;">Time-Series Forecasting</span>
+              <span style="padding: 0.25rem 0.55rem; background: var(--color-border-subtle); border-radius: 4px; font-size: 0.75rem; color: var(--color-text-main); font-weight: 500;">Explainable AI (XAI)</span>
+              <span style="padding: 0.25rem 0.55rem; background: var(--color-border-subtle); border-radius: 4px; font-size: 0.75rem; color: var(--color-text-main); font-weight: 500;">Progressive Web Apps</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; padding-top: 1rem; border-top: 1px solid var(--color-border-subtle); font-size: 0.8rem; color: var(--color-primary); font-weight: 600; margin-top: 1.25rem;">
+          <a href="https://github.com/Nikanzz">Repository Source Code</a>
+          <span style="color: var(--color-text-light);">&bull;</span>
+          <a href="https://wa.me/6281311044133">Kontak Akademik Mahasiswa</a>
+        </div>
+      </div>
+
+      <!-- Kartu Dewan Pembimbing -->
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div class="card-header" style="margin-bottom: 1rem; border-bottom: 1px solid var(--color-border); padding-bottom: 0.75rem;">
+            <div>
+              <span style="display: inline-block; padding: 0.2rem 0.5rem; background: #ecfdf5; color: #047857; font-size: 0.72rem; font-weight: 700; border-radius: 4px; text-transform: uppercase;">
+                Dewan Pembimbing
+              </span>
+              <h3 class="card-title" style="margin-top: 0.4rem;">Dosen Pembimbing Skripsi</h3>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--color-text-light); font-family: monospace;">Bimbingan Tugas Akhir</span>
+          </div>
+
+          <!-- Pembimbing I -->
+          <div style="background: var(--color-border-subtle); border: 1px solid var(--color-border); border-radius: 8px; padding: 0.85rem; margin-bottom: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span style="width: 20px; height: 20px; border-radius: 50%; background: #2563eb; color: #ffffff; font-size: 0.7rem; font-weight: 700; display: grid; place-items: center;">1</span>
+              <span style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; font-family: monospace;">Dosen Pembimbing Utama</span>
+            </div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main);">Teny Handhayani, Ph.D. </div>
+          </div>
+
+          <!-- Pembimbing II -->
+          <div style="background: var(--color-border-subtle); border: 1px solid var(--color-border); border-radius: 8px; padding: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem;">
+              <span style="width: 20px; height: 20px; border-radius: 50%; background: #059669; color: #ffffff; font-size: 0.7rem; font-weight: 700; display: grid; place-items: center;">2</span>
+              <span style="font-size: 0.72rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase; font-family: monospace;">Dosen Pembimbing Pendamping</span>
+            </div>
+            <div style="font-size: 0.92rem; font-weight: 700; color: var(--color-text-main);">Irvan Lewenusa, S.Kom., M.Kom. </div>
+          </div>
+        </div>
+
+        <div style="padding-top: 1rem; border-top: 1px solid var(--color-border-subtle); font-size: 0.78rem; color: var(--color-text-muted); margin-top: 1.25rem;">
+          Program Studi Teknik Informatika, Fakultas Teknologi Informasi
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Site Footer PWA -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <img src="/assets/icons/icon.svg" alt="NapasLoka" class="footer-logo">
+        <div class="footer-brand-text">
+          <h4>NapasLoka</h4>
+          <p>Sistem prediksi polutan Jabodetabek</p>
+        </div>
+      </div>
+      <div class="footer-info">
+        <div class="footer-info-primary">Prediksi CO dan CO₂, satu jam berikutnya</div>
+        <div class="footer-info-secondary">Data bersumber dari Open-Meteo API</div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>
