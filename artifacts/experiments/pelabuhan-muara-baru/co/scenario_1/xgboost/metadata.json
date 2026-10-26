@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "pelabuhan-muara-baru",
+    "pollutant": "co",
+    "scenario": "scenario_1",
+    "algorithm": "xgboost"
+  },
+  "created_at": "2026-10-26T11:08:55.197326+00:00",
+  "details": {
+    "metrics": {
+      "mae": 75.56237087478246,
+      "rmse": 116.28202299801873,
+      "mape": 7.259239370287508,
+      "r2": 0.9792699066480552,
+      "training_time_seconds": 2.7967392999998992,
+      "prediction_time_seconds": 0.005728300006012432
+    },
+    "best_params": {
+      "n_estimators": 300,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_monoxide_lag_3h",
+      "carbon_monoxide_lag_2h",
+      "carbon_monoxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}

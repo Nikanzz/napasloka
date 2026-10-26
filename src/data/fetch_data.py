@@ -58,7 +58,7 @@ def fetch_raw_data() -> None:
     logging.info(f"Ditemukan {len(locations)} lokasi dari konfigurasi.")
 
     START_DATE = "2024-10-26"
-    END_DATE = "2026-08-04"
+    END_DATE = "2026-10-26"
     TIMEZONE = "Asia/Bangkok"
 
     weather_url = "https://archive-api.open-meteo.com/v1/archive"
@@ -163,9 +163,13 @@ def fetch_raw_data() -> None:
 
     # Filter rentang waktu riset
     start_datetime = pd.Timestamp("2024-10-26 07:00:00", tz=TIMEZONE)
-    all_weather_df = all_weather_df[all_weather_df["datetime"] >= start_datetime].reset_index(drop=True)
-    all_co_df = all_co_df[all_co_df["datetime"] >= start_datetime].reset_index(drop=True)
-    all_co2_df = all_co2_df[all_co2_df["datetime"] >= start_datetime].reset_index(drop=True)
+    now_datetime = pd.Timestamp.now(tz=TIMEZONE)
+    all_weather_df = all_weather_df[
+        (all_weather_df["datetime"] >= start_datetime) & (all_weather_df['datetime'] <= now_datetime)].reset_index(drop=True)
+    all_co_df = all_co_df[
+        (all_co_df["datetime"] >= start_datetime) & (all_co_df["datetime"] <= now_datetime)].reset_index(drop=True)
+    all_co2_df = all_co2_df[
+        (all_co2_df["datetime"] >= start_datetime) & (all_co2_df["datetime"] <= now_datetime)].reset_index(drop=True)
 
     # Direktori target penyimpanan data mentah
     raw_weather_dir = DATA_DIR / "raw" / "weather"

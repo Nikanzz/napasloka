@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "pancoran-mas",
+    "pollutant": "co",
+    "scenario": "scenario_1",
+    "algorithm": "xgboost"
+  },
+  "created_at": "2026-10-26T11:17:19.634789+00:00",
+  "details": {
+    "metrics": {
+      "mae": 92.36451739905837,
+      "rmse": 132.31001962913035,
+      "mape": 6.3082043268605466,
+      "r2": 0.9801423816900243,
+      "training_time_seconds": 2.5268591999993077,
+      "prediction_time_seconds": 0.005095400003483519
+    },
+    "best_params": {
+      "n_estimators": 300,
+      "max_depth": 6,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_monoxide_lag_3h",
+      "carbon_monoxide_lag_2h",
+      "carbon_monoxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}

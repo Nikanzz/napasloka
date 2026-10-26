@@ -21,12 +21,12 @@ def test_evaluate_full_test_dataset() -> None:
     assert res.region == "Jakarta Barat"
     assert res.pollutant == "co"
     assert res.pollutant_unit == "µg/m³"
-    assert res.time_range.evaluated_samples == 3109
-    assert res.time_range.total_test_samples == 3109
+    assert res.time_range.evaluated_samples == 3506
+    assert res.time_range.total_test_samples == 3506
 
     # Metrics on full test set should match known metrics
-    assert 97.0 <= res.metrics.mae <= 99.0
-    assert 180.0 <= res.metrics.rmse <= 185.0
+    assert 60.0 <= res.metrics.mae <= 66.0
+    assert 90.0 <= res.metrics.rmse <= 100.0
     assert 0.95 <= res.metrics.r2 <= 0.99
 
     # Comparison with LightGBM counterpart
@@ -51,8 +51,8 @@ def test_evaluate_sliced_date_range() -> None:
         pollutant="co",
         scenario="scenario_1",
         algorithm="xgboost",
-        start_datetime="2026-04-01T00:00:00+07:00",
-        end_datetime="2026-04-14T23:00:00+07:00",
+        start_datetime="2026-07-01T00:00:00+07:00",
+        end_datetime="2026-07-14T23:00:00+07:00",
     )
     res = evaluation_service.evaluate_test_range(req)
 
@@ -97,7 +97,7 @@ def test_evaluate_downsampling_for_charts() -> None:
     )
     res = evaluation_service.evaluate_test_range(req)
 
-    assert res.time_range.evaluated_samples == 3109
+    assert res.time_range.evaluated_samples == 3506
     # Chart series downsampled to roughly 200 points
     assert len(res.chart_data.timestamps) <= 250
 

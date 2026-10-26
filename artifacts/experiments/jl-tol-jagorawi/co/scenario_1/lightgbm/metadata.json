@@ -1,0 +1,31 @@
+{
+  "spec": {
+    "location": "jl-tol-jagorawi",
+    "pollutant": "co",
+    "scenario": "scenario_1",
+    "algorithm": "lightgbm"
+  },
+  "created_at": "2026-10-26T11:18:29.926453+00:00",
+  "details": {
+    "metrics": {
+      "mae": 84.26625060945061,
+      "rmse": 119.78743287580082,
+      "mape": 6.82558684248242,
+      "r2": 0.9806746209956393,
+      "training_time_seconds": 4.805756299996574,
+      "prediction_time_seconds": 0.02049119999719551
+    },
+    "best_params": {
+      "n_estimators": 500,
+      "max_depth": 9,
+      "learning_rate": 0.05
+    },
+    "features": [
+      "carbon_monoxide_lag_3h",
+      "carbon_monoxide_lag_2h",
+      "carbon_monoxide_lag_1h"
+    ],
+    "n_train_samples": 14023,
+    "n_test_samples": 3506
+  }
+}
