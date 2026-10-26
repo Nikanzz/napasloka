@@ -5,7 +5,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 
@@ -21,25 +20,18 @@ logger = logging.getLogger("evaluate_model")
 
 
 def generate_summary_report(
-    output_csv: Path | None = None,
-    print_tables: bool = True,
-    export_markdown: Path | None = None,
-) -> pd.DataFrame:
-    """Collect metrics across all research experiment artifacts and generate summary tables.
-
-    Parameters:
-        output_csv: Path to save the consolidated CSV (default: ARTIFACTS_DIR / "summary_metrics.csv").
-        print_tables: If True, prints comparison tables to stdout.
-        export_markdown: Optional path to write markdown summary.
-
-    Returns:
-        DataFrame containing consolidated metrics across all experiments.
-    """
+    output_csv=None,
+    print_tables=True,
+    export_markdown=None,
+):
+    """Collect metrics across all research experiment artifacts and generate summary tables."""
     if output_csv is None:
         output_csv = ARTIFACTS_DIR / "summary_metrics.csv"
+    else:
+        output_csv = Path(output_csv)
 
     specs = build_experiment_matrix()
-    records: list[dict[str, Any]] = []
+    records = []
 
     for spec in specs:
         artifact_dir = spec.artifact_directory
@@ -107,8 +99,9 @@ def generate_summary_report(
         print("=" * 80)
 
     if export_markdown:
-        export_markdown.parent.mkdir(parents=True, exist_ok=True)
-        with export_markdown.open("w", encoding="utf-8") as f:
+        export_path = Path(export_markdown)
+        export_path.parent.mkdir(parents=True, exist_ok=True)
+        with export_path.open("w", encoding="utf-8") as f:
             f.write("# Ringkasan Evaluasi Model NapasLoka\n\n")
             f.write("## Perbandingan Algoritma (Rata-rata)\n")
             f.write(algo_comp.round(4).to_markdown() + "\n\n")
@@ -118,12 +111,12 @@ def generate_summary_report(
             f.write(top_co[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_markdown(index=False) + "\n\n")
             f.write("## Top 3 Model CO2 (Berdasarkan R2)\n")
             f.write(top_co2[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_markdown(index=False) + "\n")
-        logger.info(f"Markdown evaluation summary exported to: {export_markdown}")
+        logger.info(f"Markdown evaluation summary exported to: {export_path}")
 
     return df_summary
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Synthesize experiment metrics and generate thesis-grade evaluation reports."
     )
@@ -146,7 +139,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+def main():
     args = parse_args()
     generate_summary_report(
         output_csv=args.output,

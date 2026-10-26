@@ -5,7 +5,7 @@ from backend.app.schemas.evaluation import EvaluationRequest
 from backend.app.services.evaluation_service import evaluation_service
 
 
-def test_evaluate_full_test_dataset() -> None:
+def test_evaluate_full_test_dataset():
     """Verify evaluating with no date bounds returns all test samples matching offline metrics."""
     req = EvaluationRequest(
         location="taman-kamal",
@@ -44,7 +44,7 @@ def test_evaluate_full_test_dataset() -> None:
     assert len(res.chart_data.counterpart_predicted) == len(res.chart_data.timestamps)
 
 
-def test_evaluate_sliced_date_range() -> None:
+def test_evaluate_sliced_date_range():
     """Verify slicing a 14-day window dynamically calculates metrics on only those observations."""
     req = EvaluationRequest(
         location="taman-kamal",
@@ -69,7 +69,7 @@ def test_evaluate_sliced_date_range() -> None:
     assert res.comparison.counterpart_algorithm == "lightgbm"
 
 
-def test_evaluate_lightgbm_as_primary() -> None:
+def test_evaluate_lightgbm_as_primary():
     """Verify selecting LightGBM works and pairs with XGBoost as counterpart."""
     req = EvaluationRequest(
         location="cibinong",
@@ -86,7 +86,7 @@ def test_evaluate_lightgbm_as_primary() -> None:
     assert res.pollutant_unit == "ppm"
 
 
-def test_evaluate_downsampling_for_charts() -> None:
+def test_evaluate_downsampling_for_charts():
     """Verify chart series points are downsampled when max_chart_points is smaller than sample count."""
     req = EvaluationRequest(
         location="taman-kamal",
@@ -102,7 +102,7 @@ def test_evaluate_downsampling_for_charts() -> None:
     assert len(res.chart_data.timestamps) <= 250
 
 
-def test_evaluate_invalid_date_order_raises() -> None:
+def test_evaluate_invalid_date_order_raises():
     """Verify ValueError is raised when start_datetime is after end_datetime."""
     req = EvaluationRequest(
         location="taman-kamal",
@@ -116,7 +116,7 @@ def test_evaluate_invalid_date_order_raises() -> None:
         evaluation_service.evaluate_test_range(req)
 
 
-def test_evaluate_empty_range_raises() -> None:
+def test_evaluate_empty_range_raises():
     """Verify ValueError is raised when no observations exist in the selected range."""
     req = EvaluationRequest(
         location="taman-kamal",

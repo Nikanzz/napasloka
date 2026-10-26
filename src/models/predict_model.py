@@ -6,7 +6,6 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 import joblib
 import numpy as np
@@ -25,11 +24,7 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("predict_model")
 
 
-def load_final_model_artifacts(
-    location: str,
-    pollutant: str,
-    scenario: str,
-) -> tuple[Any, dict[str, Any]]:
+def load_final_model_artifacts(location, pollutant, scenario):
     """Load trained final deployment model and its metadata."""
     loc_slug = slugify_component(location)
     pol_slug = pollutant.lower()
@@ -54,23 +49,8 @@ def load_final_model_artifacts(
     return model, metadata
 
 
-def predict_from_artifact(
-    location: str,
-    pollutant: str,
-    scenario: str,
-    feature_df: pd.DataFrame,
-) -> tuple[np.ndarray, float]:
-    """Execute prediction using final deployment model on the provided dataframe.
-
-    Parameters:
-        location: Target location identifier (e.g. 'taman-kamal').
-        pollutant: 'co' or 'co2'.
-        scenario: 'scenario_1' or 'scenario_2'.
-        feature_df: Input DataFrame containing the required feature columns.
-
-    Returns:
-        tuple of (predictions_array, inference_duration_seconds)
-    """
+def predict_from_artifact(location, pollutant, scenario, feature_df):
+    """Execute prediction using final deployment model on the provided dataframe."""
     model, metadata = load_final_model_artifacts(location, pollutant, scenario)
     required_features = metadata.get("features")
     if not required_features:
@@ -83,14 +63,14 @@ def predict_from_artifact(
 
     x_input = feature_df[required_features]
 
-    start_time = time.perf_counter()
+    start_time = time.time()
     preds = model.predict(x_input)
-    inference_duration = time.perf_counter() - start_time
+    inference_duration = time.time() - start_time
 
     return np.asarray(preds), inference_duration
 
 
-def run_demo_prediction(location: str, pollutant: str, scenario: str, n_samples: int = 5) -> None:
+def run_demo_prediction(location, pollutant, scenario, n_samples=5):
     """Run a quick demonstration of inference using test observations from processed data."""
     logger.info(f"Running demo prediction for: {location} | {pollutant.upper()} | {scenario} (n={n_samples})")
 
@@ -133,7 +113,7 @@ def run_demo_prediction(location: str, pollutant: str, scenario: str, n_samples:
     print("=" * 70)
 
 
-def parse_args() -> argparse.Namespace:
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Predict pollutant concentrations using trained NapasLoka models."
     )
@@ -147,7 +127,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> None:
+def main():
     args = parse_args()
 
     if args.demo or not args.input_csv:

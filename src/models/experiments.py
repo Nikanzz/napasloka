@@ -3,14 +3,8 @@
 import ast
 import json
 import logging
-import os
-from collections.abc import Callable, Iterable
-from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
-from enum import StrEnum
 from pathlib import Path
-from tempfile import NamedTemporaryFile
-from typing import Any
 
 import joblib
 import pandas as pd
@@ -35,26 +29,25 @@ SUPPORTED_ALGORITHMS = {"xgboost", "lightgbm"}
 # 1. Experiment Specification & Matrix Builder
 # ==============================================================================
 
-@dataclass(frozen=True)
 class ExperimentSpec:
     """Four dimensions that uniquely select one independent experiment."""
 
-    location: str
-    pollutant: str
-    scenario: str
-    algorithm: str
+    def __init__(self, location, pollutant, scenario, algorithm):
+        if pollutant not in SUPPORTED_POLLUTANTS:
+            raise ValueError(f"Unsupported pollutant: {pollutant}")
+        if scenario not in SUPPORTED_SCENARIOS:
+            raise ValueError(f"Unsupported scenario: {scenario}")
+        if algorithm not in SUPPORTED_ALGORITHMS:
+            raise ValueError(f"Unsupported algorithm: {algorithm}")
+        slugify_component(location)
 
-    def __post_init__(self) -> None:
-        if self.pollutant not in SUPPORTED_POLLUTANTS:
-            raise ValueError(f"Unsupported pollutant: {self.pollutant}")
-        if self.scenario not in SUPPORTED_SCENARIOS:
-            raise ValueError(f"Unsupported scenario: {self.scenario}")
-        if self.algorithm not in SUPPORTED_ALGORITHMS:
-            raise ValueError(f"Unsupported algorithm: {self.algorithm}")
-        slugify_component(self.location)
+        self.location = location
+        self.pollutant = pollutant
+        self.scenario = scenario
+        self.algorithm = algorithm
 
     @property
-    def experiment_id(self) -> str:
+    def experiment_id(self):
         """Return the deterministic identifier used by logs and registry."""
         return build_experiment_id(
             self.location,
@@ -64,7 +57,7 @@ class ExperimentSpec:
         )
 
     @property
-    def artifact_directory(self) -> Path:
+    def artifact_directory(self):
         """Return the required location/pollutant/scenario/algorithm path."""
         return EXPERIMENTS_DIR.joinpath(
             slugify_component(self.location),
@@ -73,17 +66,25 @@ class ExperimentSpec:
             self.algorithm,
         )
 
-    def as_dict(self) -> dict[str, str]:
+    def as_dict(self):
         """Serialize dimensions for metadata and registry records."""
-        return asdict(self)
+        return {
+            "location": self.location,
+            "pollutant": self.pollutant,
+            "scenario": self.scenario,
+            "algorithm": self.algorithm,
+        }
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 
-def build_experiment_matrix() -> list[ExperimentSpec]:
+def build_experiment_matrix():
     """Expand configured locations across all research dimensions (15 loc x 2 pol x 2 scen x 2 algo = 120)."""
     locations = load_yaml_config("locations.yaml").get("locations", [])
     project = load_yaml_config("project.yaml")
     scenarios = load_yaml_config("features.yaml").get("scenarios", {})
-    specs: list[ExperimentSpec] = []
+    specs = []
     for location in locations:
         location_id = location.get("id")
         if not location_id:
@@ -99,7 +100,7 @@ def build_experiment_matrix() -> list[ExperimentSpec]:
 # 2. Experiment Registry & State Persistence
 # ==============================================================================
 
-class ExperimentStatus(StrEnum):
+class ExperimentStatus:
     """Allowed lifecycle states for one experiment."""
 
     PENDING = "pending"
@@ -111,10 +112,10 @@ class ExperimentStatus(StrEnum):
 class ExperimentRegistry:
     """Persist experiment progress after every independent model run."""
 
-    def __init__(self, path: Path | None = None) -> None:
+    def __init__(self, path=None):
         self.path = path or REGISTRY_DIR / "experiments.json"
 
-    def _read(self) -> dict[str, Any]:
+    def _read(self):
         if not self.path.exists():
             return {"version": 1, "experiments": {}}
         with self.path.open("r", encoding="utf-8") as stream:
@@ -123,21 +124,12 @@ class ExperimentRegistry:
             raise ValueError(f"Invalid experiment registry: {self.path}")
         return data
 
-    def _write(self, data: dict[str, Any]) -> None:
+    def _write(self, data):
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        with NamedTemporaryFile(
-            mode="w",
-            encoding="utf-8",
-            dir=self.path.parent,
-            delete=False,
-            suffix=".tmp",
-        ) as temporary:
-            json.dump(data, temporary, indent=2, ensure_ascii=False)
-            temporary.write("\n")
-            temporary_path = Path(temporary.name)
-        os.replace(temporary_path, self.path)
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
 
-    def register(self, spec: ExperimentSpec) -> dict[str, Any]:
+    def register(self, spec):
         """Create a pending record if the experiment is not registered."""
         data = self._read()
         records = data["experiments"]
@@ -154,13 +146,7 @@ class ExperimentRegistry:
         self._write(data)
         return record
 
-    def update(
-        self,
-        spec: ExperimentSpec,
-        status: ExperimentStatus,
-        *,
-        error: str | None = None,
-    ) -> dict[str, Any]:
+    def update(self, spec, status, error=None):
         """Update an experiment record."""
         data = self._read()
         records = data["experiments"]
@@ -181,11 +167,11 @@ class ExperimentRegistry:
         self._write(data)
         return record
 
-    def get(self, experiment_id: str) -> dict[str, Any] | None:
+    def get(self, experiment_id):
         """Return the current experiment record."""
         return self._read()["experiments"].get(experiment_id)
 
-    def should_run(self, spec: ExperimentSpec, *, retry_failed: bool = False) -> bool:
+    def should_run(self, spec, retry_failed=False):
         """Determine whether an experiment needs to be executed."""
         record = self.get(spec.experiment_id)
         if not record:
@@ -202,23 +188,13 @@ class ExperimentRegistry:
 # 3. Experiment Runner & Executor
 # ==============================================================================
 
-ExperimentExecutor = Callable[[ExperimentSpec, Path], dict[str, Any]]
-
-
 class ExperimentRunner:
     """Run independent specs while persisting status after every model."""
 
-    def __init__(self, registry: ExperimentRegistry | None = None) -> None:
+    def __init__(self, registry=None):
         self.registry = registry or ExperimentRegistry()
 
-    def run(
-        self,
-        spec: ExperimentSpec,
-        executor: ExperimentExecutor,
-        *,
-        retry_failed: bool = False,
-        force: bool = False,
-    ) -> dict[str, Any]:
+    def run(self, spec, executor, retry_failed=False, force=False):
         """Execute one experiment, or return its existing record when skipped."""
         self.registry.register(spec)
         if not force and not self.registry.should_run(spec, retry_failed=retry_failed):
@@ -235,29 +211,23 @@ class ExperimentRunner:
             raise
         return self.registry.update(spec, ExperimentStatus.COMPLETED)
 
-    def run_many(
-        self,
-        specs: Iterable[ExperimentSpec],
-        executor: ExperimentExecutor,
-        *,
-        retry_failed: bool = False,
-    ) -> list[dict[str, Any]]:
+    def run_many(self, specs, executor, retry_failed=False):
         """Run specs sequentially so every completion is independently durable."""
         return [self.run(spec, executor, retry_failed=retry_failed) for spec in specs]
 
 
-def _write_metadata(spec: ExperimentSpec, directory: Path, metadata: dict[str, Any]) -> None:
+def _write_metadata(spec, directory, metadata):
     path = directory / "metadata.json"
     payload = {
         "spec": spec.as_dict(),
         "created_at": datetime.now(timezone.utc).isoformat(),
         "details": metadata,
     }
-    with path.open("w", encoding="utf-8") as stream:
+    with open(path, "w", encoding="utf-8") as stream:
         json.dump(payload, stream, indent=2, ensure_ascii=False)
 
 
-def _get_coordinate_id(location_id: str) -> str:
+def _get_coordinate_id(location_id):
     """Map location id from config to coordinate string in dataset if needed."""
     locations = load_yaml_config("locations.yaml").get("locations", [])
     for loc in locations:
@@ -268,10 +238,10 @@ def _get_coordinate_id(location_id: str) -> str:
     return location_id
 
 
-_DATASET_CACHE: dict[str, pd.DataFrame] = {}
+_DATASET_CACHE = {}
 
 
-def _get_dataset(pollutant_file: str) -> pd.DataFrame:
+def _get_dataset(pollutant_file):
     """Cache loaded dataset in memory to avoid reading CSV 120 times."""
     if pollutant_file not in _DATASET_CACHE:
         data_path = DATA_DIR / "processed" / pollutant_file
@@ -283,7 +253,7 @@ def _get_dataset(pollutant_file: str) -> pd.DataFrame:
     return _DATASET_CACHE[pollutant_file]
 
 
-def execute_single_experiment(spec: ExperimentSpec, artifact_dir: Path) -> dict[str, Any]:
+def execute_single_experiment(spec, artifact_dir):
     """Execute one complete research experiment and persist all artifacts."""
     pollutant_file = "jabodetabek_co_dataset.csv" if spec.pollutant == "co" else "jabodetabek_co2_dataset.csv"
     df = _get_dataset(pollutant_file)
@@ -333,10 +303,10 @@ def execute_single_experiment(spec: ExperimentSpec, artifact_dir: Path) -> dict[
     artifact_dir.mkdir(parents=True, exist_ok=True)
     joblib.dump(best_model, artifact_dir / "model.joblib")
 
-    with (artifact_dir / "best_params.json").open("w", encoding="utf-8") as f:
+    with open(artifact_dir / "best_params.json", "w", encoding="utf-8") as f:
         json.dump(best_params, f, indent=2)
 
-    with (artifact_dir / "metrics.json").open("w", encoding="utf-8") as f:
+    with open(artifact_dir / "metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
 
     predictions_df = pd.DataFrame({
@@ -363,11 +333,11 @@ def execute_single_experiment(spec: ExperimentSpec, artifact_dir: Path) -> dict[
 # ==============================================================================
 
 def select_best_models(
-    summary_csv_path: Path | None = None,
-    registry_output_path: Path | None = None,
-    primary_metric: str = "mae",
-    secondary_metric: str = "rmse",
-) -> dict[str, Any]:
+    summary_csv_path=None,
+    registry_output_path=None,
+    primary_metric="mae",
+    secondary_metric="rmse",
+):
     """Determine the winning algorithm for each (location, pollutant, scenario) combination."""
     if summary_csv_path is None:
         summary_csv_path = ARTIFACTS_DIR / "summary_metrics.csv"
@@ -390,14 +360,14 @@ def select_best_models(
 
     best_df = df_sorted.groupby(["location_slug", "pollutant_lower", "scenario_lower"]).first().reset_index()
 
-    total_expected = 15 * 2 * 2  # 60 combinations
+    total_expected = 15 * 2 * 2
     if len(best_df) != total_expected:
         raise ValueError(
             f"Expected {total_expected} best model combinations, but found {len(best_df)}. "
             "Please check summary_metrics.csv completeness."
         )
 
-    best_registry: dict[str, Any] = {
+    best_registry = {
         "version": 1,
         "selection_rule": f"lowest_{primary_metric}_then_{secondary_metric}",
         "total_combinations": len(best_df),
@@ -445,7 +415,7 @@ def select_best_models(
         }
 
     registry_output_path.parent.mkdir(parents=True, exist_ok=True)
-    with registry_output_path.open("w", encoding="utf-8") as f:
+    with open(registry_output_path, "w", encoding="utf-8") as f:
         json.dump(best_registry, f, indent=2)
 
     return best_registry

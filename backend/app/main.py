@@ -10,7 +10,7 @@ from backend.app.api import config, evaluation, health, interpretation, predicti
 from backend.app.core.config import settings
 
 
-def create_app() -> FastAPI:
+def create_app():
     """Create and configure the Sistem NapasLoka API."""
 
     application = FastAPI(
@@ -61,7 +61,7 @@ def create_app() -> FastAPI:
 
         @application.get("/app", include_in_schema=False)
         @application.get("/index.html", include_in_schema=False)
-        def serve_app() -> FileResponse:
+        def serve_app():
             """Serve PWA Home page."""
             return FileResponse(
                 frontend_dir / "index.html",
@@ -69,7 +69,7 @@ def create_app() -> FastAPI:
             )
 
         @application.get("/manifest.json", include_in_schema=False)
-        def serve_manifest() -> FileResponse:
+        def serve_manifest():
             """Serve PWA manifest."""
             return FileResponse(
                 frontend_dir / "manifest.json",
@@ -77,7 +77,7 @@ def create_app() -> FastAPI:
             )
 
         @application.get("/service-worker.js", include_in_schema=False)
-        def serve_sw() -> FileResponse:
+        def serve_sw():
             """Serve PWA service worker."""
             return FileResponse(
                 frontend_dir / "service-worker.js",
@@ -85,7 +85,7 @@ def create_app() -> FastAPI:
             )
 
     @application.get("/", tags=["root"])
-    def root() -> dict[str, str]:
+    def root():
         """Root endpoint returning API service identification."""
         return {
             "name": settings.app_name,

@@ -7,7 +7,7 @@ import pytest
 from backend.app.main import app
 
 
-def test_post_prediction_endpoint_success() -> None:
+def test_post_prediction_endpoint_success():
     """Verify POST /api/v1/predict returns 200 OK with complete prediction report."""
     async def run_predict() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -40,7 +40,7 @@ def test_post_prediction_endpoint_success() -> None:
     assert data["counterpart_predicted_value"] is not None
 
 
-def test_post_prediction_scenario_2_endpoint() -> None:
+def test_post_prediction_scenario_2_endpoint():
     """Verify POST /api/v1/predict returns 15 feature inputs for Scenario 2."""
     async def run_predict() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -64,7 +64,7 @@ def test_post_prediction_scenario_2_endpoint() -> None:
     assert len(data["feature_inputs"]) == 15
 
 
-def test_post_prediction_invalid_location_returns_400() -> None:
+def test_post_prediction_invalid_location_returns_400():
     """Verify invalid location input returns 400 Bad Request."""
     async def run_predict() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)

@@ -52,22 +52,13 @@ logger = logging.getLogger("train_model")
 # ==============================================================================
 
 def retrain_single_final_model(
-    entry: dict,
-    final_dir: Path,
-    force: bool = False,
-    compute_shap_samples: int = 500,
-    use_full_data: bool = True,
-) -> dict:
-    """Train a single final deployment model based on its best experiment hyperparameters.
-
-    Parameters:
-        entry: Best model registry entry dictionary.
-        final_dir: Directory where the retrained model and artifacts are stored.
-        force: If True, overwrite existing model artifacts.
-        compute_shap_samples: Number of observation samples to calculate global TreeSHAP.
-        use_full_data: If True (default/recommended for production), retrains using 100% of available
-                       historical data up to the cutoff. If False, trains on the 80% development split.
-    """
+    entry,
+    final_dir,
+    force=False,
+    compute_shap_samples=500,
+    use_full_data=True,
+):
+    """Train a single final deployment model based on its best experiment hyperparameters."""
     loc = entry["location"]
     pol = entry["pollutant"]
     scen = entry["scenario"]
@@ -167,7 +158,7 @@ def retrain_single_final_model(
         ),
     }
 
-    with meta_dest.open("w", encoding="utf-8") as f:
+    with open(meta_dest, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info(f"Saved final deployment model and metadata to: {final_dir}")
@@ -175,14 +166,14 @@ def retrain_single_final_model(
 
 
 def retrain_final_models(
-    location: str | None = None,
-    pollutant: str | None = None,
-    scenario: str | None = None,
-    force: bool = False,
-    generate_registry_only: bool = False,
-    primary_metric: str = "mae",
-    use_dev_split_only: bool = False,
-) -> None:
+    location=None,
+    pollutant=None,
+    scenario=None,
+    force=False,
+    generate_registry_only=False,
+    primary_metric="mae",
+    use_dev_split_only=False,
+):
     """Execute retraining flow for final deployment models."""
     logger.info("Generating/verifying Best Model Registry from summary_metrics.csv...")
     registry_file = ARTIFACTS_DIR / "registry" / "best_models.json"
@@ -242,14 +233,14 @@ def retrain_final_models(
 # ==============================================================================
 
 def train_experiments(
-    run_all: bool = False,
-    location: str | None = None,
-    pollutant: str | None = None,
-    scenario: str | None = None,
-    algorithm: str | None = None,
-    retry_failed: bool = False,
-    force: bool = False,
-) -> None:
+    run_all=False,
+    location=None,
+    pollutant=None,
+    scenario=None,
+    algorithm=None,
+    retry_failed=False,
+    force=False,
+):
     """Execute research matrix experiments."""
     runner = ExperimentRunner()
 
@@ -290,7 +281,7 @@ def train_experiments(
 # CLI Entry Point
 # ==============================================================================
 
-def parse_args() -> argparse.Namespace:
+def parse_args():
     parser = argparse.ArgumentParser(
         description="Train NapasLoka research experiments or final deployment models.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -345,7 +336,7 @@ Examples:
     return parser.parse_args()
 
 
-def main() -> None:
+def main():
     args = parse_args()
 
     if args.mode == "experiment":

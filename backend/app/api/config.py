@@ -1,6 +1,5 @@
 """Read-only configuration and options exposed to the PWA."""
 
-from typing import Any
 from fastapi import APIRouter
 from backend.app.core.config import settings
 from backend.app.services.registry_service import registry_service
@@ -9,7 +8,7 @@ router = APIRouter(prefix="/config", tags=["configuration"])
 
 
 @router.get("/options")
-def configuration_options() -> dict[str, Any]:
+def configuration_options():
     """Return locations and experiment dimensions supported by the NapasLoka system."""
     return {
         "locations": settings.get_locations(),
@@ -25,13 +24,12 @@ def configuration_options() -> dict[str, Any]:
 
 
 @router.get("/models")
-def get_all_models_summary() -> dict[str, Any]:
+def get_all_models_summary():
     """Return inventory summary of all 120 trained models in the registry."""
     return registry_service.get_all_models_summary()
 
 
 @router.get("/best-models")
-def get_best_models_registry() -> dict[str, Any]:
+def get_best_models_registry():
     """Return registry of 60 winning models per location x pollutant x scenario."""
     return registry_service.get_all_best_models()
-

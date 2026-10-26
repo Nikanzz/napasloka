@@ -1,11 +1,11 @@
 """Interpretation service for local TreeSHAP attribution and global feature importance."""
 
 import logging
-from typing import Any
+
 import numpy as np
 import pandas as pd
 
-import src.models.interpretation  # Sets up Windows SAC protection
+import src.models.interpretation
 import shap
 
 from backend.app.core.config import (
@@ -39,12 +39,12 @@ SCIENTIFIC_DISCLAIMER = (
 class InterpretationService:
     """Computes dynamic local TreeSHAP explanations and collates global feature importance."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.registry = registry_service
         self.data_service = data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
-    def interpret_prediction(self, request: InterpretationRequest) -> InterpretationResponse:
+    def interpret_prediction(self, request):
         """Calculate on-the-fly local TreeSHAP attribution and aggregate offline global importance."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:

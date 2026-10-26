@@ -1,9 +1,6 @@
-"""Resolve feature names from the single schema in ``configs/features.yaml``."""
-
-from dataclasses import dataclass
+"""Resolve feature names from the single schema in configs/features.yaml."""
 
 from src.utils.config import load_yaml_config
-
 
 POLLUTANT_COLUMNS = {
     "co": "carbon_monoxide",
@@ -13,23 +10,25 @@ POLLUTANT_COLUMNS = {
 }
 
 
-@dataclass(frozen=True)
 class ScenarioDefinition:
     """Resolved feature contract for one scenario and pollutant."""
 
-    name: str
-    pollutant_column: str
-    feature_names: tuple[str, ...]
-    forecast_horizon_hours: int
+    def __init__(self, name, pollutant_column, feature_names, forecast_horizon_hours):
+        self.name = name
+        self.pollutant_column = pollutant_column
+        self.feature_names = tuple(feature_names)
+        self.forecast_horizon_hours = forecast_horizon_hours
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 
-def _lag_name(variable: str, hours: int) -> str:
+def _lag_name(variable, hours):
     return f"{variable}_lag_{hours}h"
 
 
-def resolve_scenario(pollutant: str, scenario: str) -> ScenarioDefinition:
+def resolve_scenario(pollutant, scenario):
     """Resolve a concrete scenario without duplicating feature definitions."""
-
     try:
         pollutant_column = POLLUTANT_COLUMNS[pollutant.lower()]
     except KeyError as exc:
@@ -42,7 +41,7 @@ def resolve_scenario(pollutant: str, scenario: str) -> ScenarioDefinition:
 
     scenario_config = scenarios[scenario]
     lag_hours = tuple(int(value) for value in config["lag_hours"])
-    variables: list[str] = []
+    variables = []
     if scenario_config.get("include_pollutant_lags"):
         variables.append(pollutant_column)
     if scenario_config.get("include_meteorological_lags"):
@@ -59,7 +58,6 @@ def resolve_scenario(pollutant: str, scenario: str) -> ScenarioDefinition:
     )
 
 
-def get_feature_names(pollutant: str, scenario: str) -> list[str]:
+def get_feature_names(pollutant, scenario):
     """Return ordered concrete feature names for an experiment."""
-
     return list(resolve_scenario(pollutant, scenario).feature_names)

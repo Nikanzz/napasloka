@@ -7,7 +7,7 @@ import pytest
 from backend.app.main import app
 
 
-def test_post_interpretation_endpoint_success() -> None:
+def test_post_interpretation_endpoint_success():
     """Verify POST /api/v1/interpretation returns 200 OK with SHAP explanation."""
     async def run_interpret() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -38,7 +38,7 @@ def test_post_interpretation_endpoint_success() -> None:
     assert "BUKAN merupakan bukti hubungan kausalitas" in data["scientific_disclaimer"]
 
 
-def test_post_interpretation_scenario_2_endpoint() -> None:
+def test_post_interpretation_scenario_2_endpoint():
     """Verify POST /api/v1/interpretation returns all 15 features for Scenario 2."""
     async def run_interpret() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -64,7 +64,7 @@ def test_post_interpretation_scenario_2_endpoint() -> None:
     assert len(data["chart_series"]["features"]) == 5
 
 
-def test_post_interpretation_invalid_location_returns_400() -> None:
+def test_post_interpretation_invalid_location_returns_400():
     """Verify invalid location returns 400 Bad Request."""
     async def run_interpret() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)

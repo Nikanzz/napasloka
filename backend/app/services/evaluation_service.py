@@ -1,7 +1,7 @@
 """Evaluation service for slicing test set observations, calculating dynamic metrics, and comparing models."""
 
 import logging
-from typing import Any
+
 import numpy as np
 import pandas as pd
 
@@ -30,11 +30,11 @@ logger = logging.getLogger(__name__)
 class EvaluationService:
     """Orchestrates test data evaluation, slicing, metric computation, and model comparison."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.registry = registry_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
-    def _normalize_timestamp(self, ts_input: Any, reference_tz: Any) -> pd.Timestamp | None:
+    def _normalize_timestamp(self, ts_input, reference_tz):
         """Convert any datetime or ISO string to timestamp matching the reference timezone."""
         if ts_input is None:
             return None
@@ -43,7 +43,7 @@ class EvaluationService:
             return ts.tz_localize(reference_tz)
         return ts.tz_convert(reference_tz)
 
-    def evaluate_test_range(self, request: EvaluationRequest) -> EvaluationResponse:
+    def evaluate_test_range(self, request):
         """Slice test observations for the requested period, compute metrics, and compare with baseline."""
         self.registry.validate_dimensions(
             request.location,

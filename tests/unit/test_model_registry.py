@@ -6,7 +6,7 @@ from backend.app.core.config import settings
 from backend.app.services.registry_service import registry_service
 
 
-def test_locations_configuration() -> None:
+def test_locations_configuration():
     """Verify all 15 Jabodetabek locations are configured with coordinates and regions."""
     locations = settings.get_locations()
     assert len(locations) == 15
@@ -20,7 +20,7 @@ def test_locations_configuration() -> None:
         assert 106.0 <= loc["longitude"] <= 108.0  # Jabodetabek longitude range
 
 
-def test_dimension_validation() -> None:
+def test_dimension_validation():
     """Ensure dimension validation accepts valid values and rejects invalid combinations."""
     # Valid call should not raise
     registry_service.validate_dimensions("taman-kamal", "co", "scenario_1", "xgboost")
@@ -42,7 +42,7 @@ def test_dimension_validation() -> None:
         registry_service.validate_dimensions("taman-kamal", "co", "scenario_1", "random_forest")
 
 
-def test_all_120_models_are_present_and_ready() -> None:
+def test_all_120_models_are_present_and_ready():
     """Verify that all 120 experiment combinations exist on disk with complete artifacts."""
     summary = registry_service.get_all_models_summary()
     assert summary["total_experiments"] == 120
@@ -50,7 +50,7 @@ def test_all_120_models_are_present_and_ready() -> None:
     assert summary["ready_ratio"] == 100.0
 
 
-def test_counterpart_model_pairing() -> None:
+def test_counterpart_model_pairing():
     """Verify XGBoost and LightGBM are correctly paired as counterpart baselines."""
     # XGBoost -> LightGBM counterpart
     counterpart_xgb = registry_service.get_counterpart_info(
@@ -71,7 +71,7 @@ def test_counterpart_model_pairing() -> None:
     assert counterpart_lgb.metrics.r2 > 0
 
 
-def test_model_loading_and_caching() -> None:
+def test_model_loading_and_caching():
     """Verify model estimator can be loaded and is cached in memory for zero-disk subsequent reads."""
     model_cache.clear()
     assert model_cache.stats()["size"] == 0
@@ -87,7 +87,7 @@ def test_model_loading_and_caching() -> None:
     assert model_cache.stats()["hits"] >= 1
 
 
-def test_predictions_csv_loading_and_caching() -> None:
+def test_predictions_csv_loading_and_caching():
     """Verify test predictions DataFrame is parsed properly with datetime column and cached."""
     predictions_cache.clear()
     assert predictions_cache.stats()["size"] == 0
@@ -106,7 +106,7 @@ def test_predictions_csv_loading_and_caching() -> None:
     assert predictions_cache.stats()["hits"] >= 1
 
 
-def test_memory_cache_lru_behavior() -> None:
+def test_memory_cache_lru_behavior():
     """Verify LRU cache limits size and evicts oldest items."""
     cache = MemoryCache(maxsize=3)
     cache.set("a", 1)

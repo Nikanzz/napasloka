@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 from src.utils.config import (
     ARTIFACTS_DIR,
@@ -16,7 +15,7 @@ from src.utils.config import (
 
 
 # Administrative region mapping for the 15 Jabodetabek observation points
-LOCATION_REGIONS: dict[str, str] = {
+LOCATION_REGIONS = {
     "taman-kamal": "Jakarta Barat",
     "pelabuhan-muara-baru": "Jakarta Utara",
     "daerah-pelabuhan-tanjung-priuk": "Jakarta Utara",
@@ -34,7 +33,7 @@ LOCATION_REGIONS: dict[str, str] = {
     "cibinong": "Kabupaten Bogor",
 }
 
-POLLUTANT_METADATA: dict[str, dict[str, Any]] = {
+POLLUTANT_METADATA = {
     "co": {
         "id": "co",
         "name": "Karbon Monoksida",
@@ -57,7 +56,7 @@ POLLUTANT_METADATA: dict[str, dict[str, Any]] = {
     },
 }
 
-SCENARIO_METADATA: dict[str, dict[str, Any]] = {
+SCENARIO_METADATA = {
     "scenario_1": {
         "id": "scenario_1",
         "label": "Skenario 1 (Lag Polutan)",
@@ -82,7 +81,7 @@ SCENARIO_METADATA: dict[str, dict[str, Any]] = {
     },
 }
 
-ALGORITHM_METADATA: dict[str, dict[str, Any]] = {
+ALGORITHM_METADATA = {
     "xgboost": {
         "id": "xgboost",
         "name": "XGBoost",
@@ -130,7 +129,7 @@ class Settings:
     default_test_start: str = "2026-06-02T17:00:00+07:00"
     default_test_end: str = "2026-10-26T18:00:00+07:00"
 
-    def get_locations(self) -> list[dict[str, Any]]:
+    def get_locations(self):
         """Return enriched list of configured Jabodetabek monitoring locations."""
         raw_locations = load_yaml_config("locations.yaml").get("locations", [])
         enriched = []
@@ -145,15 +144,15 @@ class Settings:
             })
         return enriched
 
-    def get_pollutants(self) -> list[dict[str, Any]]:
+    def get_pollutants(self):
         """Return supported pollutants with units and descriptions."""
         return list(POLLUTANT_METADATA.values())
 
-    def get_scenarios(self) -> list[dict[str, Any]]:
+    def get_scenarios(self):
         """Return supported modeling scenarios."""
         return list(SCENARIO_METADATA.values())
 
-    def get_algorithms(self) -> list[dict[str, Any]]:
+    def get_algorithms(self):
         """Return supported machine learning algorithms."""
         return list(ALGORITHM_METADATA.values())
 

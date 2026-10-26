@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Any
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -10,11 +9,11 @@ EXPERIMENTS_DIR = ARTIFACTS_DIR / "experiments"
 REGISTRY_DIR = ARTIFACTS_DIR / "registry"
 
 
-def project_path(*parts: str) -> Path:
+def project_path(*parts):
     return PROJECT_ROOT.joinpath(*parts)
 
 
-def load_yaml_config(relative_path: str | Path) -> dict[str, Any]:
+def load_yaml_config(relative_path):
     path = (CONFIG_DIR / relative_path).resolve()
     with path.open("r", encoding="utf-8") as stream:
         content = yaml.safe_load(stream) or {}

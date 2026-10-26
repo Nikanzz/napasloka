@@ -2,7 +2,6 @@
 
 import logging
 import threading
-from typing import Any
 import pandas as pd
 
 from backend.app.core.config import settings
@@ -15,12 +14,12 @@ logger = logging.getLogger(__name__)
 class DataService:
     """Manages processed historical observation datasets and builds lag feature vectors."""
 
-    def __init__(self) -> None:
-        self._cache: dict[str, pd.DataFrame] = {}
+    def __init__(self):
+        self._cache = {}
         self._lock = threading.Lock()
         self.locations_map = {loc["id"]: loc for loc in settings.get_locations()}
 
-    def get_coordinate_id(self, location_id: str) -> str:
+    def get_coordinate_id(self, location_id):
         """Resolve location slug to coordinate string matching dataset format."""
         loc_slug = slugify_component(location_id)
         if loc_slug in self.locations_map:
@@ -30,7 +29,7 @@ class DataService:
             return f"{lat}_{lon}"
         return location_id
 
-    def load_dataset(self, pollutant: str) -> pd.DataFrame:
+    def load_dataset(self, pollutant):
         """Load and cache processed observations DataFrame in memory."""
         file_name = "jabodetabek_co_dataset.csv" if pollutant.lower() == "co" else "jabodetabek_co2_dataset.csv"
         with self._lock:
@@ -41,17 +40,12 @@ class DataService:
 
                 logger.info("Loading processed dataset into memory from: %s", data_path)
                 df = pd.read_csv(data_path)
-                # Ensure Asia/Jakarta timezone
                 df["datetime"] = pd.to_datetime(df["datetime"], utc=True).dt.tz_convert("Asia/Jakarta")
                 self._cache[file_name] = df
 
             return self._cache[file_name]
 
-    def get_location_observations(
-        self,
-        location_id: str,
-        pollutant: str,
-    ) -> pd.DataFrame:
+    def get_location_observations(self, location_id, pollutant):
         """Filter dataset for a specific location, sorted chronologically."""
         df = self.load_dataset(pollutant)
         coord_id = self.get_coordinate_id(location_id)
@@ -63,13 +57,7 @@ class DataService:
 
         return loc_df
 
-    def build_next_hour_features(
-        self,
-        location_id: str,
-        pollutant: str,
-        scenario: str,
-        reference_datetime: Any | None = None,
-    ) -> tuple[pd.DataFrame, dict[str, Any]]:
+    def build_next_hour_features(self, location_id, pollutant, scenario, reference_datetime=None):
         """Construct lag feature row for next-hour forecast (t+1) based on observations up to t."""
         loc_df = self.get_location_observations(location_id, pollutant)
         ref_tz = loc_df["datetime"].dt.tz
@@ -85,7 +73,7 @@ class DataService:
         if len(loc_df) < 3:
             raise ValueError("Data observasi tidak mencukupi (minimal 3 observasi berurutan diperlukan untuk lag 1-3).")
 
-        # The last 3 rows are:
+        # The last 3 rows:
         # row_t: observation at time t (most recent) -> corresponds to lag_1h for forecasting t+1
         # row_t_minus_1: observation at t-1h -> corresponds to lag_2h for forecasting t+1
         # row_t_minus_2: observation at t-2h -> corresponds to lag_3h for forecasting t+1
@@ -97,7 +85,7 @@ class DataService:
         scenario_def = resolve_scenario(pollutant, scenario)
         pollutant_col = scenario_def.pollutant_column
 
-        feature_dict: dict[str, list[float]] = {}
+        feature_dict = {}
         # Lag order: lag_3h, lag_2h, lag_1h
         feature_dict[f"{pollutant_col}_lag_3h"] = [float(row_t_minus_2[pollutant_col])]
         feature_dict[f"{pollutant_col}_lag_2h"] = [float(row_t_minus_1[pollutant_col])]
@@ -110,7 +98,6 @@ class DataService:
                 feature_dict[f"{var}_lag_2h"] = [float(row_t_minus_1[var])]
                 feature_dict[f"{var}_lag_1h"] = [float(row_t[var])]
 
-        # Ensure exact column ordering matches scenario_def.feature_names
         ordered_features = [col for col in scenario_def.feature_names]
         X_df = pd.DataFrame(feature_dict)[ordered_features]
 
