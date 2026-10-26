@@ -29,7 +29,7 @@ MONTH_NAMES_ID = [
 ]
 
 
-def format_indo_timestamp(ts: pd.Timestamp) -> str:
+def format_indo_timestamp(ts):
     """Format timestamp into Indonesian standard string: '05 Agu 2026, 00:00 WIB'."""
     day = f"{ts.day:02d}"
     month = MONTH_NAMES_ID[ts.month]
@@ -39,7 +39,7 @@ def format_indo_timestamp(ts: pd.Timestamp) -> str:
     return f"{day} {month} {year}, {hour}:{minute} WIB"
 
 
-def get_feature_display_info(feature_name: str, pollutant_unit: str) -> tuple[str, str]:
+def get_feature_display_info(feature_name, pollutant_unit):
     """Return human-readable Indonesian label and measurement unit for a feature column."""
     labels_map = {
         "carbon_monoxide_lag_1h": ("CO (t-1: 1 Jam Lalu)", pollutant_unit),
@@ -64,7 +64,7 @@ def get_feature_display_info(feature_name: str, pollutant_unit: str) -> tuple[st
     return labels_map.get(feature_name, (feature_name, pollutant_unit))
 
 
-def assess_air_quality(pollutant: str, value: float) -> AirQualityAssessment:
+def assess_air_quality(pollutant, value):
     """Categorize predicted pollutant concentration according to ISPU / WHO standards."""
     if pollutant.lower() == "co":
         if value <= 4000:
@@ -129,12 +129,12 @@ def assess_air_quality(pollutant: str, value: float) -> AirQualityAssessment:
 class PredictionService:
     """Orchestrates next-hour forecasting using loaded models and latest observation lag vectors."""
 
-    def __init__(self) -> None:
+    def __init__(self):
         self.registry = registry_service
         self.data_service = data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
-    def predict_next_hour(self, request: PredictionRequest) -> NextHourPredictionResponse:
+    def predict_next_hour(self, request):
         """Generate next-hour forecast (t+1) based on latest observations up to t."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:

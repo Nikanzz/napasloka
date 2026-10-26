@@ -7,7 +7,7 @@ import httpx
 from backend.app.main import app
 
 
-def test_health_endpoint_returns_ok() -> None:
+def test_health_endpoint_returns_ok():
     async def get_health() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(

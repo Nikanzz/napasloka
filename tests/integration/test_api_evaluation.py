@@ -7,7 +7,7 @@ import pytest
 from backend.app.main import app
 
 
-def test_post_evaluation_endpoint_success() -> None:
+def test_post_evaluation_endpoint_success():
     """Verify POST /api/v1/evaluation returns complete report with 200 OK."""
     async def run_eval() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -38,7 +38,7 @@ def test_post_evaluation_endpoint_success() -> None:
     assert len(data["chart_data"]["timestamps"]) > 0
 
 
-def test_post_evaluation_sliced_date_range() -> None:
+def test_post_evaluation_sliced_date_range():
     """Verify POST /api/v1/evaluation with datetime range slices properly."""
     async def run_eval() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -64,7 +64,7 @@ def test_post_evaluation_sliced_date_range() -> None:
     assert data["time_range"]["evaluated_samples"] < data["time_range"]["total_test_samples"]
 
 
-def test_post_evaluation_invalid_date_range_returns_400() -> None:
+def test_post_evaluation_invalid_date_range_returns_400():
     """Verify out-of-range date filter returns 400 Bad Request."""
     async def run_eval() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -87,7 +87,7 @@ def test_post_evaluation_invalid_date_range_returns_400() -> None:
     assert detail["code"] == "INVALID_EVALUATION_REQUEST"
 
 
-def test_get_evaluation_range_endpoint() -> None:
+def test_get_evaluation_range_endpoint():
     """Verify GET /api/v1/evaluation/range returns temporal bounds."""
     async def get_range() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)

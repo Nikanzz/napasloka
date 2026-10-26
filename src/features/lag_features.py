@@ -6,15 +6,8 @@ from src.features.scenarios import resolve_scenario
 from src.utils.config import load_yaml_config
 
 
-def create_lag_features(
-    frame: pd.DataFrame,
-    pollutant: str,
-    scenario: str,
-    *,
-    drop_incomplete_rows: bool = True,
-) -> pd.DataFrame:
+def create_lag_features(frame, pollutant, scenario, drop_incomplete_rows=True):
     """Create configured lags, grouped by location when that column is present."""
-
     definition = resolve_scenario(pollutant, scenario)
     config = load_yaml_config("features.yaml")
     lags = [int(value) for value in config["lag_hours"]]

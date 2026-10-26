@@ -5,7 +5,7 @@ from backend.app.schemas.prediction import PredictionRequest
 from backend.app.services.prediction_service import assess_air_quality, prediction_service
 
 
-def test_assess_air_quality_co() -> None:
+def test_assess_air_quality_co():
     """Verify ISPU air quality assessment categories for Carbon Monoxide."""
     # Baik (<= 4000)
     a1 = assess_air_quality("co", 1500.0)
@@ -30,7 +30,7 @@ def test_assess_air_quality_co() -> None:
     assert a5.category == "Berbahaya"
 
 
-def test_assess_air_quality_co2() -> None:
+def test_assess_air_quality_co2():
     """Verify ambient tropospheric assessment for Carbon Dioxide."""
     # Normal (< 450 ppm)
     a1 = assess_air_quality("co2", 420.0)
@@ -45,7 +45,7 @@ def test_assess_air_quality_co2() -> None:
     assert a3.category == "Tinggi"
 
 
-def test_predict_next_hour_co_scenario_1() -> None:
+def test_predict_next_hour_co_scenario_1():
     """Verify next-hour prediction for CO Scenario 1 with XGBoost."""
     req = PredictionRequest(
         location="taman-kamal",
@@ -80,7 +80,7 @@ def test_predict_next_hour_co_scenario_1() -> None:
     assert res.counterpart_predicted_value > 0
 
 
-def test_predict_next_hour_co2_scenario_2() -> None:
+def test_predict_next_hour_co2_scenario_2():
     """Verify next-hour prediction for CO2 Scenario 2 with LightGBM (15 features)."""
     req = PredictionRequest(
         location="cibinong",
@@ -109,7 +109,7 @@ def test_predict_next_hour_co2_scenario_2() -> None:
     assert res.counterpart_predicted_value is not None
 
 
-def test_predict_next_hour_with_reference_time() -> None:
+def test_predict_next_hour_with_reference_time():
     """Verify point-forecast can use an explicit historical reference timestamp."""
     req = PredictionRequest(
         location="taman-kamal",
@@ -123,7 +123,7 @@ def test_predict_next_hour_with_reference_time() -> None:
     assert "2026-04-10T13:00:00" in res.target_time
 
 
-def test_predict_invalid_location_raises() -> None:
+def test_predict_invalid_location_raises():
     """Verify ValueError is raised on unsupported location."""
     req = PredictionRequest(
         location="unknown-place",

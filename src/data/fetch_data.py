@@ -4,6 +4,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+import numpy as np
 import pandas as pd
 import openmeteo_requests
 import requests_cache
@@ -13,19 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-import numpy as np
-from typing import Any, cast
-
 from src.utils.config import DATA_DIR, load_yaml_config
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
 
-def _extract_hourly_data(
-    response: Any,
-    variable_indices: list[int],
-    timezone: str,
-) -> tuple[pd.DatetimeIndex, list[np.ndarray]]:
+def _extract_hourly_data(response, variable_indices, timezone):
     """Safely unpack hourly time range and numpy variables from Open-Meteo response."""
     hourly = response.Hourly()
     if hourly is None:
@@ -48,7 +42,7 @@ def _extract_hourly_data(
     return time_index, arrays
 
 
-def fetch_raw_data() -> None:
+def fetch_raw_data():
     """Mengunduh data mentah dari Open-Meteo dan menyimpannya ke data/raw/."""
     config = load_yaml_config("locations.yaml")
     locations = config.get("locations", [])
@@ -66,7 +60,7 @@ def fetch_raw_data() -> None:
 
     cache_session = requests_cache.CachedSession(".cache", expire_after=-1)
     retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
-    openmeteo = openmeteo_requests.Client(session=cast(Any, retry_session))
+    openmeteo = openmeteo_requests.Client(session=retry_session)
 
     weather_list = []
     co_list = []
@@ -191,7 +185,7 @@ def fetch_raw_data() -> None:
     logging.info("Gunakan modul 'python -m src.data.clean_data' untuk memproses dan mengintegrasikan dataset.")
 
 
-def main() -> None:
+def main():
     parser = argparse.ArgumentParser(description="Unduh data mentah cuaca dan kualitas udara dari Open-Meteo.")
     parser.add_argument(
         "--clean",

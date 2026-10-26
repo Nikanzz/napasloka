@@ -7,7 +7,7 @@ import pytest
 from backend.app.main import app
 
 
-def test_root_endpoint() -> None:
+def test_root_endpoint():
     """Verify root endpoint returns API identification."""
     async def get_root() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -21,7 +21,7 @@ def test_root_endpoint() -> None:
     assert data["status"] == "online"
 
 
-def test_config_options_endpoint() -> None:
+def test_config_options_endpoint():
     """Verify /api/v1/config/options returns all required dimensions."""
     async def get_options() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)
@@ -45,7 +45,7 @@ def test_config_options_endpoint() -> None:
     assert "end" in data["evaluation_range"]
 
 
-def test_models_summary_endpoint() -> None:
+def test_models_summary_endpoint():
     """Verify /api/v1/config/models returns 120 completed models."""
     async def get_models() -> httpx.Response:
         transport = httpx.ASGITransport(app=app)

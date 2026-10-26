@@ -1,7 +1,6 @@
 """FastAPI router for test dataset evaluation and model comparison."""
 
 import logging
-from typing import Any
 from fastapi import APIRouter, HTTPException, Query, status
 
 from backend.app.core.config import settings
@@ -15,7 +14,7 @@ router = APIRouter(prefix="/evaluation", tags=["evaluation"])
 
 
 @router.post("", response_model=EvaluationResponse)
-def evaluate_model(request: EvaluationRequest) -> EvaluationResponse:
+def evaluate_model(request: EvaluationRequest):
     """Evaluate trained model predictions over a specified test date range and compare with baseline."""
     try:
         return evaluation_service.evaluate_test_range(request)
@@ -39,11 +38,11 @@ def evaluate_model(request: EvaluationRequest) -> EvaluationResponse:
 
 @router.get("/range")
 def get_evaluation_time_range(
-    location: str = Query(default="taman-kamal", description="Location ID"),
-    pollutant: str = Query(default="co", description="Pollutant ID ('co' or 'co2')"),
-    scenario: str = Query(default="scenario_1", description="Scenario ID"),
-    algorithm: str = Query(default="xgboost", description="Algorithm ID"),
-) -> dict[str, Any]:
+    location=Query(default="taman-kamal", description="Location ID"),
+    pollutant=Query(default="co", description="Pollutant ID ('co' or 'co2')"),
+    scenario=Query(default="scenario_1", description="Scenario ID"),
+    algorithm=Query(default="xgboost", description="Algorithm ID"),
+):
     """Return available temporal range bounds of the test dataset."""
     try:
         df = registry_service.load_test_predictions(location, pollutant, scenario, algorithm)
@@ -58,6 +57,6 @@ def get_evaluation_time_range(
         }
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"code": "RANGE_LOOKUP_ERROR", "message": str(e)},
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail={"code": "RANGE_NOT_FOUND", "message": str(e)},
         )

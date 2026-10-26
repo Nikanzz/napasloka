@@ -5,7 +5,7 @@ from backend.app.schemas.interpretation import InterpretationRequest
 from backend.app.services.interpretation_service import interpretation_service
 
 
-def test_interpret_prediction_co_scenario_1_xgboost() -> None:
+def test_interpret_prediction_co_scenario_1_xgboost():
     """Verify local TreeSHAP and global importance for CO Scenario 1 with XGBoost."""
     req = InterpretationRequest(
         location="taman-kamal",
@@ -46,7 +46,7 @@ def test_interpret_prediction_co_scenario_1_xgboost() -> None:
     assert "BUKAN merupakan bukti hubungan kausalitas" in res.scientific_disclaimer
 
 
-def test_interpret_prediction_co2_scenario_2_lightgbm() -> None:
+def test_interpret_prediction_co2_scenario_2_lightgbm():
     """Verify local TreeSHAP for CO2 Scenario 2 with LightGBM (15 features)."""
     req = InterpretationRequest(
         location="cibinong",
@@ -73,7 +73,7 @@ def test_interpret_prediction_co2_scenario_2_lightgbm() -> None:
     assert any("wind_speed" in name for name in feature_names)
 
 
-def test_interpret_with_reference_time() -> None:
+def test_interpret_with_reference_time():
     """Verify interpretation on historical reference point."""
     req = InterpretationRequest(
         location="taman-kamal",
@@ -86,7 +86,7 @@ def test_interpret_with_reference_time() -> None:
     assert "2026-04-10T13:00:00" in res.target_time
 
 
-def test_interpret_invalid_location_raises() -> None:
+def test_interpret_invalid_location_raises():
     """Verify ValueError is raised on invalid location."""
     req = InterpretationRequest(
         location="invalid-loc",

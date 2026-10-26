@@ -3,7 +3,6 @@
 from collections import OrderedDict
 import logging
 import threading
-from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -11,14 +10,14 @@ logger = logging.getLogger(__name__)
 class MemoryCache:
     """Thread-safe LRU in-memory cache for trained estimators and artifacts."""
 
-    def __init__(self, maxsize: int = 128) -> None:
+    def __init__(self, maxsize=128):
         self._maxsize = maxsize
-        self._cache: OrderedDict[str, Any] = OrderedDict()
+        self._cache = OrderedDict()
         self._lock = threading.RLock()
         self._hits = 0
         self._misses = 0
 
-    def get(self, key: str) -> Any | None:
+    def get(self, key):
         """Retrieve an item from cache, marking it as most recently used."""
         with self._lock:
             if key in self._cache:
@@ -28,7 +27,7 @@ class MemoryCache:
             self._misses += 1
             return None
 
-    def set(self, key: str, value: Any) -> None:
+    def set(self, key, value):
         """Store an item in cache, evicting the least recently used if exceeding maxsize."""
         with self._lock:
             if key in self._cache:
@@ -38,12 +37,12 @@ class MemoryCache:
                 oldest_key, _ = self._cache.popitem(last=False)
                 logger.debug("Evicted oldest cache entry: %s", oldest_key)
 
-    def contains(self, key: str) -> bool:
+    def contains(self, key):
         """Check if key exists in cache without modifying LRU order."""
         with self._lock:
             return key in self._cache
 
-    def remove(self, key: str) -> bool:
+    def remove(self, key):
         """Remove a specific key from cache."""
         with self._lock:
             if key in self._cache:
@@ -51,14 +50,14 @@ class MemoryCache:
                 return True
             return False
 
-    def clear(self) -> None:
+    def clear(self):
         """Clear all entries from cache."""
         with self._lock:
             self._cache.clear()
             self._hits = 0
             self._misses = 0
 
-    def stats(self) -> dict[str, Any]:
+    def stats(self):
         """Return cache hit/miss statistics and current size."""
         with self._lock:
             total = self._hits + self._misses

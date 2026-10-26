@@ -1,28 +1,23 @@
-from collections.abc import Sequence
-from dataclasses import dataclass, field
-from time import perf_counter
+import time
 import numpy as np
 
 
-@dataclass
 class PerformanceTimer:
-    elapsed_seconds: float | None = field(default=None, init=False)
-    _started_at: float | None = field(default=None, init=False, repr=False)
+    def __init__(self):
+        self.elapsed_seconds = None
+        self._started_at = None
 
-    def __enter__(self) -> "PerformanceTimer":
-        self._started_at = perf_counter()
+    def __enter__(self):
+        self._started_at = time.time()
         return self
 
-    def __exit__(self, *_: object) -> None:
+    def __exit__(self, exc_type, exc_val, exc_tb):
         if self._started_at is None:
             raise RuntimeError("Timer was not started")
-        self.elapsed_seconds = perf_counter() - self._started_at
+        self.elapsed_seconds = time.time() - self._started_at
 
 
-def mean_absolute_percentage_error_percent(
-    y_true: Sequence[float],
-    y_pred: Sequence[float],
-) -> float:
+def mean_absolute_percentage_error_percent(y_true, y_pred):
     actual = np.asarray(y_true, dtype=float)
     predicted = np.asarray(y_pred, dtype=float)
     if actual.shape != predicted.shape:
@@ -33,10 +28,7 @@ def mean_absolute_percentage_error_percent(
     return float(np.mean(np.abs((actual[mask] - predicted[mask]) / actual[mask])) * 100)
 
 
-def calculate_regression_metrics(
-    y_true: Sequence[float],
-    y_pred: Sequence[float],
-) -> dict[str, float]:
+def calculate_regression_metrics(y_true, y_pred):
     actual = np.asarray(y_true, dtype=float)
     predicted = np.asarray(y_pred, dtype=float)
     if actual.shape != predicted.shape:

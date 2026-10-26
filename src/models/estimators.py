@@ -1,28 +1,25 @@
 """Estimator factories, timed fitting, tuning, and prediction for XGBoost and LightGBM."""
 
-from dataclasses import dataclass
-from typing import Any
-
+import time
 import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, TimeSeriesSplit
 
 from src.utils.config import load_yaml_config
-from src.utils.metrics import PerformanceTimer
 
 
 # ==============================================================================
 # Model Factories
 # ==============================================================================
 
-def create_xgboost_regressor(parameters: dict[str, Any] | None = None) -> Any:
-    """Create an XGBRegressor; parameters come from config or tuning output."""
+def create_xgboost_regressor(parameters=None):
+    """Create an XGBRegressor with specified or default parameters."""
     from xgboost import XGBRegressor
 
     return XGBRegressor(**(parameters or {}))
 
 
-def create_lightgbm_regressor(parameters: dict[str, Any] | None = None) -> Any:
-    """Create an LGBMRegressor; parameters come from config or tuning output."""
+def create_lightgbm_regressor(parameters=None):
+    """Create an LGBMRegressor with specified or default parameters."""
     from lightgbm import LGBMRegressor
 
     params = {"verbose": -1, "importance_type": "gain"}
@@ -31,7 +28,7 @@ def create_lightgbm_regressor(parameters: dict[str, Any] | None = None) -> Any:
     return LGBMRegressor(**params)
 
 
-def create_estimator(algorithm: str, parameters: dict[str, Any] | None = None) -> Any:
+def create_estimator(algorithm, parameters=None):
     """Create one of the two research estimators ('xgboost' or 'lightgbm')."""
     factories = {
         "xgboost": create_xgboost_regressor,
@@ -47,44 +44,50 @@ def create_estimator(algorithm: str, parameters: dict[str, Any] | None = None) -
 # Timed Fitting and Prediction
 # ==============================================================================
 
-@dataclass(frozen=True)
 class TrainingResult:
-    """A fitted estimator and its measured wall-clock training duration."""
+    """Fitted estimator and measured training duration in seconds."""
 
-    model: Any
-    training_time_seconds: float
+    def __init__(self, model, training_time_seconds):
+        self.model = model
+        self.training_time_seconds = training_time_seconds
 
-
-def train_model(model: Any, x_train: Any, y_train: Any) -> TrainingResult:
-    """Fit an estimator and measure time using the shared timer."""
-    with PerformanceTimer() as timer:
-        model.fit(x_train, y_train)
-    assert timer.elapsed_seconds is not None
-    return TrainingResult(model=model, training_time_seconds=timer.elapsed_seconds)
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 
-@dataclass(frozen=True)
+def train_model(model, x_train, y_train):
+    """Fit an estimator and measure elapsed training time."""
+    start = time.time()
+    model.fit(x_train, y_train)
+    elapsed = time.time() - start
+    return TrainingResult(model, elapsed)
+
+
 class PredictionResult:
-    """Predictions and measured wall-clock inference duration."""
+    """Predictions array and measured inference duration in seconds."""
 
-    values: np.ndarray
-    prediction_time_seconds: float
+    def __init__(self, values, prediction_time_seconds):
+        self.values = values
+        self.prediction_time_seconds = prediction_time_seconds
+
+    def __getitem__(self, item):
+        return getattr(self, item)
 
 
-def predict(model: Any, x_test: Any) -> PredictionResult:
-    """Generate predictions and time the inference operation."""
-    with PerformanceTimer() as timer:
-        values = np.asarray(model.predict(x_test))
-    assert timer.elapsed_seconds is not None
-    return PredictionResult(values=values, prediction_time_seconds=timer.elapsed_seconds)
+def predict(model, x_test):
+    """Generate predictions and measure elapsed inference time."""
+    start = time.time()
+    values = np.asarray(model.predict(x_test))
+    elapsed = time.time() - start
+    return PredictionResult(values, elapsed)
 
 
 # ==============================================================================
 # Hyperparameter Tuning with TimeSeriesSplit
 # ==============================================================================
 
-def build_search_cv(estimator: Any, algorithm: str) -> GridSearchCV | RandomizedSearchCV:
-    """Build a search object from config, supporting both randomized and grid search."""
+def build_search_cv(estimator, algorithm):
+    """Build a search object from config, supporting randomized and grid search."""
     config = load_yaml_config("tuning.yaml")
     if not config.get("enabled", False):
         raise RuntimeError("Hyperparameter tuning is disabled in configs/tuning.yaml")
@@ -132,12 +135,7 @@ def build_search_cv(estimator: Any, algorithm: str) -> GridSearchCV | Randomized
         raise ValueError(f"Unsupported tuning strategy: {strategy}")
 
 
-def tune_on_training_set(
-    estimator: Any,
-    algorithm: str,
-    x_train: Any,
-    y_train: Any,
-) -> GridSearchCV | RandomizedSearchCV:
+def tune_on_training_set(estimator, algorithm, x_train, y_train):
     """Fit a cross-validated search on the training set only."""
     search = build_search_cv(estimator, algorithm)
     search.fit(x_train, y_train)

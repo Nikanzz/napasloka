@@ -9,7 +9,7 @@ router = APIRouter(tags=["health"])
 
 
 @router.get("/health", response_model=HealthResponse)
-def health_check() -> HealthResponse:
+def health_check():
     """Report that the API process and routing layer are available."""
 
     return HealthResponse(status="OK", service="napasloka-api")
