@@ -1,2 +1,30 @@
+[project]
+name = "napasloka"
+version = "1.0.0"
+description = "Sistem Prediksi Polutan Udara Jabodetabek"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas",
+    "numpy",
+    "matplotlib",
+    "seaborn",
+    "scikit-learn",
+    "xgboost",
+    "lightgbm",
+    "shap",
+    "fastapi",
+    "uvicorn",
+    "pydantic",
+    "pyyaml",
+    "joblib",
+    "httpx",
+    "pytest",
+    "ipykernel",
+    "openmeteo-requests",
+    "requests-cache",
+    "retry-requests",
+]
+
 [tool.vercel]
 entrypoint = "backend.app.main:app"
