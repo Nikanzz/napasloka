@@ -1,5 +1,3 @@
-"""FastAPI router for model interpretability (local TreeSHAP and global importance)."""
-
 import logging
 from fastapi import APIRouter, HTTPException, status
 
@@ -13,7 +11,6 @@ router = APIRouter(prefix="/interpretation", tags=["interpretation"])
 
 @router.post("", response_model=InterpretationResponse)
 def interpret_model_prediction(request: InterpretationRequest):
-    """Compute local TreeSHAP attribution and return global feature importance for the selected model."""
     try:
         return interpretation_service.interpret_prediction(request)
     except ValueError as e:

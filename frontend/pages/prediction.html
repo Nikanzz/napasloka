@@ -30,17 +30,27 @@
         <a href="/pages/information.html">Informasi</a>
         <a href="/pages/about.html">Tentang</a>
       </nav>
-      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
-        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <div class="header-actions">
+        <button id="btn-install-pwa" class="btn-install-pwa" type="button" style="display: none;" aria-label="Pasang Aplikasi NapasLoka">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Pasang App</span>
+        </button>
+        <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+          <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -129,7 +139,7 @@
               <span class="badge-status-final" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.85rem; font-size: 0.825rem; font-weight: 600; background-color: rgba(16, 185, 129, 0.12); color: #059669; border-radius: var(--radius-sm); border: 1px solid rgba(16, 185, 129, 0.25); white-space: nowrap;">● Observasi Terkini</span>
             </div>
             <span class="form-hint" id="ref-time-hint">
-              <span style="color: var(--color-primary); font-weight: 600;">✓ Waktu Otomatis Aktif</span> &mdash; Memproyeksikan konsentrasi 1 jam ke depan (5 Agustus 2026, 00:00 WIB) berdasarkan observasi sensor mutakhir.
+              <span style="color: var(--color-primary); font-weight: 600;">✓ Waktu Otomatis Aktif</span> &mdash; Memproyeksikan konsentrasi 1 jam ke depan berdasarkan observasi sensor Open-Meteo terkini.
             </span>
             <!-- Hidden inputs for evaluation range backwards compatibility -->
             <input id="eval-start-date" type="hidden" value="2026-07-29">
@@ -172,11 +182,11 @@
           </div>
           <div class="navy-table-row">
             <span class="navy-table-label">Observasi (t)</span>
-            <span class="navy-table-value" id="summary-ref-time">04 Agu 2026, 23:00 WIB</span>
+            <span class="navy-table-value" id="summary-ref-time">Data Terkini (Real-time)</span>
           </div>
           <div class="navy-table-row">
             <span class="navy-table-label">Target (t+1)</span>
-            <span class="navy-table-value" id="summary-target-time">05 Agu 2026, 00:00 WIB</span>
+            <span class="navy-table-value" id="summary-target-time">+1 Jam ke Depan</span>
           </div>
         </div>
 
@@ -202,13 +212,10 @@
               Estimasi Konsentrasi 1 Jam ke Depan
             </h2>
           </div>
-          <span class="page-tag" id="res-horizon-badge" style="background: #eff6ff; color: #1d4ed8; font-weight: 700;">
-            Estimasi Horizon (t+1)
-          </span>
         </div>
 
         <!-- Visual Timeline Banner (Observation t -> Target t+1) -->
-        <div class="pred-timeline-box">
+        <div class="pred-timeline-box" style="margin-bottom: 1.5rem;">
           <div class="pred-timeline-node">
             <span class="pred-timeline-tag">OBSERVASI TERAKHIR (t)</span>
             <span class="pred-timeline-time" id="res-latest-time">-</span>
@@ -221,34 +228,11 @@
             <span class="pred-connector-badge">+1 Jam Proyeksi &rarr;</span>
             <span class="pred-connector-line"></span>
           </div>
-          <div class="pred-timeline-node">
+          <div class="pred-timeline-node" style="text-align: right;">
             <span class="pred-timeline-tag highlight">TARGET PREDIKSI (t+1)</span>
             <span class="pred-timeline-time" id="res-target-time-badge">-</span>
-            <div class="pred-timeline-value highlight">
-              <span id="res-target-summary-val">-</span> <span class="pred-timeline-unit-sub" id="res-target-summary-unit">-</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Primary Hero Prediction Metric -->
-        <div class="pred-hero-container">
-          <div class="pred-hero-metric-wrap">
-            <span class="pred-hero-label">Konsentrasi Diproyeksikan</span>
-            <div class="pred-hero-number-row">
-              <span id="res-predicted-val" class="pred-hero-number">-</span>
-              <span id="res-unit" class="pred-hero-unit">-</span>
-            </div>
-            <!-- Dynamics row hidden per user request -->
-            <div class="pred-dynamics-row" style="display: none;">
-              <span id="res-trend-badge" class="pred-trend-pill trend-stabil">
-                <span id="res-trend-icon">&#9679;</span>
-                <span id="res-trend-label">Stabil</span>
-              </span>
-              <div class="pred-delta-text">
-                <span id="res-delta-val" class="pred-delta-val">-</span>
-                <span id="res-delta-pct" class="pred-delta-pct">(-)</span>
-                <span class="pred-delta-note">vs observasi sebelumnya</span>
-              </div>
+            <div class="pred-timeline-value highlight" style="font-size: 1.4rem;">
+              <span id="res-target-summary-val">-</span> <span class="pred-timeline-unit-sub" id="res-target-summary-unit" style="font-size: 0.85rem; font-weight: 700; color: #2563eb;">-</span>
             </div>
           </div>
         </div>
@@ -274,6 +258,9 @@
 
         <!-- Hidden compatibility elements for scripts and tests -->
         <div style="display: none;" aria-hidden="true">
+          <span id="res-horizon-badge"></span>
+          <span id="res-predicted-val"></span>
+          <span id="res-unit"></span>
           <span id="res-assessment-badge"></span>
           <span id="res-assessment-desc"></span>
           <span id="res-standard-ref"></span>
@@ -285,19 +272,17 @@
           <span id="res-counterpart-val"></span>
           <span id="res-counterpart-delta"></span>
           <span id="res-counterpart-agreement"></span>
+          <a id="btn-goto-evaluation" href="/pages/evaluation.html"></a>
         </div>
 
         <!-- Cross-Navigation Footer Buttons -->
         <div class="pred-actions-footer">
           <div class="pred-actions-note">
-            <span>&#9432;</span> Ingin mengamati performa historis 7 hari atau memeriksa faktor pengaruh fitur?
+            <span>&#9432;</span> Ingin memeriksa faktor dan variabel atmosfer yang paling memengaruhi hasil estimasi ini?
           </div>
           <div class="pred-actions-buttons">
-            <a id="btn-goto-evaluation" href="/pages/evaluation.html" class="btn btn-primary">
-              Lihat Grafik & Evaluasi &rarr;
-            </a>
-            <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn" style="background: #f1f5f9; color: #334155; border: 1px solid #cbd5e1;">
-              Telusuri Kontribusi SHAP &rarr;
+            <a id="btn-goto-interpretation" href="/pages/interpretation.html" class="btn btn-primary">
+              Telusuri Kontribusi Fitur (SHAP) &rarr;
             </a>
           </div>
         </div>
@@ -322,8 +307,8 @@
     </div>
   </footer>
 
-  <script src="/js/app.js"></script>
-  <script src="/js/api.js"></script>
-  <script src="/js/prediction.js"></script>
+  <script src="/js/app.js?v=1.0.7"></script>
+  <script src="/js/api.js?v=1.0.7"></script>
+  <script src="/js/prediction.js?v=1.0.7"></script>
 </body>
 </html>

@@ -29,17 +29,27 @@
         <a href="/pages/information.html">Informasi</a>
         <a href="/pages/about.html">Tentang</a>
       </nav>
-      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
-        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <div class="header-actions">
+        <button id="btn-install-pwa" class="btn-install-pwa" type="button" style="display: none;" aria-label="Pasang Aplikasi NapasLoka">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Pasang App</span>
+        </button>
+        <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+          <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -89,8 +99,6 @@
 
       <!-- Quick Configuration Card -->
       <div class="home-quick-config-wrap">
-        <div class="home-floating-horizon-pill">Horizon prediksi: +1 jam</div>
-
         <div id="quick-config-card" class="home-quick-config-card">
           <div class="home-quick-top-bar">
             <span class="home-quick-pill-badge">

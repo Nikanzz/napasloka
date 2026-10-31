@@ -1,7 +1,3 @@
-/* ==========================================================================
-   Sistem NapasLoka - UI Components (Precision Matching Chapter 3 Mockups)
-   ========================================================================== */
-
 /* --------------------------------------------------------------------------
    Cards & Panels
    -------------------------------------------------------------------------- */
@@ -36,7 +32,7 @@
   line-height: 1.45;
 }
 
-/* Deep Navy Card (Mockup 1 Right Card, Mockup 2 Data Source, Mockup 3 Hero) */
+/* Deep Navy Card */
 .navy-card {
   background: var(--color-navy);
   color: #ffffff;
@@ -101,7 +97,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Forms & Controls (Mockup 1 Input Structure)
+   Forms & Controls
    -------------------------------------------------------------------------- */
 .form-group {
   display: flex;
@@ -150,7 +146,7 @@
   margin-top: 0.15rem;
 }
 
-/* Segmented Control (CO / CO2 Toggle from Mockup 1) */
+/* Segmented Control (CO / CO2 Toggle) */
 .segmented-control {
   display: flex;
   background: #f1f5f9;
@@ -184,7 +180,7 @@
   box-shadow: 0 1px 3px rgba(37, 99, 235, 0.25);
 }
 
-/* Date Range Picker (Mockup 1 Field 05) */
+/* Date Range Picker */
 .date-range-row {
   display: flex;
   align-items: center;
@@ -250,7 +246,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Metric Cards (Mockup 3: 01 MAE, 02 RMSE, 03 MAPE, 04 R2)
+   Metric Cards (MAE, RMSE, MAPE, R2)
    -------------------------------------------------------------------------- */
 .metric-card {
   background: #ffffff;
@@ -306,7 +302,7 @@
   line-height: 1.35;
 }
 
-/* Model Comparison Highlight Cards (Mockup 3 Right Column) */
+/* Model Comparison Highlight Cards */
 .model-box-highlight {
   border: 1.5px solid var(--color-primary);
   background: #ffffff;
@@ -353,7 +349,67 @@
 }
 
 /* --------------------------------------------------------------------------
-   SHAP Horizontal Bars & Reading Cards (Mockup 4)
+   Evaluation Chart Quick Toolbar & Range Presets
+   -------------------------------------------------------------------------- */
+.eval-chart-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 0.85rem;
+}
+
+.eval-presets-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.eval-preset-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.eval-presets-group {
+  display: inline-flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.btn-eval-preset {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 0.22rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-eval-preset:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.btn-eval-preset.active {
+  background: var(--color-primary, #2563eb);
+  color: #ffffff;
+  border-color: var(--color-primary, #2563eb);
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   SHAP Horizontal Bars & Reading Cards
    -------------------------------------------------------------------------- */
 .shap-item-row {
   display: flex;
@@ -415,7 +471,7 @@
   color: var(--color-danger);
 }
 
-/* Reading Cards (Mockup 4 Right Column) */
+/* Reading Cards */
 .guide-card-success {
   background: #f0fdf4;
   border: 1px solid #bbf7d0;
@@ -489,7 +545,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Information Cards (Mockup 2 6-Grid)
+   Information Cards Grid
    -------------------------------------------------------------------------- */
 .info-card {
   background: #ffffff;
@@ -527,7 +583,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Home Page: Precision Layout Matching Picture 6 Mockup
+   Home Page Layout
    -------------------------------------------------------------------------- */
 
 .home-hero-card {
@@ -887,7 +943,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Section 2: Workflow & System Capabilities (Picture 6 Mockup)
+   Section 2: Workflow & System Capabilities
    -------------------------------------------------------------------------- */
 .home-flow-section {
   text-align: center;
@@ -1014,9 +1070,7 @@
   }
 }
 
-/* --------------------------------------------------------------------------
-   Prediction Page: Rich Next-Hour Foresight & Temporal Transition Layout
-   -------------------------------------------------------------------------- */
+/* Prediction Page */
 .ref-time-row {
   display: flex;
   gap: 0.6rem;
@@ -1450,7 +1504,7 @@
   margin-top: 0.25rem;
 }
 
-/* Feature Inputs Accordion (Collapsible Dropdown & Structured List) */
+/* Feature Inputs Accordion */
 .pred-features-accordion {
   margin-bottom: 1.5rem;
   border-radius: 10px;

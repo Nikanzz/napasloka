@@ -1,5 +1,3 @@
-"""Model registry service for discovering, validating, loading, and managing all 120 ML models."""
-
 import json
 import logging
 from pathlib import Path
@@ -37,8 +35,6 @@ logger = logging.getLogger(__name__)
 
 
 class RegistryService:
-    """Central registry and lifecycle manager for pre-trained model artifacts."""
-
     def __init__(self):
         self.experiments_dir = settings.experiments_dir
         self.registry_dir = settings.registry_dir
@@ -48,7 +44,6 @@ class RegistryService:
         self._best_models_cache = None
 
     def validate_dimensions(self, location, pollutant, scenario, algorithm):
-        """Validate that requested dimensions conform to the experimental design."""
         loc_slug = slugify_component(location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())
@@ -61,7 +56,6 @@ class RegistryService:
             raise ValueError(f"Unknown algorithm '{algorithm}'. Valid algorithms are: {SUPPORTED_ALGORITHMS}")
 
     def get_artifact_directory(self, location, pollutant, scenario, algorithm):
-        """Return the directory path for an experiment combination."""
         self.validate_dimensions(location, pollutant, scenario, algorithm)
         return self.experiments_dir.joinpath(
             slugify_component(location),
@@ -71,7 +65,6 @@ class RegistryService:
         )
 
     def get_artifact_status(self, location, pollutant, scenario, algorithm):
-        """Check the presence of all expected artifacts for a model."""
         dir_path = self.get_artifact_directory(location, pollutant, scenario, algorithm)
         has_model = (dir_path / "model.joblib").is_file()
         has_metrics = (dir_path / "metrics.json").is_file()
@@ -93,7 +86,6 @@ class RegistryService:
         )
 
     def get_metadata(self, location, pollutant, scenario, algorithm):
-        """Read and return experiment_metadata.json."""
         dir_path = self.get_artifact_directory(location, pollutant, scenario, algorithm)
         metadata_file = dir_path / "experiment_metadata.json"
         if not metadata_file.is_file():
@@ -102,7 +94,6 @@ class RegistryService:
             return json.load(f)
 
     def get_metrics(self, location, pollutant, scenario, algorithm):
-        """Read and return ModelMetrics from metrics.json."""
         dir_path = self.get_artifact_directory(location, pollutant, scenario, algorithm)
         metrics_file = dir_path / "metrics.json"
         if not metrics_file.is_file():
@@ -119,11 +110,9 @@ class RegistryService:
             )
 
     def get_counterpart_algorithm(self, algorithm):
-        """Return the counterpart algorithm (XGBoost <-> LightGBM)."""
         return "lightgbm" if algorithm == "xgboost" else "xgboost"
 
     def get_counterpart_info(self, location, pollutant, scenario, algorithm):
-        """Retrieve counterpart model metrics for comparative evaluation."""
         counterpart_algo = self.get_counterpart_algorithm(algorithm)
         try:
             status = self.get_artifact_status(location, pollutant, scenario, counterpart_algo)
@@ -144,7 +133,6 @@ class RegistryService:
             return None
 
     def get_model_details(self, location, pollutant, scenario, algorithm):
-        """Get complete model details including metadata, metrics, and counterpart."""
         self.validate_dimensions(location, pollutant, scenario, algorithm)
         loc_slug = slugify_component(location)
         loc_info = self.supported_locations[loc_slug]
@@ -179,7 +167,6 @@ class RegistryService:
         )
 
     def load_estimator(self, location, pollutant, scenario, algorithm):
-        """Load trained estimator with in-memory caching."""
         cache_key = build_experiment_id(location, pollutant, scenario, algorithm)
         cached_model = model_cache.get(cache_key)
         if cached_model is not None:
@@ -190,13 +177,11 @@ class RegistryService:
         if not model_path.is_file():
             raise FileNotFoundError(f"Model file not found at: {model_path}")
 
-        logger.info("Loading model estimator into cache from: %s", model_path)
         estimator = joblib.load(model_path)
         model_cache.set(cache_key, estimator)
         return estimator
 
     def load_test_predictions(self, location, pollutant, scenario, algorithm):
-        """Load test set predictions CSV with in-memory caching."""
         cache_key = f"pred__{build_experiment_id(location, pollutant, scenario, algorithm)}"
         cached_df = predictions_cache.get(cache_key)
         if cached_df is not None:
@@ -213,7 +198,6 @@ class RegistryService:
         return df
 
     def get_feature_importance(self, location, pollutant, scenario, algorithm):
-        """Read Gain-based feature importance from CSV."""
         dir_path = self.get_artifact_directory(location, pollutant, scenario, algorithm)
         fi_path = dir_path / "feature_importance.csv"
         if not fi_path.is_file():
@@ -223,7 +207,6 @@ class RegistryService:
         return df.to_dict(orient="records")
 
     def get_global_shap(self, location, pollutant, scenario, algorithm):
-        """Read global mean absolute SHAP values from CSV."""
         dir_path = self.get_artifact_directory(location, pollutant, scenario, algorithm)
         shap_path = dir_path / "shap_global.csv"
         if not shap_path.is_file():
@@ -233,7 +216,6 @@ class RegistryService:
         return df.to_dict(orient="records")
 
     def get_all_models_summary(self):
-        """Scan all 120 experiment combinations and return comprehensive status."""
         matrix = build_experiment_matrix()
         total = len(matrix)
         ready_count = 0
@@ -271,12 +253,10 @@ class RegistryService:
         }
 
     def load_best_models_registry(self, force_reload=False):
-        """Load the best models registry mapping (60 entries). Auto-generate if missing."""
         if self._best_models_cache is not None and not force_reload:
             return self._best_models_cache
 
         if not self.best_models_file.is_file():
-            logger.info("best_models.json not found, selecting best models from summary_metrics.csv...")
             from src.models.experiments import select_best_models
             registry_data = select_best_models(
                 registry_output_path=self.best_models_file,
@@ -291,7 +271,6 @@ class RegistryService:
             return registry_data
 
     def get_best_model(self, location, pollutant, scenario):
-        """Retrieve winning model entry for a specific (location, pollutant, scenario)."""
         loc_slug = slugify_component(location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())
@@ -309,16 +288,13 @@ class RegistryService:
         return best_models[key]
 
     def get_all_best_models(self):
-        """Return the dictionary of all 60 best models."""
         return self.load_best_models_registry()
 
     def get_final_artifact_directory(self, location, pollutant, scenario):
-        """Return the artifact directory for a retrained final deployment model."""
         loc_slug = slugify_component(location)
         return self.final_models_dir.joinpath(loc_slug, pollutant.lower(), scenario.lower())
 
     def load_final_estimator(self, location, pollutant, scenario):
-        """Load retrained final deployment model with in-memory caching."""
         loc_slug = slugify_component(location)
         cache_key = f"final__{loc_slug}__{pollutant.lower()}__{scenario.lower()}"
         cached = model_cache.get(cache_key)
@@ -329,18 +305,11 @@ class RegistryService:
         final_model_path = final_dir / "model.joblib"
 
         if final_model_path.is_file():
-            logger.info("Loading final deployment estimator from: %s", final_model_path)
             estimator = joblib.load(final_model_path)
             model_cache.set(cache_key, estimator)
             return estimator
 
-        # Fallback to winning experiment model
         best_entry = self.get_best_model(location, pollutant, scenario)
-        logger.warning(
-            "Final model not found at %s. Falling back to winning experiment model (%s).",
-            final_model_path,
-            best_entry["best_algorithm"],
-        )
         return self.load_estimator(
             location,
             pollutant,
@@ -349,7 +318,6 @@ class RegistryService:
         )
 
     def get_final_metadata(self, location, pollutant, scenario):
-        """Read and return final_metadata.json for a deployment model."""
         final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
         meta_file = final_dir / "final_metadata.json"
         if meta_file.is_file():
@@ -359,7 +327,6 @@ class RegistryService:
         return self.get_best_model(location, pollutant, scenario)
 
     def get_final_feature_importance(self, location, pollutant, scenario):
-        """Read Gain-based feature importance from final model directory."""
         final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
         fi_path = final_dir / "feature_importance.csv"
         if fi_path.is_file():
@@ -370,7 +337,6 @@ class RegistryService:
         return self.get_feature_importance(location, pollutant, scenario, best_entry["best_algorithm"])
 
     def get_final_global_shap(self, location, pollutant, scenario):
-        """Read global mean absolute SHAP from final model directory."""
         final_dir = self.get_final_artifact_directory(location, pollutant, scenario)
         shap_path = final_dir / "shap_global.csv"
         if shap_path.is_file():

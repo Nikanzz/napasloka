@@ -1,8 +1,5 @@
 "use strict";
 
-/**
- * Controller for Grafik & Evaluasi Model (Precision Matching Chapter 3 Mockup 3) using Plotly.js.
- */
 document.addEventListener("DOMContentLoaded", async () => {
   const form = document.getElementById("evaluation-filter-form");
   const btnApply = document.getElementById("btn-apply-eval");
@@ -14,41 +11,57 @@ document.addEventListener("DOMContentLoaded", async () => {
   const selectAlgo = document.getElementById("eval-select-algorithm");
   const inputStartDate = document.getElementById("eval-start-date");
   const inputEndDate = document.getElementById("eval-end-date");
-
-  // Hero card elements (Mockup 3)
-  const heroHeadlineSub = document.getElementById("hero-headline-sub");
-  const heroPredVal = document.getElementById("hero-pred-val");
-  const heroPredUnit = document.getElementById("hero-pred-unit");
-  const heroLocName = document.getElementById("hero-loc-name");
-  const heroModelName = document.getElementById("hero-model-name");
-  const heroTimeStamp = document.getElementById("hero-time-stamp");
-
-  // Metric elements
-  const valMae = document.getElementById("val-mae");
-  const unitMae = document.getElementById("unit-mae");
-  const valRmse = document.getElementById("val-rmse");
-  const unitRmse = document.getElementById("unit-rmse");
-  const valMape = document.getElementById("val-mape");
-  const valR2 = document.getElementById("val-r2");
-
-  // Model comparison box elements (Mockup 3 Right Card)
-  const selAlgoName = document.getElementById("selected-algo-name");
-  const selAlgoRmse = document.getElementById("selected-algo-rmse");
-  const cpAlgoName = document.getElementById("counterpart-algo-name");
-  const cpAlgoRmse = document.getElementById("counterpart-algo-rmse");
-
-  // Chart
   const chartContainer = document.getElementById("plotly-evaluation-chart");
 
-  let appOptions = null;
-  let datasetBounds = null;
-  let currentEvalResponse = null;
+  const fmt = (n, d = 2) => (n != null && !isNaN(n) ? Number(n).toLocaleString("id-ID", { minimumFractionDigits: d, maximumFractionDigits: d }) : "-");
 
-  // 1. Initialize options & dropdowns
+  function formatDateForInput(dateObj) {
+    const year = dateObj.getFullYear();
+    const month = String(dateObj.getMonth() + 1).padStart(2, "0");
+    const day = String(dateObj.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatDateShort(isoStr) {
+    if (!isoStr) return "-";
+    const d = new Date(isoStr);
+    const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+  }
+
+  function formatDateDisplay(isoStr) {
+    if (!isoStr) return "-";
+    const d = new Date(isoStr);
+    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const h = String(d.getHours()).padStart(2, "0");
+    const m = String(d.getMinutes()).padStart(2, "0");
+    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${h}:${m}`;
+  }
+
+  function setElText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function showError(msg) {
+    if (!statusContainer) return;
+    statusContainer.style.display = "block";
+    statusContainer.innerHTML = `
+      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; color: #b91c1c; font-size: 0.85rem;">
+        <strong>Terjadi Kendala:</strong> ${msg}
+      </div>
+    `;
+  }
+
+  function hideError() {
+    if (!statusContainer) return;
+    statusContainer.style.display = "none";
+    statusContainer.innerHTML = "";
+  }
+
   try {
-    appOptions = await window.NapasLokaApi.getOptions();
+    const appOptions = await window.NapasLokaApi.getOptions();
 
-    // Populate dropdowns
     selectLoc.innerHTML = "";
     appOptions.locations.forEach((loc) => {
       const opt = document.createElement("option");
@@ -81,15 +94,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       selectAlgo.appendChild(opt);
     });
 
-    // Read initial selections from URL or localStorage
     const urlParams = new URLSearchParams(window.location.search);
     const initialLoc = urlParams.get("location") || localStorage.getItem("napasloka_selected_location") || "petamburan-perkantoran-transjakarta";
     const initialPol = urlParams.get("pollutant") || localStorage.getItem("napasloka_selected_pollutant") || "co";
     const initialScen = urlParams.get("scenario") || localStorage.getItem("napasloka_selected_scenario") || "scenario_2";
     let initialAlgo = urlParams.get("algorithm") || localStorage.getItem("napasloka_selected_algorithm") || "lightgbm";
-    if (!initialAlgo || initialAlgo === "auto") {
-      initialAlgo = "lightgbm";
-    }
+    if (initialAlgo === "auto") initialAlgo = "lightgbm";
 
     if (selectLoc.querySelector(`option[value="${initialLoc}"]`)) selectLoc.value = initialLoc;
     if (selectPol.querySelector(`option[value="${initialPol}"]`)) selectPol.value = initialPol;
@@ -98,42 +108,71 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const initialStart = urlParams.get("start_date");
     const initialEnd = urlParams.get("end_date");
-    if (initialStart && inputStartDate) inputStartDate.value = `${initialStart}T00:00`;
-    if (initialEnd && inputEndDate) inputEndDate.value = `${initialEnd}T23:59`;
+    let latestDatasetEnd = null;
 
-    // Load available date bounds
-    await updateDatasetBounds();
+    try {
+      const rangeInfo = await window.NapasLokaApi.getEvaluationRange(selectLoc.value, selectPol.value);
+      if (rangeInfo?.end) {
+        latestDatasetEnd = new Date(rangeInfo.end);
+        if (!initialStart && !initialEnd && inputStartDate && inputEndDate) {
+          const defaultStart = new Date(latestDatasetEnd.getTime() - 7 * 24 * 60 * 60 * 1000);
+          inputStartDate.value = formatDateForInput(defaultStart);
+          inputEndDate.value = formatDateForInput(latestDatasetEnd);
+        }
+      }
+    } catch {
+    }
 
-    // Trigger initial evaluation load
+    if (initialStart && inputStartDate) inputStartDate.value = initialStart;
+    if (initialEnd && inputEndDate) inputEndDate.value = initialEnd;
+
+    const presetButtons = document.querySelectorAll(".btn-eval-preset");
+    const btnResetDates = document.getElementById("btn-reset-dates");
+
+    function setActivePresetButton(activeDays) {
+      presetButtons.forEach((btn) => {
+        if (btn.getAttribute("data-days") === String(activeDays)) {
+          btn.classList.add("active");
+        } else {
+          btn.classList.remove("active");
+        }
+      });
+    }
+
+    presetButtons.forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const days = btn.getAttribute("data-days");
+        if (days === "all") {
+          if (inputStartDate) inputStartDate.value = "";
+          if (inputEndDate) inputEndDate.value = "";
+          setActivePresetButton("all");
+        } else {
+          const numDays = parseInt(days, 10);
+          if (latestDatasetEnd && !isNaN(numDays)) {
+            const startD = new Date(latestDatasetEnd.getTime() - numDays * 24 * 60 * 60 * 1000);
+            if (inputStartDate) inputStartDate.value = formatDateForInput(startD);
+            if (inputEndDate) inputEndDate.value = formatDateForInput(latestDatasetEnd);
+            setActivePresetButton(days);
+          }
+        }
+        await loadEvaluationData();
+      });
+    });
+
+    if (btnResetDates) {
+      btnResetDates.addEventListener("click", async () => {
+        if (inputStartDate) inputStartDate.value = "";
+        if (inputEndDate) inputEndDate.value = "";
+        setActivePresetButton("all");
+        await loadEvaluationData();
+      });
+    }
+
     await loadEvaluationData();
   } catch (err) {
     showError("Gagal menginisialisasi parameter evaluasi: " + err.message);
   }
 
-  // Update bounds when location or pollutant changes
-  selectLoc.addEventListener("change", async () => {
-    await updateDatasetBounds();
-  });
-  selectPol.addEventListener("change", async () => {
-    await updateDatasetBounds();
-  });
-
-  async function updateDatasetBounds() {
-    try {
-      datasetBounds = await window.NapasLokaApi.getEvaluationRange(selectLoc.value, selectPol.value);
-    } catch (e) {
-      console.warn("Could not fetch dataset bounds:", e);
-    }
-  }
-
-  function formatDateDisplay(isoStr) {
-    if (!isoStr) return "-";
-    const d = new Date(isoStr);
-    const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()} · ${`${d.getHours()}`.padStart(2, "0")}:${`${d.getMinutes()}`.padStart(2, "0")}`;
-  }
-
-  // Handle form submit
   if (form) {
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -145,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     hideError();
     if (btnApply) {
       btnApply.disabled = true;
-      btnApply.innerHTML = '<span>Memproses...</span>';
+      btnApply.innerHTML = "<span>Memproses...</span>";
     }
 
     const payload = {
@@ -156,14 +195,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       max_chart_points: 1000,
     };
 
-    if (inputStartDate && inputStartDate.value) {
-      payload.start_datetime = inputStartDate.value;
-    }
-    if (inputEndDate && inputEndDate.value) {
-      payload.end_datetime = inputEndDate.value;
-    }
+    if (inputStartDate?.value) payload.start_datetime = `${inputStartDate.value}T00:00:00`;
+    if (inputEndDate?.value) payload.end_datetime = `${inputEndDate.value}T23:59:59`;
 
-    // Save selection
     localStorage.setItem("napasloka_selected_location", payload.location);
     localStorage.setItem("napasloka_selected_pollutant", payload.pollutant);
     localStorage.setItem("napasloka_selected_scenario", payload.scenario);
@@ -171,94 +205,69 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const res = await window.NapasLokaApi.postEvaluation(payload);
-      currentEvalResponse = res;
       renderEvaluationDashboard(res);
     } catch (err) {
       showError(err.message || "Gagal memproses data evaluasi model.");
     } finally {
       if (btnApply) {
         btnApply.disabled = false;
-        btnApply.innerHTML = '<span>Perbarui Tampilan</span>';
+        btnApply.innerHTML = "<span>Perbarui Tampilan</span>";
       }
     }
   }
 
   function renderEvaluationDashboard(res) {
-    // 1. Top Hero Card (Mockup 3)
-    if (heroHeadlineSub) {
-      heroHeadlineSub.textContent = `Prediksi ${res.pollutant.toUpperCase()} satu jam berikutnya`;
-    }
-    if (res.chart_data && res.chart_data.predicted && res.chart_data.predicted.length > 0) {
+    setElText("hero-headline-sub", `Prediksi ${res.pollutant.toUpperCase()} satu jam berikutnya`);
+
+    if (res.chart_data?.predicted?.length > 0) {
       const lastPred = res.chart_data.predicted[res.chart_data.predicted.length - 1];
-      if (heroPredVal) heroPredVal.textContent = lastPred.toLocaleString("id-ID", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+      setElText("hero-pred-val", fmt(lastPred, 1));
     }
-    if (heroPredUnit) heroPredUnit.textContent = res.pollutant_unit;
-    if (heroLocName) heroLocName.textContent = res.location_name;
+    setElText("hero-pred-unit", res.pollutant_unit);
+    setElText("hero-loc-name", res.location_name);
 
     const algoShortName = res.algorithm === "xgboost" ? "XGBoost" : "LightGBM";
     const scenShortName = res.scenario === "scenario_1" ? "Skenario 1" : "Skenario 2";
-    if (heroModelName) heroModelName.textContent = `${algoShortName} · ${scenShortName}`;
+    setElText("hero-model-name", `${algoShortName} · ${scenShortName}`);
 
-    if (heroTimeStamp) {
-      try {
-        const d = new Date(res.time_range.end);
-        d.setHours(d.getHours() + 1);
-        heroTimeStamp.textContent = `${formatDateDisplay(d.toISOString())} WIB`;
-      } catch {
-        heroTimeStamp.textContent = `${formatDateDisplay(res.time_range.end)} WIB`;
-      }
+    try {
+      const d = new Date(res.time_range.end);
+      d.setHours(d.getHours() + 1);
+      setElText("hero-time-stamp", `${formatDateDisplay(d.toISOString())} WIB`);
+    } catch {
+      setElText("hero-time-stamp", `${formatDateDisplay(res.time_range.end)} WIB`);
     }
 
-    // 2. 4 Metric Cards (Mockup 3)
-    if (valMae) valMae.textContent = res.metrics.mae.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (unitMae) unitMae.textContent = res.pollutant_unit;
+    setElText("val-mae", fmt(res.metrics.mae, 2));
+    setElText("unit-mae", res.pollutant_unit);
+    setElText("val-rmse", fmt(res.metrics.rmse, 2));
+    setElText("unit-rmse", res.pollutant_unit);
+    setElText("val-mape", fmt(res.metrics.mape, 2));
+    setElText("val-r2", fmt(res.metrics.r2, 2));
 
-    if (valRmse) valRmse.textContent = res.metrics.rmse.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (unitRmse) unitRmse.textContent = res.pollutant_unit;
-
-    if (valMape) valMape.textContent = res.metrics.mape.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    if (valR2) valR2.textContent = res.metrics.r2.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    // Update Quality Badges
-    const badgeMae = document.getElementById("badge-mae-quality");
-    const badgeRmse = document.getElementById("badge-rmse-quality");
     const badgeMape = document.getElementById("badge-mape-quality");
-    const badgeR2 = document.getElementById("badge-r2-quality");
-    const humanSummary = document.getElementById("eval-human-summary");
-    const btnGotoInterp = document.getElementById("btn-eval-goto-interp");
-
     if (badgeMape && res.metrics.mape !== undefined) {
-      if (res.metrics.mape < 10) {
-        badgeMape.textContent = "Akurasi Tinggi";
-        badgeMape.className = "badge badge-emerald";
-      } else if (res.metrics.mape < 20) {
-        badgeMape.textContent = "Akurasi Baik";
-        badgeMape.className = "badge badge-blue";
-      } else {
-        badgeMape.textContent = "Akurasi Cukup";
-        badgeMape.className = "badge badge-gray";
-      }
+      const isHigh = res.metrics.mape < 10;
+      const isGood = res.metrics.mape < 20;
+      badgeMape.textContent = isHigh ? "Akurasi Tinggi" : isGood ? "Akurasi Baik" : "Akurasi Cukup";
+      badgeMape.className = `badge ${isHigh ? "badge-emerald" : isGood ? "badge-blue" : "badge-gray"}`;
     }
 
+    const badgeR2 = document.getElementById("badge-r2-quality");
     if (badgeR2 && res.metrics.r2 !== undefined) {
-      if (res.metrics.r2 >= 0.85) {
-        badgeR2.textContent = "Korelasi Sangat Kuat";
-        badgeR2.className = "badge badge-emerald";
-      } else if (res.metrics.r2 >= 0.70) {
-        badgeR2.textContent = "Korelasi Kuat";
-        badgeR2.className = "badge badge-blue";
-      } else {
-        badgeR2.textContent = "Korelasi Moderat";
-        badgeR2.className = "badge badge-gray";
-      }
+      const isStrong = res.metrics.r2 >= 0.85;
+      const isGood = res.metrics.r2 >= 0.70;
+      badgeR2.textContent = isStrong ? "Korelasi Sangat Kuat" : isGood ? "Korelasi Kuat" : "Korelasi Moderat";
+      badgeR2.className = `badge ${isStrong ? "badge-emerald" : isGood ? "badge-blue" : "badge-gray"}`;
     }
 
+    const humanSummary = document.getElementById("eval-human-summary");
     if (humanSummary && res.metrics) {
       const r2Pct = Math.round(res.metrics.r2 * 100);
       const mapeVal = res.metrics.mape.toFixed(1);
       const algoName = res.algorithm_label || "Model terpilih";
       let compNote = "";
-      if (res.comparison && res.comparison.counterpart_metrics) {
+      if (res.comparison?.counterpart_metrics) {
         const isBetter = res.metrics.rmse <= res.comparison.counterpart_metrics.rmse;
         const diffRmse = Math.abs(res.metrics.rmse - res.comparison.counterpart_metrics.rmse).toFixed(2);
         compNote = isBetter
@@ -268,122 +277,93 @@ document.addEventListener("DOMContentLoaded", async () => {
       humanSummary.textContent = `${algoName} berhasil menjelaskan ${r2Pct}% variasi polutan (R² = ${res.metrics.r2.toFixed(2)}) dengan deviasi rata-rata ${mapeVal}%. ${compNote}`;
     }
 
+    const btnGotoInterp = document.getElementById("btn-eval-goto-interp");
     if (btnGotoInterp) {
-      const loc = selectLoc ? selectLoc.value : res.location;
-      const pol = selectPol ? selectPol.value : res.pollutant;
-      const scen = selectScen ? selectScen.value : res.scenario;
-      const algo = selectAlgo ? selectAlgo.value : res.algorithm;
-      btnGotoInterp.href = `/pages/interpretation.html?location=${encodeURIComponent(loc)}&pollutant=${encodeURIComponent(pol)}&scenario=${encodeURIComponent(scen)}&algorithm=${encodeURIComponent(algo)}`;
+      const query = `location=${encodeURIComponent(selectLoc.value)}&pollutant=${encodeURIComponent(selectPol.value)}&scenario=${encodeURIComponent(selectScen.value)}&algorithm=${encodeURIComponent(selectAlgo.value)}`;
+      btnGotoInterp.href = `/pages/interpretation.html?${query}`;
     }
 
-    // 3. Render Plotly Chart
-    renderPlotlyChart(res);
+    setElText("selected-algo-name", res.algorithm_label);
+    setElText("selected-algo-rmse", `RMSE ${fmt(res.metrics.rmse, 2)}`);
 
-    // 4. Comparison Cards (Mockup 3 Right Card)
-    if (selAlgoName) selAlgoName.textContent = res.algorithm_label;
-    if (selAlgoRmse) selAlgoRmse.textContent = `RMSE ${res.metrics.rmse.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-
-    if (cpAlgoName) cpAlgoName.textContent = res.comparison ? res.comparison.counterpart_label : "Model Pembanding";
-    if (cpAlgoRmse && res.comparison) {
-      cpAlgoRmse.textContent = `RMSE ${res.comparison.counterpart_metrics.rmse.toLocaleString("id-ID", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    if (res.comparison) {
+      setElText("counterpart-algo-name", res.comparison.counterpart_label);
+      setElText("counterpart-algo-rmse", `RMSE ${fmt(res.comparison.counterpart_metrics.rmse, 2)}`);
     }
 
     const bestModelPill = document.getElementById("eval-best-model-pill");
     if (bestModelPill && res.best_model_label) {
       bestModelPill.textContent = `⭐ Model Terbaik: ${res.best_model_label}`;
-      bestModelPill.title = "Algoritma dengan nilai MAE terendah yang terpilih sebagai final deployment model";
     }
+
+    const sampleBadge = document.getElementById("eval-sample-badge");
+    if (sampleBadge && res.time_range) {
+      const evalCount = res.time_range.evaluated_samples || res.chart_data?.actual?.length || 0;
+      sampleBadge.textContent = `${evalCount.toLocaleString("id-ID")} jam (${formatDateShort(res.time_range.start)} - ${formatDateShort(res.time_range.end)})`;
+    }
+
+    renderPlotlyChart(res);
   }
 
-
   function renderPlotlyChart(res) {
-    if (!chartContainer) return;
+    if (!chartContainer || !window.Plotly) return;
     const data = res.chart_data;
 
-    const traceActual = {
-      x: data.timestamps,
-      y: data.actual,
-      name: "Aktual",
-      type: "scatter",
-      mode: "lines+markers",
-      line: { color: "#0c1445", width: 2 },
-      marker: { size: 4, color: "#0c1445" },
-      hoverinfo: "x+y",
-      hoverlabel: {
-        bgcolor: "#ffffff",
-        bordercolor: "#cbd5e1",
-        font: { color: "#0c1445", size: 12, family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+    const traces = [
+      {
+        x: data.timestamps,
+        y: data.actual,
+        name: "Aktual (Observasi)",
+        type: "scatter",
+        mode: "lines",
+        line: { color: "#1e293b", width: 2 },
+        hoverinfo: "y",
       },
-    };
-
-    const tracePredicted = {
-      x: data.timestamps,
-      y: data.predicted,
-      name: "Prediksi",
-      type: "scatter",
-      mode: "lines+markers",
-      line: { color: "#2563eb", width: 2, dash: "dash" },
-      marker: { size: 4, color: "#2563eb" },
-      hoverinfo: "x+y",
-      hoverlabel: {
-        bgcolor: "#ffffff",
-        bordercolor: "#cbd5e1",
-        font: { color: "#2563eb", size: 12, family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+      {
+        x: data.timestamps,
+        y: data.predicted,
+        name: "Prediksi (Model)",
+        type: "scatter",
+        mode: "lines",
+        line: { color: "#ea580c", width: 2.2, dash: "dash" },
+        hoverinfo: "y",
       },
-    };
-
-    const traces = [traceActual, tracePredicted];
+    ];
 
     const layout = {
-      margin: { t: 15, r: 15, l: 45, b: 35 },
+      margin: { t: 25, r: 20, l: 50, b: 45 },
       hovermode: "x unified",
+      showlegend: false,
       hoverlabel: {
         bgcolor: "#ffffff",
         bordercolor: "#cbd5e1",
-        font: {
-          family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-          size: 12,
-          color: "#0f172a",
-        },
-        namelength: -1,
+        font: { family: "Inter, sans-serif", size: 12, color: "#0f172a" },
       },
-      showlegend: false,
       xaxis: {
         showgrid: true,
         gridcolor: "#f1f5f9",
         tickfont: { size: 10, color: "#64748b" },
+        rangeslider: {
+          visible: true,
+          thickness: 0.12,
+          bgcolor: "#f8fafc",
+          bordercolor: "#e2e8f0",
+          borderwidth: 1,
+        },
       },
       yaxis: {
         showgrid: true,
         gridcolor: "#f1f5f9",
         tickfont: { size: 10, color: "#64748b" },
+        title: {
+          text: `${res.pollutant.toUpperCase()} (${res.pollutant_unit})`,
+          font: { size: 10, color: "#64748b" },
+        },
       },
-      font: { family: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
       paper_bgcolor: "transparent",
       plot_bgcolor: "transparent",
     };
 
-    const config = {
-      responsive: true,
-      displayModeBar: false,
-    };
-
-    Plotly.newPlot(chartContainer, traces, layout, config);
-  }
-
-  function showError(msg) {
-    if (!statusContainer) return;
-    statusContainer.style.display = "block";
-    statusContainer.innerHTML = `
-      <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 1rem; color: #b91c1c; font-size: 0.85rem;">
-        <strong>Terjadi Kendala:</strong> ${msg}
-      </div>
-    `;
-  }
-
-  function hideError() {
-    if (!statusContainer) return;
-    statusContainer.style.display = "none";
-    statusContainer.innerHTML = "";
+    Plotly.newPlot(chartContainer, traces, layout, { responsive: true, displayModeBar: false });
   }
 });

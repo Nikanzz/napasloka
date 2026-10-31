@@ -1,5 +1,3 @@
-"""FastAPI router for next-hour pollutant concentration prediction."""
-
 import logging
 from fastapi import APIRouter, HTTPException, status
 
@@ -13,7 +11,6 @@ router = APIRouter(prefix="/predict", tags=["prediction"])
 
 @router.post("", response_model=NextHourPredictionResponse)
 def request_prediction(request: PredictionRequest):
-    """Generate next-hour prediction for the selected location, pollutant, scenario, and algorithm."""
     try:
         return prediction_service.predict_next_hour(request)
     except ValueError as e:
