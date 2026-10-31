@@ -1,8 +1,4 @@
-"""Evaluation service for slicing test set observations, calculating dynamic metrics, and comparing models."""
-
 import logging
-
-import numpy as np
 import pandas as pd
 
 from backend.app.core.config import (
@@ -28,14 +24,11 @@ logger = logging.getLogger(__name__)
 
 
 class EvaluationService:
-    """Orchestrates test data evaluation, slicing, metric computation, and model comparison."""
-
     def __init__(self):
         self.registry = registry_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def _normalize_timestamp(self, ts_input, reference_tz):
-        """Convert any datetime or ISO string to timestamp matching the reference timezone."""
         if ts_input is None:
             return None
         ts = pd.to_datetime(ts_input)
@@ -44,7 +37,6 @@ class EvaluationService:
         return ts.tz_convert(reference_tz)
 
     def evaluate_test_range(self, request):
-        """Slice test observations for the requested period, compute metrics, and compare with baseline."""
         self.registry.validate_dimensions(
             request.location,
             request.pollutant,
@@ -58,7 +50,6 @@ class EvaluationService:
         scenario_info = SCENARIO_METADATA[request.scenario]
         algorithm_info = ALGORITHM_METADATA[request.algorithm]
 
-        # 1. Load primary model test predictions
         df_primary = self.registry.load_test_predictions(
             loc_slug,
             request.pollutant,
@@ -71,14 +62,12 @@ class EvaluationService:
         dataset_max = df_primary["datetime"].max()
         total_samples = len(df_primary)
 
-        # 2. Parse and normalize requested date range
         start_ts = self._normalize_timestamp(request.start_datetime, ref_tz) or dataset_min
         end_ts = self._normalize_timestamp(request.end_datetime, ref_tz) or dataset_max
 
         if start_ts > end_ts:
             raise ValueError(f"Tanggal mulai ({start_ts}) tidak boleh melebihi tanggal akhir ({end_ts}).")
 
-        # 3. Slice primary dataframe
         mask = (df_primary["datetime"] >= start_ts) & (df_primary["datetime"] <= end_ts)
         df_sliced = df_primary[mask].sort_values("datetime").reset_index(drop=True)
 
@@ -90,7 +79,6 @@ class EvaluationService:
 
         evaluated_samples = len(df_sliced)
 
-        # 4. Compute dynamic regression metrics on the sliced range
         primary_metrics_dict = calculate_regression_metrics(
             df_sliced["actual"].values,
             df_sliced["predicted"].values,
@@ -111,11 +99,10 @@ class EvaluationService:
             prediction_time_seconds=stored_metrics.prediction_time_seconds,
         )
 
-        # 5. Load and evaluate counterpart model on the identical slice
         counterpart_algo = self.registry.get_counterpart_algorithm(request.algorithm)
         counterpart_info = ALGORITHM_METADATA.get(counterpart_algo, {})
-        comparison: ComparisonMetrics | None = None
-        df_cp_sliced: pd.DataFrame | None = None
+        comparison = None
+        df_cp_sliced = None
 
         try:
             df_cp = self.registry.load_test_predictions(
@@ -147,7 +134,6 @@ class EvaluationService:
                     prediction_time_seconds=cp_stored.prediction_time_seconds,
                 )
 
-                # Differences (positive = primary is superior)
                 mae_diff_pct = (
                     round(((cp_metrics.mae - primary_metrics.mae) / cp_metrics.mae) * 100, 2)
                     if cp_metrics.mae > 0 else 0.0
@@ -199,9 +185,8 @@ class EvaluationService:
         except Exception as e:
             logger.warning("Could not calculate counterpart comparison: %s", e)
 
-        # 6. Prepare chart series (support downsampling if large)
         chart_df = df_sliced
-        chart_cp_pred: list[float] | None = None
+        chart_cp_pred = None
 
         if request.max_chart_points and evaluated_samples > request.max_chart_points:
             step = max(1, evaluated_samples // request.max_chart_points)
@@ -241,7 +226,6 @@ class EvaluationService:
             request.algorithm,
         )
 
-        # Lookup registered best model for this combination
         best_algo = None
         best_algo_label = None
         is_best = False
@@ -276,6 +260,4 @@ class EvaluationService:
         )
 
 
-# Singleton service instance
 evaluation_service = EvaluationService()
-

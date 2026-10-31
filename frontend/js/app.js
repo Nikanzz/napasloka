@@ -1,122 +1,101 @@
 "use strict";
 
-// 1. Service Worker Registration
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((reg) => {
-        // Check for updates
-        reg.onupdatefound = () => {
-          const installingWorker = reg.installing;
-          if (installingWorker) {
-            installingWorker.onstatechange = () => {
-              if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
-                console.info("NapasLoka PWA: Versi baru telah tersedia di latar belakang.");
-              }
-            };
-          }
-        };
-      })
-      .catch((error) => {
-        console.warn("NapasLoka Service Worker registration failed:", error);
-      });
+    navigator.serviceWorker.register("/service-worker.js").catch((err) => {
+      console.warn("Service Worker registration failed:", err);
+    });
   });
 }
 
-// 2. Dynamic Year in Footer
-document.querySelectorAll("[data-current-year]").forEach((element) => {
-  element.textContent = new Date().getFullYear();
+document.querySelectorAll("[data-current-year]").forEach((el) => {
+  el.textContent = new Date().getFullYear();
 });
 
-// 3. Online/Offline Network Status Indicator
 function updateNetworkStatus(isOnline) {
   document.querySelectorAll(".header-status, .status-indicator").forEach((badge) => {
-    if (isOnline) {
-      badge.innerHTML = '<span class="status-dot" style="background-color: var(--color-success, #10b981);"></span><span>Sistem aktif</span>';
-    } else {
-      badge.innerHTML = '<span class="status-dot" style="background-color: var(--color-danger, #ef4444);"></span><span>Mode Offline</span>';
-    }
+    badge.innerHTML = isOnline
+      ? '<span class="status-dot" style="background-color: var(--color-success, #10b981);"></span><span>Sistem aktif</span>'
+      : '<span class="status-dot" style="background-color: var(--color-danger, #ef4444);"></span><span>Mode Offline</span>';
   });
 }
 window.addEventListener("offline", () => updateNetworkStatus(false));
 window.addEventListener("online", () => updateNetworkStatus(true));
 
-// 4. PWA Installation Prompt Stashing
 let deferredPrompt = null;
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  const installBtn = document.getElementById("btn-install-pwa");
-  if (installBtn) {
-    installBtn.style.display = "inline-flex";
-    installBtn.addEventListener("click", async () => {
+const installButtons = () => document.querySelectorAll(".btn-install-pwa, #btn-install-pwa");
+
+function initPwaInstall() {
+  const isStandalone = window.matchMedia("(display-mode: standalone)").matches || window.navigator.standalone;
+  if (isStandalone) {
+    installButtons().forEach((btn) => (btn.style.display = "none"));
+    return;
+  }
+
+  installButtons().forEach((btn) => {
+    btn.addEventListener("click", async () => {
       if (deferredPrompt) {
         deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
         if (outcome === "accepted") {
-          installBtn.style.display = "none";
+          installButtons().forEach((b) => (b.style.display = "none"));
         }
         deferredPrompt = null;
+      } else {
+        alert("Gunakan menu browser untuk memasang aplikasi NapasLoka ke layar utama.");
       }
     });
-  }
+  });
+}
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installButtons().forEach((btn) => (btn.style.display = "inline-flex"));
 });
 
-// 5. Mobile Navigation Hamburger Menu
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  installButtons().forEach((btn) => (btn.style.display = "none"));
+});
+
 function initMobileNav() {
   const toggleBtn = document.getElementById("btn-nav-toggle");
   const nav = document.getElementById("primary-nav") || document.querySelector(".nav");
   if (!toggleBtn || !nav) return;
 
   function setNavOpen(isOpen) {
-    toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
-    toggleBtn.setAttribute("aria-label", isOpen ? "Tutup menu navigasi" : "Buka menu navigasi");
-    if (isOpen) {
-      nav.classList.add("is-open");
-    } else {
-      nav.classList.remove("is-open");
-    }
+    toggleBtn.setAttribute("aria-expanded", String(isOpen));
+    nav.classList.toggle("is-open", isOpen);
   }
 
   toggleBtn.addEventListener("click", (e) => {
     e.stopPropagation();
-    const isCurrentlyOpen = toggleBtn.getAttribute("aria-expanded") === "true";
-    setNavOpen(!isCurrentlyOpen);
+    const isOpen = toggleBtn.getAttribute("aria-expanded") === "true";
+    setNavOpen(!isOpen);
   });
 
-  // Close when clicking any nav link
   nav.querySelectorAll("a").forEach((link) => {
-    link.addEventListener("click", () => {
-      setNavOpen(false);
-    });
+    link.addEventListener("click", () => setNavOpen(false));
   });
 
-  // Close when clicking outside header / nav
   document.addEventListener("click", (e) => {
     if (!nav.contains(e.target) && !toggleBtn.contains(e.target)) {
       setNavOpen(false);
     }
   });
 
-  // Close on Escape key
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && toggleBtn.getAttribute("aria-expanded") === "true") {
-      setNavOpen(false);
-      toggleBtn.focus();
-    }
-  });
-
-  // Reset if resized to desktop
-  window.addEventListener("resize", () => {
-    if (window.innerWidth > 768 && toggleBtn.getAttribute("aria-expanded") === "true") {
-      setNavOpen(false);
-    }
+    if (e.key === "Escape") setNavOpen(false);
   });
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", initMobileNav);
+  document.addEventListener("DOMContentLoaded", () => {
+    initPwaInstall();
+    initMobileNav();
+  });
 } else {
+  initPwaInstall();
   initMobileNav();
 }

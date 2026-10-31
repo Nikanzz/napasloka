@@ -1,18 +1,14 @@
-"""FastAPI application factory for the Sistem NapasLoka backend."""
-
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from backend.app.api import config, evaluation, health, interpretation, prediction
+from backend.app.api import config, evaluation, interpretation, prediction
 from backend.app.core.config import settings
 
 
 def create_app():
-    """Create and configure the Sistem NapasLoka API."""
-
     application = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
@@ -30,9 +26,7 @@ def create_app():
         allow_headers=["*"],
     )
 
-    # API Routers
     for router in (
-        health.router,
         config.router,
         prediction.router,
         evaluation.router,
@@ -40,7 +34,6 @@ def create_app():
     ):
         application.include_router(router, prefix=settings.api_v1_prefix)
 
-    # Middleware to ensure fresh service-worker.js and HTML pages are never stale-cached
     @application.middleware("http")
     async def add_cache_control_headers(request, call_next):
         response = await call_next(request)
@@ -51,7 +44,6 @@ def create_app():
             response.headers["Cache-Control"] = "no-cache, must-revalidate"
         return response
 
-    # Mount static assets for frontend PWA
     frontend_dir = Path(__file__).resolve().parent.parent.parent / "frontend"
     if frontend_dir.is_dir():
         application.mount("/pages", StaticFiles(directory=str(frontend_dir / "pages")), name="pages")
@@ -62,7 +54,6 @@ def create_app():
         @application.get("/app", include_in_schema=False)
         @application.get("/index.html", include_in_schema=False)
         def serve_app():
-            """Serve PWA Home page."""
             return FileResponse(
                 frontend_dir / "index.html",
                 headers={"Cache-Control": "no-cache, must-revalidate"}
@@ -70,7 +61,6 @@ def create_app():
 
         @application.get("/manifest.json", include_in_schema=False)
         def serve_manifest():
-            """Serve PWA manifest."""
             return FileResponse(
                 frontend_dir / "manifest.json",
                 headers={"Cache-Control": "no-cache, must-revalidate"}
@@ -78,15 +68,19 @@ def create_app():
 
         @application.get("/service-worker.js", include_in_schema=False)
         def serve_sw():
-            """Serve PWA service worker."""
             return FileResponse(
                 frontend_dir / "service-worker.js",
                 headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
             )
 
     @application.get("/", tags=["root"])
-    def root():
-        """Root endpoint returning API service identification."""
+    def root(request: Request):
+        accept = request.headers.get("accept", "")
+        if "text/html" in accept and frontend_dir.is_dir():
+            return FileResponse(
+                frontend_dir / "index.html",
+                headers={"Cache-Control": "no-cache, must-revalidate"}
+            )
         return {
             "name": settings.app_name,
             "version": settings.app_version,

@@ -32,17 +32,27 @@
         <a href="/pages/information.html">Informasi</a>
         <a href="/pages/about.html">Tentang</a>
       </nav>
-      <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
-        <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-        <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      </button>
+      <div class="header-actions">
+        <button id="btn-install-pwa" class="btn-install-pwa" type="button" style="display: none;" aria-label="Pasang Aplikasi NapasLoka">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          <span>Pasang App</span>
+        </button>
+        <button type="button" class="nav-toggle-btn" id="btn-nav-toggle" aria-label="Buka menu navigasi" aria-expanded="false" aria-controls="primary-nav">
+          <svg class="icon-menu" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+          <svg class="icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -96,13 +106,18 @@
               <select id="eval-select-algorithm" name="algorithm" class="form-control" required></select>
             </div>
           </div>
-          <div style="display: flex; justify-content: flex-end;">
-            <button id="btn-apply-eval" type="submit" class="btn btn-primary" style="padding: 0.4rem 1rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; border-top: 1px solid #f1f5f9; padding-top: 0.85rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span style="font-size: 0.78rem; font-weight: 600; color: #475569;">Filter Tanggal Uji:</span>
+              <input id="eval-start-date" name="start_datetime" type="date" class="form-control" style="font-size: 0.78rem; padding: 0.3rem 0.55rem; width: auto;" />
+              <span style="font-size: 0.75rem; color: #94a3b8;">s/d</span>
+              <input id="eval-end-date" name="end_datetime" type="date" class="form-control" style="font-size: 0.78rem; padding: 0.3rem 0.55rem; width: auto;" />
+              <button id="btn-reset-dates" type="button" class="btn" style="background: #f1f5f9; color: #475569; padding: 0.3rem 0.65rem; font-size: 0.75rem;">Reset Tanggal</button>
+            </div>
+            <button id="btn-apply-eval" type="submit" class="btn btn-primary" style="padding: 0.4rem 1.25rem;">
               Perbarui Tampilan
             </button>
           </div>
-          <input id="eval-start-date" name="start_datetime" type="hidden">
-          <input id="eval-end-date" name="end_datetime" type="hidden">
         </form>
       </details>
     </div>
@@ -110,9 +125,9 @@
     <!-- Error/Status Container -->
     <div id="eval-status-container" style="display: none; margin-bottom: 1.5rem;"></div>
 
-    <!-- 4 Metric Cards Grid (Mockup 3: 01 MAE, 02 RMSE, 03 MAPE, 04 R2) -->
+    <!-- 4 Metric Cards-->
     <section class="grid-4" style="margin-bottom: 1.75rem;" aria-label="Metrik kinerja model">
-      <!-- 01 MAE Card -->
+      <!--  MAE Card -->
       <article class="metric-card">
         <div class="metric-card-header">
           <span class="metric-number">01</span>
@@ -126,7 +141,7 @@
         <span class="metric-desc">Rata-rata selisih mutlak prediksi dengan observasi aktual.</span>
       </article>
 
-      <!-- 02 RMSE Card -->
+      <!-- RMSE Card -->
       <article class="metric-card">
         <div class="metric-card-header">
           <span class="metric-number">02</span>
@@ -140,7 +155,7 @@
         <span class="metric-desc">Peka terhadap eror besar dan fluktuasi polusi ekstrem.</span>
       </article>
 
-      <!-- 03 MAPE Card -->
+      <!-- MAPE Card -->
       <article class="metric-card">
         <div class="metric-card-header">
           <span class="metric-number">03</span>
@@ -154,7 +169,7 @@
         <span class="metric-desc">Rata-rata persentase eror terhadap nilai riil.</span>
       </article>
 
-      <!-- 04 R2 Card -->
+      <!-- R2 Card -->
       <article class="metric-card">
         <div class="metric-card-header">
           <span class="metric-number">04</span>
@@ -168,33 +183,47 @@
       </article>
     </section>
 
-    <!-- Bottom 2-Column: Interactive Chart & Model Comparison -->
+    <!-- Chart & Model Comparison -->
     <div class="grid-2" style="align-items: start; margin-bottom: 3.5rem;">
-      <!-- Column 1: Time Series Chart (Card ~65%) -->
+      <!-- Time-series Chart -->
       <section class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem; flex-wrap: wrap; gap: 0.5rem;">
           <div>
             <span class="page-tag" style="margin-bottom: 0.25rem;">Evaluasi visual</span>
             <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a;">
               Perbandingan aktual dan prediksi
             </h3>
           </div>
-          <div style="display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; font-weight: 600;">
-            <span style="display: flex; align-items: center; gap: 5px; color: #0c1445;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: #0c1445;"></span> Aktual
+          <div style="display: flex; align-items: center; gap: 1.25rem; font-size: 0.82rem; font-weight: 600;">
+            <span style="display: flex; align-items: center; gap: 6px; color: #1e293b;">
+              <span style="width: 14px; height: 3px; background: #1e293b; border-radius: 2px;"></span> Aktual (Observasi)
             </span>
-            <span style="display: flex; align-items: center; gap: 5px; color: #2563eb;">
-              <span style="width: 12px; height: 2px; border-top: 2px dashed #2563eb;"></span> Prediksi
+            <span style="display: flex; align-items: center; gap: 6px; color: #ea580c;">
+              <span style="width: 14px; height: 3px; border-top: 3px dashed #ea580c;"></span> Prediksi (Model)
             </span>
           </div>
         </div>
 
+        <!-- Date Range Quick Toolbar directly on top of Chart -->
+        <div class="eval-chart-toolbar">
+          <div class="eval-presets-wrap">
+            <span class="eval-preset-label">Rentang Cepat:</span>
+            <div class="eval-presets-group">
+              <button type="button" class="btn-eval-preset active" data-days="7">7 Hari Terakhir</button>
+              <button type="button" class="btn-eval-preset" data-days="14">14 Hari</button>
+              <button type="button" class="btn-eval-preset" data-days="30">30 Hari</button>
+              <button type="button" class="btn-eval-preset" data-days="all">Semua Data Uji</button>
+            </div>
+          </div>
+          <span id="eval-sample-badge" class="badge badge-gray" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">Memuat data...</span>
+        </div>
+
         <!-- Chart Container -->
-        <div id="plotly-evaluation-chart" style="width: 100%; height: 340px; min-height: 340px;"></div>
+        <div id="plotly-evaluation-chart" style="width: 100%; height: 360px; min-height: 360px;"></div>
 
         <div style="margin-top: 0.85rem; font-size: 0.78rem; color: #64748b; display: flex; align-items: center; gap: 6px;">
           <span style="color: #10b981;">&bull;</span>
-          <span>Pola prediksi mengikuti perubahan nilai aktual pada periode yang dipilih.</span>
+          <span>Garis kontras tinggi: <strong>Aktual (abu gelap solid)</strong> vs <strong>Prediksi (oranye terang putus-putus)</strong>. Geser slider di bawah plot untuk zoom & pan.</span>
         </div>
 
         <!-- Hidden checkbox for script compatibility -->
@@ -202,7 +231,7 @@
         <div id="chart-loading-indicator" style="display:none;"></div>
       </section>
 
-      <!-- Column 2: Model Comparison (Card ~35%) -->
+      <!-- Model Comparison -->
       <aside class="card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.4rem;">
           <span class="page-tag" style="margin-bottom: 0;">Perbandingan model</span>
@@ -270,7 +299,7 @@
     </div>
   </main>
 
-  <!-- Site Footer (Deep Navy from Mockup) -->
+  <!-- Site Footer -->
   <footer class="site-footer">
     <div class="footer-container">
       <div class="footer-brand">

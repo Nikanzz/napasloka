@@ -1,52 +1,35 @@
-"""Pydantic schemas for next-hour prediction request and response."""
-
 from datetime import datetime
-from typing import Any, Literal
-from pydantic import BaseModel, Field
+from typing import Literal
+from pydantic import BaseModel
 
 from backend.app.schemas.registry import AlgorithmType, PollutantType, ScenarioType
 
 
 class PredictionRequest(BaseModel):
-    """Payload for next-hour atmospheric pollutant prediction."""
-
-    location: str = Field(..., min_length=1, description="Location slug identifier")
-    pollutant: PollutantType = Field(..., description="Target pollutant ('co' or 'co2')")
-    scenario: ScenarioType = Field(..., description="Scenario identifier ('scenario_1' or 'scenario_2')")
-    algorithm: AlgorithmType | Literal["auto"] | None = Field(
-        default="auto",
-        description="Selected algorithm ('xgboost', 'lightgbm', or 'auto' to use winning final deployment model)",
-    )
-    reference_datetime: datetime | str | None = Field(
-        default=None,
-        description="Historical observation point t to forecast from (defaults to latest available observation)",
-    )
-    # Optional fields for backwards compatibility
+    location: str
+    pollutant: PollutantType
+    scenario: ScenarioType
+    algorithm: AlgorithmType | Literal["auto"] | None = "auto"
+    reference_datetime: datetime | str | None = None
     start_datetime: datetime | str | None = None
     end_datetime: datetime | str | None = None
 
 
 class AirQualityAssessment(BaseModel):
-    """Assessment of the predicted concentration based on health standards."""
-
-    category: str = Field(..., description="Category label, e.g. 'Baik', 'Sedang', 'Tidak Sehat'")
-    color: str = Field(..., description="Hex color code for UI badges")
-    description: str = Field(..., description="Health advisory and impact description")
-    standard: str = Field(..., description="Air quality standard reference (ISPU Permen LHK / WHO)")
+    category: str
+    color: str
+    description: str
+    standard: str
 
 
 class FeatureInputItem(BaseModel):
-    """Details of an individual feature fed into the model."""
-
-    name: str = Field(..., description="Feature column identifier")
-    label: str = Field(..., description="Human-readable feature label")
-    value: float = Field(..., description="Feature numerical value")
-    unit: str = Field(..., description="Measurement unit")
+    name: str
+    label: str
+    value: float
+    unit: str
 
 
 class NextHourPredictionResponse(BaseModel):
-    """Complete prediction report for next-hour forecast."""
-
     experiment_id: str
     location: str
     location_name: str
@@ -61,33 +44,26 @@ class NextHourPredictionResponse(BaseModel):
     algorithm: AlgorithmType
     algorithm_label: str
 
-    # Forecast values
-    predicted_value: float = Field(..., description="Predicted concentration for the next hour (t+1)")
-    target_time: str = Field(..., description="ISO timestamp of predicted hour (t+1)")
-    target_time_display: str = Field(..., description="Formatted Indonesian display string for target time")
+    predicted_value: float
+    target_time: str
+    target_time_display: str
 
-    # Reference observation (t)
-    latest_observation_time: str = Field(..., description="ISO timestamp of reference observation (t)")
-    latest_observation_display: str = Field(..., description="Formatted Indonesian display string for reference observation")
-    latest_observation_value: float = Field(..., description="Observed concentration at reference hour (t)")
-    delta_value: float = Field(..., description="Absolute change (predicted - latest)")
-    delta_percentage: float = Field(..., description="Relative percentage change")
-    trend: str = Field(..., description="Directional trend ('naik', 'turun', or 'stabil')")
+    latest_observation_time: str
+    latest_observation_display: str
+    latest_observation_value: float
+    delta_value: float
+    delta_percentage: float
+    trend: str
 
-    # Health and environmental assessment
     assessment: AirQualityAssessment
-
-    # Inputs used
     feature_inputs: list[FeatureInputItem]
 
-    # Baseline comparison (what does counterpart algorithm forecast on identical inputs?)
     counterpart_algorithm: str
     counterpart_label: str
     counterpart_predicted_value: float | None = None
     counterpart_delta: float | None = None
 
-    # Model deployment & research status
-    model_status: str = Field(default="Final deployment model", description="Status of the model used ('Final deployment model' or 'Experiment model')")
-    is_final_model: bool = Field(default=True, description="True if using retrained final deployment model")
-    best_algorithm: str = Field(default="lightgbm", description="Winning algorithm for this location-pollutant-scenario")
-
+    model_status: str = "Final deployment model"
+    is_final_model: bool = True
+    best_algorithm: str = "lightgbm"
+    is_live_data: bool = False

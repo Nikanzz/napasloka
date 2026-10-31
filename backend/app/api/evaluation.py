@@ -1,7 +1,5 @@
-"""FastAPI router for test dataset evaluation and model comparison."""
-
 import logging
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, status
 
 from backend.app.core.config import settings
 from backend.app.schemas.evaluation import EvaluationRequest, EvaluationResponse
@@ -15,7 +13,6 @@ router = APIRouter(prefix="/evaluation", tags=["evaluation"])
 
 @router.post("", response_model=EvaluationResponse)
 def evaluate_model(request: EvaluationRequest):
-    """Evaluate trained model predictions over a specified test date range and compare with baseline."""
     try:
         return evaluation_service.evaluate_test_range(request)
     except ValueError as e:
@@ -38,12 +35,11 @@ def evaluate_model(request: EvaluationRequest):
 
 @router.get("/range")
 def get_evaluation_time_range(
-    location=Query(default="taman-kamal", description="Location ID"),
-    pollutant=Query(default="co", description="Pollutant ID ('co' or 'co2')"),
-    scenario=Query(default="scenario_1", description="Scenario ID"),
-    algorithm=Query(default="xgboost", description="Algorithm ID"),
+    location="taman-kamal",
+    pollutant="co",
+    scenario="scenario_1",
+    algorithm="xgboost",
 ):
-    """Return available temporal range bounds of the test dataset."""
     try:
         df = registry_service.load_test_predictions(location, pollutant, scenario, algorithm)
         return {

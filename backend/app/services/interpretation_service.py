@@ -1,11 +1,6 @@
-"""Interpretation service for local TreeSHAP attribution and global feature importance."""
-
 import logging
-
 import numpy as np
 import pandas as pd
-
-import src.models.interpretation
 import shap
 
 from backend.app.core.config import (
@@ -37,25 +32,20 @@ SCIENTIFIC_DISCLAIMER = (
 
 
 class InterpretationService:
-    """Computes dynamic local TreeSHAP explanations and collates global feature importance."""
-
     def __init__(self):
         self.registry = registry_service
         self.data_service = data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def interpret_prediction(self, request):
-        """Calculate on-the-fly local TreeSHAP attribution and aggregate offline global importance."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())
             raise ValueError(f"Unknown location '{request.location}'. Valid locations are: {valid_locs}")
 
-        # Lookup registered best model
         best_entry = self.registry.get_best_model(loc_slug, request.pollutant, request.scenario)
         best_algo = best_entry["best_algorithm"]
 
-        # Determine effective algorithm and model tier
         requested_algo = request.algorithm
         if requested_algo is None or requested_algo == "auto":
             effective_algo = best_algo
@@ -75,7 +65,6 @@ class InterpretationService:
         scenario_info = SCENARIO_METADATA[request.scenario]
         algorithm_info = ALGORITHM_METADATA[effective_algo]
 
-        # 1. Build input feature vector
         X_df, meta = self.data_service.build_next_hour_features(
             loc_slug,
             request.pollutant,
@@ -83,7 +72,6 @@ class InterpretationService:
             reference_datetime=request.reference_datetime,
         )
 
-        # 2. Load model estimator (final model if best_algo, else experiment model)
         if is_final:
             model = self.registry.load_final_estimator(
                 loc_slug,
@@ -98,12 +86,10 @@ class InterpretationService:
                 effective_algo,
             )
 
-        # 3. Compute TreeSHAP
         explainer = shap.TreeExplainer(model)
         shap_raw = explainer.shap_values(X_df)
         if isinstance(shap_raw, list):
             shap_raw = shap_raw[0]
-
 
         shap_array = np.asarray(shap_raw).flatten()
         base_val_raw = (
@@ -114,9 +100,8 @@ class InterpretationService:
         base_value = round(base_val_raw, 2)
         pred_value = round(float(model.predict(X_df)[0]), 2)
 
-        # 4. Form local contributions
         total_abs_impact = float(np.sum(np.abs(shap_array)))
-        contributions: list[LocalShapContribution] = []
+        contributions = []
 
         for idx, col in enumerate(X_df.columns):
             val = float(X_df[col].iloc[0])
@@ -145,16 +130,12 @@ class InterpretationService:
                 )
             )
 
-        # Sort by impact magnitude descending
         contributions.sort(key=lambda c: c.impact_magnitude, reverse=True)
         top_contributor = contributions[0]
 
-        # Top-K for charting
         top_k = min(request.top_k, len(contributions))
         top_contributions = contributions[:top_k]
 
-        # 5. Format chart series for Plotly (horizontal bar chart)
-        # Invert order for Plotly so top contributor is rendered at the top
         chart_items = list(reversed(top_contributions))
         chart_series = {
             "features": [c.label for c in chart_items],
@@ -168,8 +149,7 @@ class InterpretationService:
             "units": [c.unit for c in chart_items],
         }
 
-        # 6. Collate global feature importance from saved artifacts
-        global_importance: list[GlobalFeatureItem] = []
+        global_importance = []
         try:
             if is_final:
                 raw_gain = self.registry.get_final_feature_importance(
@@ -212,7 +192,6 @@ class InterpretationService:
         except Exception as e:
             logger.warning("Could not load global importance artifacts: %s", e)
 
-        # 7. Synthesize human-readable interpretation narrative
         target_ts = meta["target_prediction_time"]
         global_lead = global_importance[0] if global_importance else None
         global_lead_text = (
@@ -265,5 +244,4 @@ class InterpretationService:
         )
 
 
-# Singleton interpretation service instance
 interpretation_service = InterpretationService()

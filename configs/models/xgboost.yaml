@@ -1,4 +1,3 @@
 algorithm: xgboost
 estimator: XGBRegressor
 parameters: {}
-# TODO: Final parameters and search space to be defined.

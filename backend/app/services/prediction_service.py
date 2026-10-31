@@ -1,7 +1,4 @@
-"""Prediction service for next-hour atmospheric pollutant forecasting."""
-
 import logging
-from typing import Any
 import pandas as pd
 
 from backend.app.core.config import (
@@ -18,6 +15,7 @@ from backend.app.schemas.prediction import (
     PredictionRequest,
 )
 from backend.app.services.data_service import data_service
+from backend.app.services.live_data_service import live_data_service
 from backend.app.services.registry_service import registry_service
 from src.utils.identifiers import build_experiment_id, slugify_component
 
@@ -30,7 +28,6 @@ MONTH_NAMES_ID = [
 
 
 def format_indo_timestamp(ts):
-    """Format timestamp into Indonesian standard string: '05 Agu 2026, 00:00 WIB'."""
     day = f"{ts.day:02d}"
     month = MONTH_NAMES_ID[ts.month]
     year = ts.year
@@ -40,7 +37,6 @@ def format_indo_timestamp(ts):
 
 
 def get_feature_display_info(feature_name, pollutant_unit):
-    """Return human-readable Indonesian label and measurement unit for a feature column."""
     labels_map = {
         "carbon_monoxide_lag_1h": ("CO (t-1: 1 Jam Lalu)", pollutant_unit),
         "carbon_monoxide_lag_2h": ("CO (t-2: 2 Jam Lalu)", pollutant_unit),
@@ -65,44 +61,43 @@ def get_feature_display_info(feature_name, pollutant_unit):
 
 
 def assess_air_quality(pollutant, value):
-    """Categorize predicted pollutant concentration according to ISPU / WHO standards."""
     if pollutant.lower() == "co":
         if value <= 4000:
             return AirQualityAssessment(
                 category="Baik",
-                color="#10b981",  # Emerald Green
+                color="#10b981",
                 description="Tingkat mutu udara sangat baik, tidak memberikan dampak negatif terhadap manusia, hewan, dan tumbuhan.",
                 standard="Baku Mutu ISPU / WHO 24-jam (4.000 µg/m³)",
             )
         elif value <= 8000:
             return AirQualityAssessment(
                 category="Sedang",
-                color="#f59e0b",  # Amber
+                color="#f59e0b",
                 description="Konsentrasi dapat diterima masyarakat umum, namun kelompok sensitif disarankan membatasi aktivitas fisik di luar ruangan.",
                 standard="Baku Mutu ISPU Permen LHK",
             )
         elif value <= 15000:
             return AirQualityAssessment(
                 category="Tidak Sehat",
-                color="#ef4444",  # Red
+                color="#ef4444",
                 description="Tingkat kualitas udara mulai merugikan kesehatan pada populasi rentan (penderita penyakit kardiovaskular/pernapasan).",
                 standard="Baku Mutu ISPU Permen LHK",
             )
         elif value <= 30000:
             return AirQualityAssessment(
                 category="Sangat Tidak Sehat",
-                color="#8b5cf6",  # Purple
+                color="#8b5cf6",
                 description="Kualitas udara membahayakan kesehatan pada sejumlah segmen populasi. Hindari aktivitas luar ruangan yang berkepanjangan.",
                 standard="Baku Mutu ISPU Permen LHK",
             )
         else:
             return AirQualityAssessment(
                 category="Berbahaya",
-                color="#b91c1c",  # Dark Maroon
+                color="#b91c1c",
                 description="Tingkat kualitas udara berbahaya secara umum bagi seluruh populasi dan berpotensi memicu masalah kesehatan serius.",
                 standard="Baku Mutu ISPU Permen LHK",
             )
-    else:  # CO2 (Carbon Dioxide in ppm)
+    else:
         if value <= 450:
             return AirQualityAssessment(
                 category="Normal Ambien",
@@ -127,25 +122,21 @@ def assess_air_quality(pollutant, value):
 
 
 class PredictionService:
-    """Orchestrates next-hour forecasting using loaded models and latest observation lag vectors."""
-
     def __init__(self):
         self.registry = registry_service
         self.data_service = data_service
+        self.live_service = live_data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def predict_next_hour(self, request):
-        """Generate next-hour forecast (t+1) based on latest observations up to t."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())
             raise ValueError(f"Unknown location '{request.location}'. Valid locations are: {valid_locs}")
 
-        # Lookup registered best model
         best_entry = self.registry.get_best_model(loc_slug, request.pollutant, request.scenario)
         best_algo = best_entry["best_algorithm"]
 
-        # Determine effective algorithm and model tier
         requested_algo = request.algorithm
         if requested_algo is None or requested_algo == "auto":
             effective_algo = best_algo
@@ -165,16 +156,21 @@ class PredictionService:
         scenario_info = SCENARIO_METADATA[request.scenario]
         algorithm_info = ALGORITHM_METADATA[effective_algo]
 
-        # 1. Build input feature vector from latest observations
         reference_time = request.reference_datetime or request.end_datetime
-        X_df, meta = self.data_service.build_next_hour_features(
-            loc_slug,
-            request.pollutant,
-            request.scenario,
-            reference_datetime=reference_time,
-        )
+        if reference_time is not None:
+            X_df, meta = self.data_service.build_next_hour_features(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+                reference_datetime=reference_time,
+            )
+        else:
+            X_df, meta = self.live_service.build_live_features(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+            )
 
-        # 2. Load model estimator (final model if best_algo, else experiment model)
         if is_final:
             model = self.registry.load_final_estimator(
                 loc_slug,
@@ -192,7 +188,6 @@ class PredictionService:
         pred_raw = float(model.predict(X_df)[0])
         pred_value = round(pred_raw, 2)
 
-        # 3. Calculate delta and trend compared to latest observation (t)
         latest_val = round(meta["latest_observation_value"], 2)
         delta_val = round(pred_value - latest_val, 2)
         delta_pct = round((delta_val / latest_val) * 100, 2) if latest_val != 0 else 0.0
@@ -204,11 +199,9 @@ class PredictionService:
         else:
             trend = "stabil"
 
-        # 4. Assess air quality standard
         assessment = assess_air_quality(request.pollutant, pred_value)
 
-        # 5. Build human-readable feature inputs list
-        feature_inputs: list[FeatureInputItem] = []
+        feature_inputs = []
         for col_name, val in meta["feature_values"].items():
             label, unit = get_feature_display_info(col_name, pollutant_info["unit"])
             feature_inputs.append(
@@ -220,11 +213,10 @@ class PredictionService:
                 )
             )
 
-        # 6. Counterpart algorithm prediction for the identical next hour
         counterpart_algo = self.registry.get_counterpart_algorithm(effective_algo)
         counterpart_meta = ALGORITHM_METADATA.get(counterpart_algo, {})
-        cp_pred_value: float | None = None
-        cp_delta: float | None = None
+        cp_pred_value = None
+        cp_delta = None
 
         try:
             cp_model = self.registry.load_estimator(
@@ -281,8 +273,8 @@ class PredictionService:
             model_status=model_status,
             is_final_model=is_final,
             best_algorithm=best_algo,
+            is_live_data=meta.get("is_live_data", False),
         )
 
 
-# Singleton prediction service instance
 prediction_service = PredictionService()

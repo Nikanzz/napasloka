@@ -1,6 +1,3 @@
-"""Core configuration and metadata definitions for NapasLoka backend."""
-
-from dataclasses import dataclass, field
 from pathlib import Path
 
 from src.utils.config import (
@@ -13,8 +10,6 @@ from src.utils.config import (
     load_yaml_config,
 )
 
-
-# Administrative region mapping for the 15 Jabodetabek observation points
 LOCATION_REGIONS = {
     "taman-kamal": "Jakarta Barat",
     "pelabuhan-muara-baru": "Jakarta Utara",
@@ -97,40 +92,37 @@ ALGORITHM_METADATA = {
 }
 
 
-@dataclass
 class Settings:
-    """Application runtime settings and path references."""
+    def __init__(self):
+        self.app_name = "Sistem NapasLoka"
+        self.app_version = "1.0.0"
+        self.api_v1_prefix = "/api/v1"
+        self.debug = False
 
-    app_name: str = "Sistem NapasLoka"
-    app_version: str = "1.0.0"
-    api_v1_prefix: str = "/api/v1"
-    debug: bool = False
+        self.project_root = PROJECT_ROOT
+        self.config_dir = CONFIG_DIR
+        self.data_dir = DATA_DIR
+        self.processed_data_dir = DATA_DIR / "processed"
+        self.artifacts_dir = ARTIFACTS_DIR
+        self.experiments_dir = EXPERIMENTS_DIR
+        self.registry_dir = REGISTRY_DIR
+        self.final_models_dir = ARTIFACTS_DIR / "final"
+        self.best_models_file = REGISTRY_DIR / "best_models.json"
 
-    project_root: Path = PROJECT_ROOT
-    config_dir: Path = CONFIG_DIR
-    data_dir: Path = DATA_DIR
-    processed_data_dir: Path = DATA_DIR / "processed"
-    artifacts_dir: Path = ARTIFACTS_DIR
-    experiments_dir: Path = EXPERIMENTS_DIR
-    registry_dir: Path = REGISTRY_DIR
-    final_models_dir: Path = ARTIFACTS_DIR / "final"
-    best_models_file: Path = REGISTRY_DIR / "best_models.json"
+        self.allowed_origins = [
+            "http://localhost:5500",
+            "http://127.0.0.1:5500",
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:8000",
+            "http://127.0.0.1:8000",
+            "*",
+        ]
 
-    allowed_origins: list[str] = field(default_factory=lambda: [
-        "http://localhost:5500",
-        "http://127.0.0.1:5500",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "http://localhost:8000",
-        "http://127.0.0.1:8000",
-        "*",
-    ])
-
-    default_test_start: str = "2026-06-02T17:00:00+07:00"
-    default_test_end: str = "2026-10-26T18:00:00+07:00"
+        self.default_test_start = "2026-06-02T17:00:00+07:00"
+        self.default_test_end = "2026-10-26T18:00:00+07:00"
 
     def get_locations(self):
-        """Return enriched list of configured Jabodetabek monitoring locations."""
         raw_locations = load_yaml_config("locations.yaml").get("locations", [])
         enriched = []
         for loc in raw_locations:
@@ -145,15 +137,12 @@ class Settings:
         return enriched
 
     def get_pollutants(self):
-        """Return supported pollutants with units and descriptions."""
         return list(POLLUTANT_METADATA.values())
 
     def get_scenarios(self):
-        """Return supported modeling scenarios."""
         return list(SCENARIO_METADATA.values())
 
     def get_algorithms(self):
-        """Return supported machine learning algorithms."""
         return list(ALGORITHM_METADATA.values())
 
 

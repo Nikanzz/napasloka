@@ -1,12 +1,12 @@
 /* ==========================================================================
-   Sistem NapasLoka - Main Stylesheet (Precision Matching Chapter 3 Mockups)
+   Sistem NapasLoka - Main Stylesheet
    ========================================================================== */
 
 :root {
   --color-primary: #2563eb;        /* Royal Blue 600 */
   --color-primary-dark: #1d4ed8;   /* Royal Blue 700 */
   --color-primary-light: #eff6ff;  /* Blue 50 */
-  --color-navy: #0c1445;           /* Deep Midnight Navy for Mockup Cards & Footer */
+  --color-navy: #0c1445;           /* Deep Midnight Navy for Accent Cards & Footer */
   --color-navy-card: #0c1445;
   --color-navy-subtle: rgba(255, 255, 255, 0.08);
   
@@ -69,7 +69,7 @@ a:hover {
 }
 
 /* --------------------------------------------------------------------------
-   Site Header & Navigation (White Clean Bar from Mockups)
+   Site Header & Navigation
    -------------------------------------------------------------------------- */
 .site-header {
   width: 100%;
@@ -132,6 +132,7 @@ a:hover {
   align-items: center;
   gap: 1.5rem;
   flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .nav a {
@@ -165,6 +166,40 @@ a:hover {
 
 .nav-toggle-btn {
   display: none;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.btn-install-pwa {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e3a8a;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-install-pwa:hover {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.btn-install-pwa svg {
+  stroke: #2563eb;
+  flex-shrink: 0;
 }
 
 /* --------------------------------------------------------------------------
@@ -291,7 +326,7 @@ h1 {
 }
 
 /* --------------------------------------------------------------------------
-   Site Footer (Deep Navy from Mockups)
+   Site Footer
    -------------------------------------------------------------------------- */
 .site-footer {
   background: var(--color-navy);
