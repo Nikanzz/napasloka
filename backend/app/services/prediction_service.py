@@ -157,18 +157,35 @@ class PredictionService:
         algorithm_info = ALGORITHM_METADATA[effective_algo]
 
         reference_time = request.reference_datetime or request.end_datetime
-        if reference_time is not None:
+        use_live = False
+        if reference_time is None:
+            use_live = True
+        else:
+            try:
+                ref_ts = pd.to_datetime(reference_time)
+                loc_df = self.data_service.get_location_observations(loc_slug, request.pollutant)
+                max_dt = loc_df["datetime"].max()
+                if ref_ts.tzinfo is None:
+                    ref_ts = ref_ts.tz_localize(max_dt.tz)
+                else:
+                    ref_ts = ref_ts.tz_convert(max_dt.tz)
+                if ref_ts > max_dt:
+                    use_live = True
+            except Exception:
+                use_live = False
+
+        if use_live:
+            X_df, meta = self.live_service.build_live_features(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+            )
+        else:
             X_df, meta = self.data_service.build_next_hour_features(
                 loc_slug,
                 request.pollutant,
                 request.scenario,
                 reference_datetime=reference_time,
-            )
-        else:
-            X_df, meta = self.live_service.build_live_features(
-                loc_slug,
-                request.pollutant,
-                request.scenario,
             )
 
         if is_final:

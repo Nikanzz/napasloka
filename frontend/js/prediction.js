@@ -411,7 +411,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     const startVal = evalStartDate?.value || "2026-07-29";
     const endVal = evalEndDate?.value || "2026-08-04";
     const refVal = res.latest_observation_time || "2026-08-04T23:00";
-    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&reference_datetime=${encodeURIComponent(refVal)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}`;
+    const liveParam = res.is_live_data ? "&live=true" : "";
+    const queryParams = `location=${encodeURIComponent(res.location)}&pollutant=${encodeURIComponent(res.pollutant)}&scenario=${encodeURIComponent(res.scenario)}&algorithm=${encodeURIComponent(res.algorithm)}&reference_datetime=${encodeURIComponent(refVal)}&start_date=${encodeURIComponent(startVal)}&end_date=${encodeURIComponent(endVal)}${liveParam}`;
 
     const btnGotoEval = document.getElementById("btn-goto-evaluation");
     const btnGotoInterp = document.getElementById("btn-goto-interpretation");

@@ -166,17 +166,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnGotoPred) btnGotoPred.href = `/pages/prediction.html${queryParams}`;
     if (btnGotoEval) btnGotoEval.href = `/pages/evaluation.html${queryParams}`;
 
-    try {
-      const data = await window.NapasLokaApi.postInterpretation({
-        location,
-        pollutant,
-        scenario,
-        algorithm: "auto",
-        reference_datetime: refDatetime,
-        top_k: topK,
-      });
+    const isLiveParam = urlParams.get("live") === "true";
+    const data = await window.NapasLokaApi.postInterpretation({
+      location,
+      pollutant,
+      scenario,
+      algorithm: "auto",
+      reference_datetime: refDatetime,
+      is_live: isLiveParam,
+      top_k: topK,
+    });
 
-      setElText("ref-summary-text", `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}`);
+    const liveSuffix = data.is_live_data ? " · 🟢 Live Open-Meteo" : "";
+    setElText("ref-summary-text", `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}${liveSuffix}`);
       setElText("ref-pred-val", fmt(data.predicted_value, 1));
       setElText("ref-pred-unit", data.pollutant_unit);
       setElText("ref-model-badge", `${data.algorithm_label} · ${data.scenario_label} (${data.model_status})`);

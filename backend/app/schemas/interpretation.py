@@ -11,6 +11,7 @@ class InterpretationRequest(BaseModel):
     scenario: ScenarioType
     algorithm: AlgorithmType | Literal["auto"] | None = "auto"
     reference_datetime: datetime | str | None = None
+    is_live: bool | None = None
     top_k: int = 5
 
 
@@ -63,3 +64,4 @@ class InterpretationResponse(BaseModel):
     model_status: str = "Final deployment model"
     is_final_model: bool = True
     best_algorithm: str = "lightgbm"
+    is_live_data: bool = False

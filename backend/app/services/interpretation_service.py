@@ -17,6 +17,7 @@ from backend.app.schemas.interpretation import (
     LocalShapContribution,
 )
 from backend.app.services.data_service import data_service
+from backend.app.services.live_data_service import live_data_service
 from backend.app.services.prediction_service import format_indo_timestamp, get_feature_display_info
 from backend.app.services.registry_service import registry_service
 from src.utils.identifiers import build_experiment_id, slugify_component
@@ -35,6 +36,7 @@ class InterpretationService:
     def __init__(self):
         self.registry = registry_service
         self.data_service = data_service
+        self.live_service = live_data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def interpret_prediction(self, request):
@@ -65,12 +67,38 @@ class InterpretationService:
         scenario_info = SCENARIO_METADATA[request.scenario]
         algorithm_info = ALGORITHM_METADATA[effective_algo]
 
-        X_df, meta = self.data_service.build_next_hour_features(
-            loc_slug,
-            request.pollutant,
-            request.scenario,
-            reference_datetime=request.reference_datetime,
-        )
+        reference_time = request.reference_datetime
+        use_live = getattr(request, "is_live", None) is True
+        if not use_live:
+            if reference_time is None:
+                use_live = True
+            else:
+                try:
+                    ref_ts = pd.to_datetime(reference_time)
+                    loc_df = self.data_service.get_location_observations(loc_slug, request.pollutant)
+                    max_dt = loc_df["datetime"].max()
+                    if ref_ts.tzinfo is None:
+                        ref_ts = ref_ts.tz_localize(max_dt.tz)
+                    else:
+                        ref_ts = ref_ts.tz_convert(max_dt.tz)
+                    if ref_ts > max_dt:
+                        use_live = True
+                except Exception:
+                    use_live = False
+
+        if use_live:
+            X_df, meta = self.live_service.build_live_features(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+            )
+        else:
+            X_df, meta = self.data_service.build_next_hour_features(
+                loc_slug,
+                request.pollutant,
+                request.scenario,
+                reference_datetime=reference_time,
+            )
 
         if is_final:
             model = self.registry.load_final_estimator(
@@ -241,6 +269,7 @@ class InterpretationService:
             model_status=model_status,
             is_final_model=is_final,
             best_algorithm=best_algo,
+            is_live_data=meta.get("is_live_data", False),
         )
 
 

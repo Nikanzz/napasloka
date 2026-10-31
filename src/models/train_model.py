@@ -1,12 +1,3 @@
-"""Train machine learning models for NapasLoka research and production.
-
-Supports two operational modes:
-1. 'experiment': Trains the research matrix (up to 120 experiments) with hyperparameter tuning,
-                 metrics evaluation, gain feature importance, and SHAP analysis.
-2. 'final':      Generates/updates best_models.json and retrains deployment-ready final models
-                 (up to 60 models) using optimal hyperparameters.
-"""
-
 import argparse
 import datetime
 import json
