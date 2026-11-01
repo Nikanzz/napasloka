@@ -291,6 +291,7 @@ class PredictionService:
             is_final_model=is_final,
             best_algorithm=best_algo,
             is_live_data=meta.get("is_live_data", False),
+            live_data_error=meta.get("live_data_error"),
         )
 
 

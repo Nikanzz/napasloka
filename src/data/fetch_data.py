@@ -1,6 +1,3 @@
-"""Script untuk mengunduh data mentah (cuaca dan polutan) dari Open-Meteo API ke data/raw/."""
-
-import argparse
 import logging
 import sys
 from pathlib import Path
@@ -43,7 +40,7 @@ def _extract_hourly_data(response, variable_indices, timezone):
 
 
 def fetch_raw_data():
-    """Mengunduh data mentah dari Open-Meteo dan menyimpannya ke data/raw/."""
+    """download raw data from open-meteo and send it to data/raw/."""
     config = load_yaml_config("locations.yaml")
     locations = config.get("locations", [])
     if not locations:
@@ -74,7 +71,7 @@ def fetch_raw_data():
 
         logging.info(f"Mengunduh data mentah untuk {name} ({lat}, {lon})...")
 
-        # 1. Weather data
+        # Weather data
         weather_params = {
             "latitude": lat,
             "longitude": lon,
@@ -104,7 +101,7 @@ def fetch_raw_data():
             "wind_speed_100m": w_wind,
         })
 
-        # 2. Air quality (CO)
+        # Air quality (CO)
         co_params = {
             "latitude": lat,
             "longitude": lon,
@@ -125,7 +122,7 @@ def fetch_raw_data():
             "carbon_monoxide": co_vals,
         })
 
-        # 3. Air quality (CO2)
+        # Air quality (CO2)
         co2_params = {
             "latitude": lat,
             "longitude": lon,
@@ -186,22 +183,8 @@ def fetch_raw_data():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Unduh data mentah cuaca dan kualitas udara dari Open-Meteo.")
-    parser.add_argument(
-        "--clean",
-        "--preprocess",
-        dest="clean",
-        action="store_true",
-        help="Jalankan otomatis pembersihan, validasi & integrasi data setelah selesai mengunduh.",
-    )
-    args = parser.parse_args()
-
+    """Download raw weather and air quality observations from Open-Meteo."""
     fetch_raw_data()
-
-    if args.clean:
-        logging.info("Menjalankan pipeline pembersihan & integrasi otomatis...")
-        from src.data.clean_data import clean_and_integrate_data
-        clean_and_integrate_data()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-import argparse
 import csv
 import logging
 import sys
@@ -229,16 +228,8 @@ def clean_and_integrate_data(run_validation=True):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Clean, validate, and integrate raw meteorological and pollutant data into canonical datasets."
-    )
-    parser.add_argument(
-        "--skip-validation",
-        action="store_true",
-        help="Skip dataset physical integrity and missing value assertion checks.",
-    )
-    args = parser.parse_args()
-    clean_and_integrate_data(run_validation=not args.skip_validation)
+    """Clean, validate, and integrate raw meteorological and pollutant data into canonical datasets."""
+    clean_and_integrate_data()
 
 
 if __name__ == "__main__":

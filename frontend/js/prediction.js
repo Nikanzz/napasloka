@@ -326,8 +326,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const refHint = document.getElementById("ref-time-hint");
     if (refHint && res.latest_observation_display && res.target_time_display) {
-      const srcLabel = res.is_live_data ? "🟢 Live Data Open-Meteo" : "Data Acuan";
-      refHint.innerHTML = `<span style="color: #059669; font-weight: 600;">${srcLabel}</span> &mdash; Acuan (t): <strong>${res.latest_observation_display}</strong> &rarr; Target (t+1): <strong>${res.target_time_display}</strong>`;
+      if (res.is_live_data) {
+        refHint.innerHTML = `<span style="color: #059669; font-weight: 600;">🟢 Live Data Open-Meteo</span> &mdash; Acuan (t): <strong>${res.latest_observation_display}</strong> &rarr; Target (t+1): <strong>${res.target_time_display}</strong>`;
+      } else {
+        const errDetail = res.live_data_error ? ` (${res.live_data_error})` : "";
+        refHint.innerHTML = `<span style="color: #d97706; font-weight: 600;">⚠️ Data Acuan Historis (Fallback)</span> &mdash; Acuan (t): <strong>${res.latest_observation_display}</strong> &rarr; Target (t+1): <strong>${res.target_time_display}</strong><span style="display:block; font-size:0.75rem; color: var(--color-text-muted);">${errDetail ? "Koneksi stasiun luar: " + errDetail : "Menggunakan observasi historis dataset."}</span>`;
+      }
     }
 
     setElText("res-latest-time", res.latest_observation_display || formatIndoTime(res.latest_observation_time));

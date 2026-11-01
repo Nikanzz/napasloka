@@ -31,16 +31,22 @@ def fetch_open_meteo_live(lat, lon):
         f"https://api.open-meteo.com/v1/forecast"
         f"?latitude={lat}&longitude={lon}"
         f"&hourly=temperature_2m,relative_humidity_2m,rain,wind_speed_100m"
-        f"&past_days=2&forecast_days=1&timezone=Asia%2FBangkok"
+        f"&past_days=2&forecast_days=1&timezone=Asia%2FJakarta"
     )
     air_url = (
         f"https://air-quality-api.open-meteo.com/v1/air-quality"
         f"?latitude={lat}&longitude={lon}"
         f"&hourly=carbon_monoxide,carbon_dioxide"
-        f"&past_days=2&forecast_days=1&domains=cams_global&timezone=Asia%2FBangkok"
+        f"&past_days=2&forecast_days=1&domains=cams_global&timezone=Asia%2FJakarta"
     )
 
-    with httpx.Client(timeout=8.0) as client:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 NapasLoka/1.0 (AirQualityForecast)",
+        "Accept": "application/json",
+    }
+
+    timeout_config = httpx.Timeout(12.0, connect=5.0)
+    with httpx.Client(timeout=timeout_config, headers=headers, follow_redirects=True) as client:
         w_resp = client.get(weather_url)
         w_resp.raise_for_status()
         w_json = w_resp.json().get("hourly", {})
@@ -53,7 +59,7 @@ def fetch_open_meteo_live(lat, lon):
     a_df = pd.DataFrame(a_json)
 
     merged = pd.merge(w_df, a_df, on="time", how="inner")
-    merged["datetime"] = pd.to_datetime(merged["time"], utc=True).dt.tz_convert("Asia/Jakarta")
+    merged["datetime"] = pd.to_datetime(merged["time"]).dt.tz_localize("Asia/Jakarta")
     merged = merged.sort_values("datetime").reset_index(drop=True)
 
     _LIVE_CACHE[hour_key] = merged
@@ -118,9 +124,12 @@ class LiveDataService:
             return X_df, metadata
 
         except Exception as e:
-            logger.warning("Failed to fetch live data from Open-Meteo (%s). Falling back to local data.", e)
+            err_msg = f"{type(e).__name__}: {str(e)}"
+            print(f"[LIVE_DATA ERROR] Failed to fetch live data from Open-Meteo: {err_msg}", flush=True)
+            logger.warning("Failed to fetch live data from Open-Meteo (%s). Falling back to local data.", err_msg)
             X_df, meta = data_service.build_next_hour_features(loc_slug, pollutant, scenario)
             meta["is_live_data"] = False
+            meta["live_data_error"] = err_msg
             return X_df, meta
 
 

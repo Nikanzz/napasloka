@@ -67,3 +67,4 @@ class NextHourPredictionResponse(BaseModel):
     is_final_model: bool = True
     best_algorithm: str = "lightgbm"
     is_live_data: bool = False
+    live_data_error: str | None = None

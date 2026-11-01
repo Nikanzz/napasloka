@@ -1,6 +1,5 @@
-"""Consolidated model evaluation, metrics synthesis, and academic report generator."""
+"""Consolidate experiment metrics into summary_metrics.csv for research and deployment."""
 
-import argparse
 import json
 import logging
 import sys
@@ -19,12 +18,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("evaluate_model")
 
 
-def generate_summary_report(
-    output_csv=None,
-    print_tables=True,
-    export_markdown=None,
-):
-    """Collect metrics across all research experiment artifacts and generate summary tables."""
+def generate_summary_report(output_csv=None):
+    """Collect metrics across all research experiment artifacts into a single CSV."""
     if output_csv is None:
         output_csv = ARTIFACTS_DIR / "summary_metrics.csv"
     else:
@@ -72,80 +67,12 @@ def generate_summary_report(
     df_summary.to_csv(output_csv, index=False)
     logger.info(f"Consolidated {len(df_summary)} experiments into: {output_csv}")
 
-    if print_tables:
-        print("\n" + "=" * 80)
-        print("                 RINGKASAN HASIL EVALUASI RISET NAPASLOKA")
-        print("=" * 80)
-
-        print("\n--- 1. Perbandingan Algoritma (XGBoost vs LightGBM) ---")
-        algo_comp = df_summary.groupby(["pollutant", "algorithm"])[
-            ["mae", "rmse", "mape", "r2", "training_time_seconds"]
-        ].mean()
-        print(algo_comp.round(4))
-
-        print("\n--- 2. Pengaruh Fitur Cuaca (Skenario 1 vs Skenario 2) ---")
-        scen_comp = df_summary.groupby(["pollutant", "scenario"])[
-            ["mae", "rmse", "mape", "r2"]
-        ].mean()
-        print(scen_comp.round(4))
-
-        print("\n--- 3. Top 3 Model dengan Akurasi Tertinggi (CO) ---")
-        top_co = df_summary[df_summary["pollutant"] == "CO"].sort_values(by="r2", ascending=False).head(3)
-        print(top_co[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_string(index=False))
-
-        print("\n--- 4. Top 3 Model dengan Akurasi Tertinggi (CO2) ---")
-        top_co2 = df_summary[df_summary["pollutant"] == "CO2"].sort_values(by="r2", ascending=False).head(3)
-        print(top_co2[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_string(index=False))
-        print("=" * 80)
-
-    if export_markdown:
-        export_path = Path(export_markdown)
-        export_path.parent.mkdir(parents=True, exist_ok=True)
-        with export_path.open("w", encoding="utf-8") as f:
-            f.write("# Ringkasan Evaluasi Model NapasLoka\n\n")
-            f.write("## Perbandingan Algoritma (Rata-rata)\n")
-            f.write(algo_comp.round(4).to_markdown() + "\n\n")
-            f.write("## Pengaruh Fitur Cuaca (Rata-rata)\n")
-            f.write(scen_comp.round(4).to_markdown() + "\n\n")
-            f.write("## Top 3 Model CO (Berdasarkan R2)\n")
-            f.write(top_co[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_markdown(index=False) + "\n\n")
-            f.write("## Top 3 Model CO2 (Berdasarkan R2)\n")
-            f.write(top_co2[["location", "scenario", "algorithm", "mae", "mape", "r2"]].to_markdown(index=False) + "\n")
-        logger.info(f"Markdown evaluation summary exported to: {export_path}")
-
     return df_summary
 
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="Synthesize experiment metrics and generate thesis-grade evaluation reports."
-    )
-    parser.add_argument(
-        "--output",
-        type=Path,
-        default=ARTIFACTS_DIR / "summary_metrics.csv",
-        help="Path to output summary_metrics.csv (default: artifacts/summary_metrics.csv).",
-    )
-    parser.add_argument(
-        "--markdown",
-        type=Path,
-        help="Optional path to output markdown summary report.",
-    )
-    parser.add_argument(
-        "--quiet",
-        action="store_true",
-        help="Suppress terminal printing of summary tables.",
-    )
-    return parser.parse_args()
-
-
 def main():
-    args = parse_args()
-    generate_summary_report(
-        output_csv=args.output,
-        print_tables=not args.quiet,
-        export_markdown=args.markdown,
-    )
+    """Execute metric consolidation workflow directly."""
+    generate_summary_report()
 
 
 if __name__ == "__main__":
