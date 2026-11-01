@@ -116,9 +116,15 @@ window.NapasLokaApi = {
       const t0_time = times[idx_t0];
       const t0_val = Number(polVals[idx_t0]);
 
+      // Compute target prediction time (+1 hour) preserving Western Indonesia Time (WIB, UTC+7).
       const d0 = new Date(`${t0_time}:00+07:00`);
       const d1 = new Date(d0.getTime() + 3600000);
-      const target_time = d1.toISOString();
+      const d1Wib = new Date(d1.getTime() + 7 * 3600000);
+      const y1 = d1Wib.getUTCFullYear();
+      const m1 = String(d1Wib.getUTCMonth() + 1).padStart(2, "0");
+      const day1 = String(d1Wib.getUTCDate()).padStart(2, "0");
+      const h1 = String(d1Wib.getUTCHours()).padStart(2, "0");
+      const target_time = `${y1}-${m1}-${day1}T${h1}:00:00+07:00`;
 
       const feature_values = {
         [`${polCol}_lag_3h`]: Number(polVals[idx_t2]),

@@ -29,6 +29,12 @@ MONTH_NAMES_ID = [
 
 
 def format_indo_timestamp(ts):
+    """Format a timestamp into a standardized Indonesian display format in WIB (UTC+7)."""
+    ts = pd.to_datetime(ts)
+    if ts.tzinfo is None:
+        ts = ts.tz_localize("Asia/Jakarta")
+    else:
+        ts = ts.tz_convert("Asia/Jakarta")
     day = f"{ts.day:02d}"
     month = MONTH_NAMES_ID[ts.month]
     year = ts.year
@@ -186,8 +192,12 @@ class PredictionService:
             latest_dt = pd.to_datetime(request.client_live_features.latest_observation_time)
             if target_dt.tzinfo is None:
                 target_dt = target_dt.tz_localize("Asia/Jakarta")
+            else:
+                target_dt = target_dt.tz_convert("Asia/Jakarta")
             if latest_dt.tzinfo is None:
                 latest_dt = latest_dt.tz_localize("Asia/Jakarta")
+            else:
+                latest_dt = latest_dt.tz_convert("Asia/Jakarta")
 
             meta = {
                 "latest_observation_time": latest_dt,

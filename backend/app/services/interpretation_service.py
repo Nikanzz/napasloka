@@ -98,8 +98,12 @@ class InterpretationService:
             latest_dt = pd.to_datetime(request.client_live_features.latest_observation_time)
             if target_dt.tzinfo is None:
                 target_dt = target_dt.tz_localize("Asia/Jakarta")
+            else:
+                target_dt = target_dt.tz_convert("Asia/Jakarta")
             if latest_dt.tzinfo is None:
                 latest_dt = latest_dt.tz_localize("Asia/Jakarta")
+            else:
+                latest_dt = latest_dt.tz_convert("Asia/Jakarta")
 
             meta = {
                 "latest_observation_time": latest_dt,
