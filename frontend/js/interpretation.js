@@ -167,7 +167,21 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (btnGotoEval) btnGotoEval.href = `/pages/evaluation.html${queryParams}`;
 
     const isLiveParam = urlParams.get("live") === "true";
-    const data = await window.NapasLokaApi.postInterpretation({
+
+    let clientLive = null;
+    if ((!refDatetime || isLiveParam) && navigator.onLine && appOptions?.locations) {
+      const locObj = appOptions.locations.find((l) => l.id === location);
+      if (locObj && locObj.latitude && locObj.longitude) {
+        clientLive = await window.NapasLokaApi.fetchClientLiveFeatures(
+          locObj.latitude,
+          locObj.longitude,
+          pollutant,
+          scenario
+        );
+      }
+    }
+
+    const payload = {
       location,
       pollutant,
       scenario,
@@ -175,7 +189,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       reference_datetime: refDatetime,
       is_live: isLiveParam,
       top_k: topK,
-    });
+    };
+    if (clientLive) payload.client_live_features = clientLive;
+
+    const data = await window.NapasLokaApi.postInterpretation(payload);
 
     const liveSuffix = data.is_live_data ? " · 🟢 Live Open-Meteo" : "";
     setElText("ref-summary-text", `${data.pollutant.toUpperCase()} · ${data.location_name} · ${data.target_time_display}${liveSuffix}`);

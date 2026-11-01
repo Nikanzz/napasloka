@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Any, Literal
 from pydantic import BaseModel
 
+from backend.app.schemas.prediction import ClientLiveFeatures
 from backend.app.schemas.registry import AlgorithmType, PollutantType, ScenarioType
 
 
@@ -13,6 +14,7 @@ class InterpretationRequest(BaseModel):
     reference_datetime: datetime | str | None = None
     is_live: bool | None = None
     top_k: int = 5
+    client_live_features: ClientLiveFeatures | None = None
 
 
 class LocalShapContribution(BaseModel):

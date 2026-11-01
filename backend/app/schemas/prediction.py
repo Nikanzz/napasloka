@@ -5,6 +5,13 @@ from pydantic import BaseModel
 from backend.app.schemas.registry import AlgorithmType, PollutantType, ScenarioType
 
 
+class ClientLiveFeatures(BaseModel):
+    latest_observation_time: str
+    latest_observation_value: float
+    target_prediction_time: str
+    feature_values: dict[str, float]
+
+
 class PredictionRequest(BaseModel):
     location: str
     pollutant: PollutantType
@@ -13,6 +20,7 @@ class PredictionRequest(BaseModel):
     reference_datetime: datetime | str | None = None
     start_datetime: datetime | str | None = None
     end_datetime: datetime | str | None = None
+    client_live_features: ClientLiveFeatures | None = None
 
 
 class AirQualityAssessment(BaseModel):

@@ -67,4 +67,84 @@ window.NapasLokaApi = {
       body: JSON.stringify(data),
     });
   },
+
+  async fetchClientLiveFeatures(lat, lon, pollutant, scenario) {
+    try {
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,rain,wind_speed_100m&past_days=2&forecast_days=1&timezone=Asia%2FJakarta`;
+      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=carbon_monoxide,carbon_dioxide&past_days=2&forecast_days=1&domains=cams_global&timezone=Asia%2FJakarta`;
+
+      const [wResp, aResp] = await Promise.all([
+        fetch(weatherUrl),
+        fetch(airUrl),
+      ]);
+
+      if (!wResp.ok || !aResp.ok) return null;
+
+      const wJson = await wResp.json();
+      const aJson = await aResp.json();
+
+      const times = wJson.hourly?.time || [];
+      const polCol = pollutant.toLowerCase() === "co" ? "carbon_monoxide" : "carbon_dioxide";
+      const polVals = aJson.hourly?.[polCol] || [];
+
+      if (!times.length || !polVals.length) return null;
+
+      const now = new Date();
+      const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+      const wibDate = new Date(utcTime + 7 * 3600000);
+      const yr = wibDate.getFullYear();
+      const mo = String(wibDate.getMonth() + 1).padStart(2, "0");
+      const da = String(wibDate.getDate()).padStart(2, "0");
+      const hr = String(wibDate.getHours()).padStart(2, "0");
+      const currentWibHourStr = `${yr}-${mo}-${da}T${hr}:00`;
+
+      let validIndices = [];
+      for (let i = 0; i < times.length; i++) {
+        if (times[i] <= currentWibHourStr && polVals[i] !== null && polVals[i] !== undefined) {
+          validIndices.push(i);
+        }
+      }
+
+      if (validIndices.length < 3) {
+        validIndices = [times.length - 3, times.length - 2, times.length - 1];
+      }
+
+      const idx_t2 = validIndices[validIndices.length - 3];
+      const idx_t1 = validIndices[validIndices.length - 2];
+      const idx_t0 = validIndices[validIndices.length - 1];
+
+      const t0_time = times[idx_t0];
+      const t0_val = Number(polVals[idx_t0]);
+
+      const d0 = new Date(`${t0_time}:00+07:00`);
+      const d1 = new Date(d0.getTime() + 3600000);
+      const target_time = d1.toISOString();
+
+      const feature_values = {
+        [`${polCol}_lag_3h`]: Number(polVals[idx_t2]),
+        [`${polCol}_lag_2h`]: Number(polVals[idx_t1]),
+        [`${polCol}_lag_1h`]: Number(polVals[idx_t0]),
+      };
+
+      if (scenario === "scenario_2") {
+        const meteoVars = ["temperature_2m", "relative_humidity_2m", "rain", "wind_speed_100m"];
+        meteoVars.forEach((mv) => {
+          const vals = wJson.hourly?.[mv] || [];
+          feature_values[`${mv}_lag_3h`]: Number(vals[idx_t2] ?? 0);
+          feature_values[`${mv}_lag_2h`]: Number(vals[idx_t1] ?? 0);
+          feature_values[`${mv}_lag_1h`]: Number(vals[idx_t0] ?? 0);
+        });
+      }
+
+      return {
+        latest_observation_time: `${t0_time}:00+07:00`,
+        latest_observation_value: t0_val,
+        target_prediction_time: target_time,
+        feature_values: feature_values,
+      };
+    } catch (err) {
+      console.warn("Client live fetch error (will fallback to backend/dataset):", err);
+      return null;
+    }
+  },
 };

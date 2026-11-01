@@ -20,6 +20,7 @@ from backend.app.services.data_service import data_service
 from backend.app.services.live_data_service import live_data_service
 from backend.app.services.prediction_service import format_indo_timestamp, get_feature_display_info
 from backend.app.services.registry_service import registry_service
+from src.features.scenarios import resolve_scenario
 from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
@@ -86,7 +87,28 @@ class InterpretationService:
                 except Exception:
                     use_live = False
 
-        if use_live:
+        if request.client_live_features is not None:
+            scenario_def = resolve_scenario(request.pollutant, request.scenario)
+            ordered_features = list(scenario_def.feature_names)
+            feat_vals = request.client_live_features.feature_values
+            row_dict = {col: [float(feat_vals.get(col, 0.0))] for col in ordered_features}
+            X_df = pd.DataFrame(row_dict)[ordered_features]
+
+            target_dt = pd.to_datetime(request.client_live_features.target_prediction_time)
+            latest_dt = pd.to_datetime(request.client_live_features.latest_observation_time)
+            if target_dt.tzinfo is None:
+                target_dt = target_dt.tz_localize("Asia/Jakarta")
+            if latest_dt.tzinfo is None:
+                latest_dt = latest_dt.tz_localize("Asia/Jakarta")
+
+            meta = {
+                "latest_observation_time": latest_dt,
+                "latest_observation_value": float(request.client_live_features.latest_observation_value),
+                "target_prediction_time": target_dt,
+                "feature_values": {col: float(X_df[col].iloc[0]) for col in ordered_features},
+                "is_live_data": True,
+            }
+        elif use_live:
             X_df, meta = self.live_service.build_live_features(
                 loc_slug,
                 request.pollutant,

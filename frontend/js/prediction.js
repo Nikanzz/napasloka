@@ -293,8 +293,25 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const payload = { location: loc, pollutant: pol, scenario: scen, algorithm: "auto" };
-      if (isCustom) payload.reference_datetime = inputRefTime.value;
+      if (isCustom) {
+        payload.reference_datetime = inputRefTime.value;
+      } else if (navigator.onLine && appOptions?.locations) {
+        const locObj = appOptions.locations.find((l) => l.id === loc);
+        if (locObj && locObj.latitude && locObj.longitude) {
+          submitBtn.innerHTML = "<span>Mengambil Cuaca Jam Ini...</span>";
+          const clientLive = await window.NapasLokaApi.fetchClientLiveFeatures(
+            locObj.latitude,
+            locObj.longitude,
+            pol,
+            scen
+          );
+          if (clientLive) {
+            payload.client_live_features = clientLive;
+          }
+        }
+      }
 
+      submitBtn.innerHTML = "<span>Memproses Model Prediksi...</span>";
       const res = await window.NapasLokaApi.postPrediction(payload);
       renderPredictionResult(res);
     } catch (err) {
