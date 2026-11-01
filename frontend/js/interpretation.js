@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const plotlyWrapper = document.getElementById("plotly-shap-wrapper");
   const plotlyContainer = document.getElementById("plotly-shap-chart");
 
+  let appOptions = null;
   let lastChartSeries = null;
   let lastPollutantUnit = "µg/m³";
 
@@ -52,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const appOptions = await window.NapasLokaApi.getOptions();
+    appOptions = await window.NapasLokaApi.getOptions();
 
     if (selectLoc && appOptions.locations) {
       selectLoc.innerHTML = "";
@@ -152,46 +153,47 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     try {
       const location = selectLoc ? selectLoc.value : "mustikasari";
-    const pollutant = selectPol ? selectPol.value : "co";
-    const scenario = selectScen ? selectScen.value : "scenario_2";
-    const topK = selectTopK ? parseInt(selectTopK.value, 10) || 5 : 5;
+      const pollutant = selectPol ? selectPol.value : "co";
+      const scenario = selectScen ? selectScen.value : "scenario_2";
+      const topK = selectTopK ? parseInt(selectTopK.value, 10) || 5 : 5;
 
-    let refDatetime = null;
-    if (inputDatetime?.value) {
-      refDatetime = inputDatetime.value.includes("T") ? inputDatetime.value : `${inputDatetime.value}T23:00`;
-    }
-
-    const queryParams = `?location=${encodeURIComponent(location)}&pollutant=${encodeURIComponent(pollutant)}&scenario=${encodeURIComponent(scenario)}&algorithm=auto`;
-    const btnGotoPred = document.getElementById("btn-goto-prediction") || document.getElementById("btn-interp-goto-prediction");
-    const btnGotoEval = document.getElementById("btn-goto-evaluation") || document.getElementById("btn-interp-goto-evaluation");
-    if (btnGotoPred) btnGotoPred.href = `/pages/prediction.html${queryParams}`;
-    if (btnGotoEval) btnGotoEval.href = `/pages/evaluation.html${queryParams}`;
-
-    const isLiveParam = urlParams.get("live") === "true";
-
-    let clientLive = null;
-    if ((!refDatetime || isLiveParam) && navigator.onLine && appOptions?.locations) {
-      const locObj = appOptions.locations.find((l) => l.id === location);
-      if (locObj && locObj.latitude && locObj.longitude) {
-        clientLive = await window.NapasLokaApi.fetchClientLiveFeatures(
-          locObj.latitude,
-          locObj.longitude,
-          pollutant,
-          scenario
-        );
+      let refDatetime = null;
+      if (inputDatetime?.value) {
+        refDatetime = inputDatetime.value.includes("T") ? inputDatetime.value : `${inputDatetime.value}T23:00`;
       }
-    }
 
-    const payload = {
-      location,
-      pollutant,
-      scenario,
-      algorithm: "auto",
-      reference_datetime: refDatetime,
-      is_live: isLiveParam,
-      top_k: topK,
-    };
-    if (clientLive) payload.client_live_features = clientLive;
+      const queryParams = `?location=${encodeURIComponent(location)}&pollutant=${encodeURIComponent(pollutant)}&scenario=${encodeURIComponent(scenario)}&algorithm=auto`;
+      const btnGotoPred = document.getElementById("btn-goto-prediction") || document.getElementById("btn-interp-goto-prediction");
+      const btnGotoEval = document.getElementById("btn-goto-evaluation") || document.getElementById("btn-interp-goto-evaluation");
+      if (btnGotoPred) btnGotoPred.href = `/pages/prediction.html${queryParams}`;
+      if (btnGotoEval) btnGotoEval.href = `/pages/evaluation.html${queryParams}`;
+
+      const currentUrlParams = new URLSearchParams(window.location.search);
+      const isLiveParam = currentUrlParams.get("live") === "true";
+
+      let clientLive = null;
+      if ((!refDatetime || isLiveParam) && navigator.onLine && appOptions?.locations) {
+        const locObj = appOptions.locations.find((l) => l.id === location);
+        if (locObj && locObj.latitude && locObj.longitude) {
+          clientLive = await window.NapasLokaApi.fetchClientLiveFeatures(
+            locObj.latitude,
+            locObj.longitude,
+            pollutant,
+            scenario
+          );
+        }
+      }
+
+      const payload = {
+        location,
+        pollutant,
+        scenario,
+        algorithm: "auto",
+        reference_datetime: refDatetime,
+        is_live: isLiveParam,
+        top_k: topK,
+      };
+      if (clientLive) payload.client_live_features = clientLive;
 
     const data = await window.NapasLokaApi.postInterpretation(payload);
 
