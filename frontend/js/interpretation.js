@@ -150,7 +150,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     hideError();
     setLoading(true);
 
-    const location = selectLoc ? selectLoc.value : "mustikasari";
+    try {
+      const location = selectLoc ? selectLoc.value : "mustikasari";
     const pollutant = selectPol ? selectPol.value : "co";
     const scenario = selectScen ? selectScen.value : "scenario_2";
     const topK = selectTopK ? parseInt(selectTopK.value, 10) || 5 : 5;

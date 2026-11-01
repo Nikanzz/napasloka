@@ -130,9 +130,9 @@ window.NapasLokaApi = {
         const meteoVars = ["temperature_2m", "relative_humidity_2m", "rain", "wind_speed_100m"];
         meteoVars.forEach((mv) => {
           const vals = wJson.hourly?.[mv] || [];
-          feature_values[`${mv}_lag_3h`]: Number(vals[idx_t2] ?? 0);
-          feature_values[`${mv}_lag_2h`]: Number(vals[idx_t1] ?? 0);
-          feature_values[`${mv}_lag_1h`]: Number(vals[idx_t0] ?? 0);
+          feature_values[`${mv}_lag_3h`] = Number(vals[idx_t2] ?? 0);
+          feature_values[`${mv}_lag_2h`] = Number(vals[idx_t1] ?? 0);
+          feature_values[`${mv}_lag_1h`] = Number(vals[idx_t0] ?? 0);
         });
       }
 
