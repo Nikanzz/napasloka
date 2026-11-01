@@ -1,5 +1,3 @@
-"""Consolidate experiment metrics into summary_metrics.csv for research and deployment."""
-
 import json
 import logging
 import sys

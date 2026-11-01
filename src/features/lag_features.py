@@ -1,19 +1,10 @@
-"""Create leakage-safe lag features after preprocessing and integration."""
-
-import pandas as pd
-
 from src.features.scenarios import resolve_scenario
-from src.utils.config import load_yaml_config
-
 
 def create_lag_features(frame, pollutant, scenario, drop_incomplete_rows=True):
     """Create configured lags, grouped by location when that column is present."""
     definition = resolve_scenario(pollutant, scenario)
-    config = load_yaml_config("features.yaml")
-    lags = [int(value) for value in config["lag_hours"]]
-    variables = [definition.pollutant_column]
-    if config["scenarios"][scenario]["include_meteorological_lags"]:
-        variables.extend(config["meteorological_variables"])
+    lags = definition.lag_hours
+    variables = definition.variables
 
     missing = sorted(set(variables).difference(frame.columns))
     if missing:

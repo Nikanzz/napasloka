@@ -15,220 +15,120 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger("clean_data")
 
 
-# ==============================================================================
-# 1. Quality Validation Logic
-# ==============================================================================
-
-class ValidationReport:
-    """Quality and integrity metrics from inspecting a dataset."""
-
-    def __init__(self, duplicate_timestamps, missing_values, invalid_values):
-        self.duplicate_timestamps = duplicate_timestamps
-        self.missing_values = missing_values
-        self.invalid_values = invalid_values
-
-    @property
-    def is_valid(self):
-        return not (
-            self.duplicate_timestamps
-            or any(self.missing_values.values())
-            or any(self.invalid_values.values())
-        )
-
-
-def validate_frame(frame):
-    """Inspect a dataframe for duplicate timestamps, missing values, and physical boundary violations."""
-    duplicate_keys = ["datetime"]
-    if "location" in frame:
-        duplicate_keys.insert(0, "location")
-    duplicate_count = int(frame.duplicated(subset=duplicate_keys).sum())
-    missing = {str(column): int(count) for column, count in frame.isna().sum().items()}
-
-    invalid = {}
-    lower_bounded = [
-        "carbon_monoxide",
-        "carbon_dioxide",
-        "rain",
-        "wind_speed_100m",
+def validate_raw_files_exist(raw_weather_path, raw_co_path, raw_co2_path):
+    required_files = [
+        (raw_weather_path, "Raw weather"),
+        (raw_co_path, "Raw CO"),
+        (raw_co2_path, "Raw CO2"),
     ]
-    for column in lower_bounded:
-        if column in frame:
-            invalid[column] = int((frame[column] < 0).sum())
-
-    if "relative_humidity_2m" in frame:
-        humidity = frame["relative_humidity_2m"]
-        invalid["relative_humidity_2m"] = int(((humidity < 0) | (humidity > 100)).sum())
-
-    if "latitude" in frame:
-        invalid["latitude"] = int(((frame["latitude"] < -90) | (frame["latitude"] > 90)).sum())
-
-    if "longitude" in frame:
-        invalid["longitude"] = int(((frame["longitude"] < -180) | (frame["longitude"] > 180)).sum())
-
-    return ValidationReport(duplicate_count, missing, invalid)
+    for file_path, description in required_files:
+        if not file_path.exists():
+            raise FileNotFoundError(
+                f"{description} file not found: {file_path}. Run 'python -m src.data.fetch_data' first."
+            )
 
 
-# ==============================================================================
-# 2. In-Memory Preprocessing & Chronological Splitting Helpers
-# ==============================================================================
+def load_and_deduplicate_weather(raw_weather_path):
+    weather_lookup = {}
+    duplicate_count = 0
 
-def standardize_datetime(frame, timezone="Asia/Jakarta", datetime_column="datetime"):
-    """Parse timestamps and localize/convert to standard research timezone."""
-    if datetime_column not in frame:
-        raise ValueError(f"Missing datetime column: {datetime_column}")
-    result = frame.copy()
-    parsed = pd.to_datetime(result[datetime_column], errors="raise")
-    if parsed.dt.tz is None:
-        parsed = parsed.dt.tz_localize(timezone, ambiguous="raise", nonexistent="raise")
-    else:
-        parsed = parsed.dt.tz_convert(timezone)
-    result[datetime_column] = parsed
-    return result
+    with raw_weather_path.open("r", encoding="utf-8") as f:
+        reader = csv.reader(f)
+        next(reader)
+        for row in reader:
+            if not row:
+                continue
+            location_id, timestamp = row[0], row[3]
+            key = (location_id, timestamp)
+            if key in weather_lookup:
+                duplicate_count += 1
+            weather_lookup[key] = row[1:]
 
-
-def sort_chronologically(frame, datetime_column="datetime"):
-    """Sort chronologically by location and time without modifying source data in-place."""
-    columns = [datetime_column]
-    if "location" in frame:
-        columns.insert(0, "location")
-    return frame.sort_values(columns, kind="stable").reset_index(drop=True)
+    return weather_lookup
 
 
-def preprocess_frame(frame, timezone="Asia/Jakarta"):
-    """Apply standard datetime localization and chronological ordering."""
-    return sort_chronologically(standardize_datetime(frame, timezone=timezone))
+def integrate_pollutant_data(raw_pollutant_path, weather_lookup, pollutant_column_name, output_path):
+    rows_written = 0
+    seen_keys = set()
+    header = [
+        "location", "latitude", "longitude", "datetime",
+        "temperature_2m", "relative_humidity_2m", "rain", "wind_speed_100m",
+        pollutant_column_name
+    ]
+
+    with raw_pollutant_path.open("r", encoding="utf-8") as f_in, output_path.open("w", newline="", encoding="utf-8") as f_out:
+        reader = csv.reader(f_in)
+        writer = csv.writer(f_out)
+        next(reader)
+        writer.writerow(header)
+
+        for row in reader:
+            if not row:
+                continue
+            location_id, timestamp, pollutant_value = row[0], row[3], row[4]
+            key = (location_id, timestamp)
+            if key in seen_keys:
+                continue
+            seen_keys.add(key)
+
+            if key in weather_lookup:
+                weather_vals = weather_lookup[key]
+                output_row = [
+                    location_id,
+                    weather_vals[0],
+                    weather_vals[1],
+                    timestamp,
+                    weather_vals[3],
+                    weather_vals[4],
+                    weather_vals[5],
+                    weather_vals[6],
+                    pollutant_value,
+                ]
+                writer.writerow(output_row)
+                rows_written += 1
+
+    return rows_written
 
 
-def chronological_train_test_split(frame, test_fraction=0.2):
-    """Split an already chronological frame without shuffling (preserves temporal causality)."""
-    if not 0 < test_fraction < 1:
-        raise ValueError("test_fraction must be between 0 and 1")
-    split_index = int(len(frame) * (1 - test_fraction))
-    if split_index == 0 or split_index == len(frame):
-        raise ValueError("Dataset is too small for the requested split")
-    return frame.iloc[:split_index].copy(), frame.iloc[split_index:].copy()
+def verify_and_impute_missing_values(dataset_path, pollutant_name):
+    frame = pd.read_csv(dataset_path)
+    numeric_columns = frame.select_dtypes(include="number").columns
+    missing_count = int(frame[numeric_columns].isna().sum().sum())
+
+    if missing_count == 0:
+        logger.info(f"Missing value check for {pollutant_name}: Complete (0 missing values), imputation skipped.")
+        return frame
+
+    logger.info(f"Found {missing_count} missing values in {pollutant_name}. Applying causal forward fill...")
+    frame[numeric_columns] = frame[numeric_columns].ffill()
+    frame.to_csv(dataset_path, index=False)
+    return frame
 
 
-# ==============================================================================
-# 3. Main Data Cleaning & Integration Pipeline
-# ==============================================================================
-
-def clean_and_integrate_data(run_validation=True):
-    """Read raw files, perform inner join, validate physical bounds, and save to data/processed/."""
+def clean_and_integrate_data():
     raw_weather_path = DATA_DIR / "raw" / "weather" / "weather_raw.csv"
     raw_co_path = DATA_DIR / "raw" / "air_quality" / "co_raw.csv"
     raw_co2_path = DATA_DIR / "raw" / "air_quality" / "co2_raw.csv"
 
-    for path, desc in [
-        (raw_weather_path, "Raw weather"),
-        (raw_co_path, "Raw CO"),
-        (raw_co2_path, "Raw CO2"),
-    ]:
-        if not path.exists():
-            raise FileNotFoundError(f"{desc} file not found: {path}. Run 'python -m src.data.fetch_data' first.")
+    validate_raw_files_exist(raw_weather_path, raw_co_path, raw_co2_path)
 
     processed_dir = DATA_DIR / "processed"
     processed_dir.mkdir(parents=True, exist_ok=True)
     out_co_path = processed_dir / "jabodetabek_co_dataset.csv"
     out_co2_path = processed_dir / "jabodetabek_co2_dataset.csv"
 
-    logger.info("Memulai pra-pemrosesan, integrasi, dan validasi data...")
-    logger.info(f"Membaca data cuaca mentah dari: {raw_weather_path}")
+    weather_lookup = load_and_deduplicate_weather(raw_weather_path)
 
-    weather_data = {}
-    with raw_weather_path.open("r", encoding="utf-8") as f_w:
-        reader = csv.reader(f_w)
-        next(reader)
+    integrate_pollutant_data(raw_co_path, weather_lookup, "carbon_monoxide", out_co_path)
+    integrate_pollutant_data(raw_co2_path, weather_lookup, "carbon_dioxide", out_co2_path)
 
-        for row in reader:
-            if not row:
-                continue
-            loc, dt = row[0], row[3]
-            weather_data[(loc, dt)] = row[1:]
+    df_co = verify_and_impute_missing_values(out_co_path, "CO")
+    df_co2 = verify_and_impute_missing_values(out_co2_path, "CO2")
 
-    logger.info(f"Total observasi cuaca termuat: {len(weather_data)}")
-
-    # Integrasi CO
-    logger.info(f"Mengintegrasikan data CO mentah dari: {raw_co_path}...")
-    co_rows_written = 0
-    with raw_co_path.open("r", encoding="utf-8") as f_co, out_co_path.open("w", newline="", encoding="utf-8") as f_out:
-        co_reader = csv.reader(f_co)
-        co_writer = csv.writer(f_out)
-        next(co_reader)
-        header_co = [
-            "location", "latitude", "longitude", "datetime",
-            "temperature_2m", "relative_humidity_2m", "rain", "wind_speed_100m",
-            "carbon_monoxide"
-        ]
-        co_writer.writerow(header_co)
-
-        for row in co_reader:
-            if not row:
-                continue
-            loc, dt, co_val = row[0], row[3], row[4]
-            key = (loc, dt)
-            if key in weather_data:
-                w_vals = weather_data[key]
-                out_row = [loc, w_vals[0], w_vals[1], dt, w_vals[3], w_vals[4], w_vals[5], w_vals[6], co_val]
-                co_writer.writerow(out_row)
-                co_rows_written += 1
-
-    logger.info(f"Dataset CO berhasil disimpan di: {out_co_path} ({co_rows_written} baris)")
-
-    # Integrasi CO2
-    logger.info(f"Mengintegrasikan data CO2 mentah dari: {raw_co2_path}...")
-    co2_rows_written = 0
-    with raw_co2_path.open("r", encoding="utf-8") as f_co2, out_co2_path.open("w", newline="", encoding="utf-8") as f_out:
-        co2_reader = csv.reader(f_co2)
-        co2_writer = csv.writer(f_out)
-        next(co2_reader)
-        header_co2 = [
-            "location", "latitude", "longitude", "datetime",
-            "temperature_2m", "relative_humidity_2m", "rain", "wind_speed_100m",
-            "carbon_dioxide"
-        ]
-        co2_writer.writerow(header_co2)
-
-        for row in co2_reader:
-            if not row:
-                continue
-            loc, dt, co2_val = row[0], row[3], row[4]
-            key = (loc, dt)
-            if key in weather_data:
-                w_vals = weather_data[key]
-                out_row = [loc, w_vals[0], w_vals[1], dt, w_vals[3], w_vals[4], w_vals[5], w_vals[6], co2_val]
-                co2_writer.writerow(out_row)
-                co2_rows_written += 1
-
-    logger.info(f"Dataset CO2 berhasil disimpan di: {out_co2_path} ({co2_rows_written} baris)")
-
-    # Validasi Integritas Data
-    df_co = pd.read_csv(out_co_path)
-    df_co2 = pd.read_csv(out_co2_path)
-
-    if run_validation:
-        logger.info("Menjalankan validasi kualitas dan batasan fisik dataset...")
-        val_co = validate_frame(df_co)
-        val_co2 = validate_frame(df_co2)
-
-        total_invalid_co = sum(val_co.invalid_values.values())
-        total_invalid_co2 = sum(val_co2.invalid_values.values())
-
-        logger.info(
-            f"Validasi CO : Duplikat={val_co.duplicate_timestamps}, "
-            f"Missing={sum(val_co.missing_values.values())}, Anomali Fisik={total_invalid_co} (Valid={val_co.is_valid})"
-        )
-        logger.info(
-            f"Validasi CO2: Duplikat={val_co2.duplicate_timestamps}, "
-            f"Missing={sum(val_co2.missing_values.values())}, Anomali Fisik={total_invalid_co2} (Valid={val_co2.is_valid})"
-        )
-
-    logger.info("Pembersihan, integrasi, dan validasi data selesai dengan sukses!")
     return df_co, df_co2
 
 
 def main():
-    """Clean, validate, and integrate raw meteorological and pollutant data into canonical datasets."""
     clean_and_integrate_data()
 
 

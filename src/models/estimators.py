@@ -1,5 +1,3 @@
-"""Estimator factories, timed fitting, tuning, and prediction for XGBoost and LightGBM."""
-
 import time
 import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, TimeSeriesSplit

@@ -1,10 +1,3 @@
-"""Train machine learning models for NapasLoka research and production.
-
-Supports two operational modes:
-1. 'final':      Generates/updates best_models.json and retrains deployment models (60 models).
-2. 'experiment': Trains the complete research matrix (120 experiments).
-"""
-
 import datetime
 import json
 import logging
@@ -28,6 +21,7 @@ from src.models.experiments import (
     _get_dataset,
     build_experiment_matrix,
     execute_single_experiment,
+    run_experiments,
     select_best_models,
 )
 from src.models.interpretation import (
@@ -215,21 +209,7 @@ def retrain_final_models(
 
 def train_experiments(force=False, retry_failed=False):
     """Execute the full 120-experiment research matrix."""
-    runner = ExperimentRunner()
-    specs = build_experiment_matrix()
-    logger.info(f"Starting batch execution of {len(specs)} research experiments...")
-
-    for idx, spec in enumerate(specs, start=1):
-        exp_id = spec.experiment_id
-        if not force and not runner.registry.should_run(spec, retry_failed=retry_failed):
-            logger.info(f"[{idx}/{len(specs)}] SKIPPED (already completed): {exp_id}")
-            continue
-        logger.info(f"[{idx}/{len(specs)}] RUNNING: {exp_id}")
-        record = runner.run(spec, execute_single_experiment, retry_failed=retry_failed, force=force)
-        status = record.get("status", "unknown")
-        logger.info(f"[{idx}/{len(specs)}] FINISHED: {exp_id} -> {status}")
-
-    logger.info("Batch execution finished!")
+    run_experiments(force=force)
 
 
 # ==============================================================================

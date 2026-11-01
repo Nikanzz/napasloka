@@ -1,20 +1,16 @@
-"""Experiment matrix definition, registry state persistence, execution, and best model selection."""
-
 import ast
 import json
 import logging
 from datetime import datetime, timezone
-from pathlib import Path
 
 import joblib
 import pandas as pd
 
-from src.data.clean_data import chronological_train_test_split
 from src.features.lag_features import create_lag_features
 from src.features.scenarios import resolve_scenario
 from src.models.estimators import create_estimator, predict, tune_on_training_set
 from src.models.interpretation import calculate_tree_shap, gain_feature_importance, mean_absolute_shap
-from src.utils.config import ARTIFACTS_DIR, DATA_DIR, EXPERIMENTS_DIR, REGISTRY_DIR, load_yaml_config
+from src.utils.config import ARTIFACTS_DIR, DATA_DIR, EXPERIMENTS_DIR, load_yaml_config
 from src.utils.identifiers import build_experiment_id, slugify_component
 from src.utils.metrics import PerformanceTimer, calculate_regression_metrics
 
@@ -25,49 +21,18 @@ SUPPORTED_SCENARIOS = {"scenario_1", "scenario_2"}
 SUPPORTED_ALGORITHMS = {"xgboost", "lightgbm"}
 
 
-# ==============================================================================
-# 1. Experiment Specification & Matrix Builder
-# ==============================================================================
-
 class ExperimentSpec:
-    """Four dimensions that uniquely select one independent experiment."""
+    """Four research dimensions identifying one model experiment."""
 
     def __init__(self, location, pollutant, scenario, algorithm):
-        if pollutant not in SUPPORTED_POLLUTANTS:
-            raise ValueError(f"Unsupported pollutant: {pollutant}")
-        if scenario not in SUPPORTED_SCENARIOS:
-            raise ValueError(f"Unsupported scenario: {scenario}")
-        if algorithm not in SUPPORTED_ALGORITHMS:
-            raise ValueError(f"Unsupported algorithm: {algorithm}")
-        slugify_component(location)
-
-        self.location = location
-        self.pollutant = pollutant
-        self.scenario = scenario
-        self.algorithm = algorithm
-
-    @property
-    def experiment_id(self):
-        """Return the deterministic identifier used by logs and registry."""
-        return build_experiment_id(
-            self.location,
-            self.pollutant,
-            self.scenario,
-            self.algorithm,
-        )
-
-    @property
-    def artifact_directory(self):
-        """Return the required location/pollutant/scenario/algorithm path."""
-        return EXPERIMENTS_DIR.joinpath(
-            slugify_component(self.location),
-            self.pollutant,
-            self.scenario,
-            self.algorithm,
-        )
+        self.location = slugify_component(location)
+        self.pollutant = pollutant.lower()
+        self.scenario = scenario.lower()
+        self.algorithm = algorithm.lower()
+        self.experiment_id = build_experiment_id(self.location, self.pollutant, self.scenario, self.algorithm)
+        self.artifact_directory = EXPERIMENTS_DIR / self.location / self.pollutant / self.scenario / self.algorithm
 
     def as_dict(self):
-        """Serialize dimensions for metadata and registry records."""
         return {
             "location": self.location,
             "pollutant": self.pollutant,
@@ -80,161 +45,29 @@ class ExperimentSpec:
 
 
 def build_experiment_matrix():
-    """Expand configured locations across all research dimensions (15 loc x 2 pol x 2 scen x 2 algo = 120)."""
+    """Generate 120 experiment combinations (15 locations x 2 pollutants x 2 scenarios x 2 algorithms)."""
     locations = load_yaml_config("locations.yaml").get("locations", [])
     project = load_yaml_config("project.yaml")
     scenarios = load_yaml_config("features.yaml").get("scenarios", {})
+
     specs = []
-    for location in locations:
-        location_id = location.get("id")
-        if not location_id:
-            raise ValueError("Every configured location must have a non-empty id")
-        for pollutant in project.get("pollutants", {}):
-            for scenario in scenarios:
-                for algorithm in project.get("algorithms", []):
-                    specs.append(ExperimentSpec(location_id, pollutant, scenario, algorithm))
+    for loc in locations:
+        loc_id = loc.get("id")
+        if not loc_id:
+            continue
+        for pol in project.get("pollutants", {}):
+            for scen in scenarios:
+                for algo in project.get("algorithms", []):
+                    specs.append(ExperimentSpec(loc_id, pol, scen, algo))
     return specs
 
 
-# ==============================================================================
-# 2. Experiment Registry & State Persistence
-# ==============================================================================
-
-class ExperimentStatus:
-    """Allowed lifecycle states for one experiment."""
-
-    PENDING = "pending"
-    RUNNING = "running"
-    COMPLETED = "completed"
-    FAILED = "failed"
-
-
-class ExperimentRegistry:
-    """Persist experiment progress after every independent model run."""
-
-    def __init__(self, path=None):
-        self.path = path or REGISTRY_DIR / "experiments.json"
-
-    def _read(self):
-        if not self.path.exists():
-            return {"version": 1, "experiments": {}}
-        with self.path.open("r", encoding="utf-8") as stream:
-            data = json.load(stream)
-        if not isinstance(data.get("experiments"), dict):
-            raise ValueError(f"Invalid experiment registry: {self.path}")
-        return data
-
-    def _write(self, data):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with open(self.path, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2, ensure_ascii=False)
-
-    def register(self, spec):
-        """Create a pending record if the experiment is not registered."""
-        data = self._read()
-        records = data["experiments"]
-        record = records.setdefault(
-            spec.experiment_id,
-            {
-                "experiment_id": spec.experiment_id,
-                "status": ExperimentStatus.PENDING,
-                "spec": spec.as_dict(),
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                "updated_at": datetime.now(timezone.utc).isoformat(),
-            },
-        )
-        self._write(data)
-        return record
-
-    def update(self, spec, status, error=None):
-        """Update an experiment record."""
-        data = self._read()
-        records = data["experiments"]
-        record = records.setdefault(
-            spec.experiment_id,
-            {
-                "experiment_id": spec.experiment_id,
-                "spec": spec.as_dict(),
-                "created_at": datetime.now(timezone.utc).isoformat(),
-            },
-        )
-        record["status"] = str(status)
-        record["updated_at"] = datetime.now(timezone.utc).isoformat()
-        if error is not None:
-            record["error"] = error
-        elif "error" in record and status == ExperimentStatus.COMPLETED:
-            record.pop("error", None)
-        self._write(data)
-        return record
-
-    def get(self, experiment_id):
-        """Return the current experiment record."""
-        return self._read()["experiments"].get(experiment_id)
-
-    def should_run(self, spec, retry_failed=False):
-        """Determine whether an experiment needs to be executed."""
-        record = self.get(spec.experiment_id)
-        if not record:
-            return True
-        status = record.get("status")
-        if status == ExperimentStatus.COMPLETED:
-            return False
-        if status == ExperimentStatus.FAILED:
-            return retry_failed
-        return True
-
-
-# ==============================================================================
-# 3. Experiment Runner & Executor
-# ==============================================================================
-
-class ExperimentRunner:
-    """Run independent specs while persisting status after every model."""
-
-    def __init__(self, registry=None):
-        self.registry = registry or ExperimentRegistry()
-
-    def run(self, spec, executor, retry_failed=False, force=False):
-        """Execute one experiment, or return its existing record when skipped."""
-        self.registry.register(spec)
-        if not force and not self.registry.should_run(spec, retry_failed=retry_failed):
-            return self.registry.get(spec.experiment_id) or {}
-
-        artifact_directory = spec.artifact_directory
-        artifact_directory.mkdir(parents=True, exist_ok=True)
-        self.registry.update(spec, ExperimentStatus.RUNNING)
-        try:
-            metadata = executor(spec, artifact_directory)
-            _write_metadata(spec, artifact_directory, metadata)
-        except Exception as exc:
-            self.registry.update(spec, ExperimentStatus.FAILED, error=str(exc))
-            raise
-        return self.registry.update(spec, ExperimentStatus.COMPLETED)
-
-    def run_many(self, specs, executor, retry_failed=False):
-        """Run specs sequentially so every completion is independently durable."""
-        return [self.run(spec, executor, retry_failed=retry_failed) for spec in specs]
-
-
-def _write_metadata(spec, directory, metadata):
-    path = directory / "metadata.json"
-    payload = {
-        "spec": spec.as_dict(),
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "details": metadata,
-    }
-    with open(path, "w", encoding="utf-8") as stream:
-        json.dump(payload, stream, indent=2, ensure_ascii=False)
-
-
 def _get_coordinate_id(location_id):
-    """Map location id from config to coordinate string in dataset if needed."""
+    """Map location id to latitude_longitude string when matching raw observation rows."""
     locations = load_yaml_config("locations.yaml").get("locations", [])
     for loc in locations:
         if loc.get("id") == location_id:
-            lat = loc["latitude"]
-            lon = loc["longitude"]
-            return f"{lat}_{lon}"
+            return f"{loc['latitude']}_{loc['longitude']}"
     return location_id
 
 
@@ -242,7 +75,7 @@ _DATASET_CACHE = {}
 
 
 def _get_dataset(pollutant_file):
-    """Cache loaded dataset in memory to avoid reading CSV 120 times."""
+    """Load and cache processed datasets in memory to prevent repeated disk reads."""
     if pollutant_file not in _DATASET_CACHE:
         data_path = DATA_DIR / "processed" / pollutant_file
         if not data_path.exists():
@@ -253,15 +86,28 @@ def _get_dataset(pollutant_file):
     return _DATASET_CACHE[pollutant_file]
 
 
-def execute_single_experiment(spec, artifact_dir):
-    """Execute one complete research experiment and persist all artifacts."""
+def chronological_train_test_split(frame, test_fraction=0.2):
+    """Split dataset chronologically without shuffling to preserve temporal causality."""
+    if not 0 < test_fraction < 1:
+        raise ValueError("test_fraction must be between 0 and 1")
+    split_index = int(len(frame) * (1 - test_fraction))
+    if split_index == 0 or split_index == len(frame):
+        raise ValueError("Dataset is too small for the requested split")
+    return frame.iloc[:split_index].copy(), frame.iloc[split_index:].copy()
+
+
+def execute_single_experiment(spec, artifact_dir=None):
+    """Train, tune, evaluate, and persist all artifacts for a single experiment."""
+    if artifact_dir is None:
+        artifact_dir = spec.artifact_directory
+
     pollutant_file = "jabodetabek_co_dataset.csv" if spec.pollutant == "co" else "jabodetabek_co2_dataset.csv"
     df = _get_dataset(pollutant_file)
 
     coord_id = _get_coordinate_id(spec.location)
     df_loc = df[(df["location"] == coord_id) | (df["location"] == spec.location)].copy()
     if df_loc.empty:
-        raise ValueError(f"No data found for location {spec.location} (coordinate: {coord_id})")
+        raise ValueError(f"No observation data found for location: {spec.location}")
 
     df_loc = df_loc.sort_values("datetime").reset_index(drop=True)
 
@@ -284,18 +130,19 @@ def execute_single_experiment(spec, artifact_dir):
 
     base_estimator = create_estimator(spec.algorithm, parameters={"random_state": 42})
 
-    with PerformanceTimer() as train_timer:
+    with PerformanceTimer() as timer:
         search = tune_on_training_set(base_estimator, spec.algorithm, x_train, y_train)
 
-    training_time_seconds = train_timer.elapsed_seconds or 0.0
     best_model = search.best_estimator_
     best_params = search.best_params_
+    training_time = timer.elapsed_seconds or 0.0
 
     pred_result = predict(best_model, x_test)
     metrics = calculate_regression_metrics(y_test, pred_result.values)
-    metrics["training_time_seconds"] = training_time_seconds
+    metrics["training_time_seconds"] = training_time
     metrics["prediction_time_seconds"] = pred_result.prediction_time_seconds
 
+    # Calculate model interpretability via TreeSHAP and gain importance.
     shap_values = calculate_tree_shap(best_model, x_test)
     df_shap_global = mean_absolute_shap(shap_values, feature_cols)
     df_gain = gain_feature_importance(best_model, feature_cols, normalize=True)
@@ -319,18 +166,54 @@ def execute_single_experiment(spec, artifact_dir):
     df_shap_global.to_csv(artifact_dir / "shap_global.csv", index=False)
     df_gain.to_csv(artifact_dir / "feature_importance.csv", index=False)
 
-    return {
+    metadata = {
+        "spec": spec.as_dict(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
         "metrics": metrics,
         "best_params": best_params,
         "features": feature_cols,
         "n_train_samples": len(train_df),
         "n_test_samples": len(test_df),
     }
+    with open(artifact_dir / "metadata.json", "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+    with open(artifact_dir / "experiment_metadata.json", "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2, ensure_ascii=False)
+
+    return metadata
 
 
-# ==============================================================================
-# 4. Best Model Registry Selection
-# ==============================================================================
+def run_experiments(specs=None, force=False):
+    """Execute all research experiments sequentially, skipping previously completed runs."""
+    if specs is None:
+        specs = build_experiment_matrix()
+
+    logger.info(f"Starting execution of {len(specs)} research experiments...")
+    for idx, spec in enumerate(specs, start=1):
+        metrics_file = spec.artifact_directory / "metrics.json"
+        if not force and metrics_file.exists():
+            logger.info(f"[{idx}/{len(specs)}] SKIPPED (already completed): {spec.experiment_id}")
+            continue
+
+        logger.info(f"[{idx}/{len(specs)}] RUNNING: {spec.experiment_id}")
+        execute_single_experiment(spec)
+        logger.info(f"[{idx}/{len(specs)}] FINISHED: {spec.experiment_id}")
+
+    logger.info("Batch execution finished!")
+
+
+class ExperimentRunner:
+    """Compatibility runner preserved for external caller interfaces."""
+
+    def __init__(self, registry=None):
+        pass
+
+    def run(self, spec, executor=None, force=False, **kwargs):
+        return execute_single_experiment(spec)
+
+    def run_many(self, specs, executor=None, force=False, **kwargs):
+        return run_experiments(specs, force=force)
+
 
 def select_best_models(
     summary_csv_path=None,
@@ -338,7 +221,7 @@ def select_best_models(
     primary_metric="mae",
     secondary_metric="rmse",
 ):
-    """Determine the winning algorithm for each (location, pollutant, scenario) combination."""
+    """Select the winning algorithm (lowest MAE then RMSE) for each location, pollutant, and scenario."""
     if summary_csv_path is None:
         summary_csv_path = ARTIFACTS_DIR / "summary_metrics.csv"
     if registry_output_path is None:
@@ -353,6 +236,7 @@ def select_best_models(
     df["scenario_lower"] = df["scenario"].str.lower()
     df["algorithm_lower"] = df["algorithm"].str.lower()
 
+    # Sort so that the lowest primary metric and secondary metric comes first.
     df_sorted = df.sort_values(
         by=["location_slug", "pollutant_lower", "scenario_lower", primary_metric, secondary_metric],
         ascending=[True, True, True, True, True],

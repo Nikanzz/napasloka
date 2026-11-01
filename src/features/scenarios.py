@@ -1,21 +1,13 @@
-"""Resolve feature names from the single schema in configs/features.yaml."""
-
 from src.utils.config import load_yaml_config
-
-POLLUTANT_COLUMNS = {
-    "co": "carbon_monoxide",
-    "co2": "carbon_dioxide",
-    "carbon_monoxide": "carbon_monoxide",
-    "carbon_dioxide": "carbon_dioxide",
-}
-
 
 class ScenarioDefinition:
     """Resolved feature contract for one scenario and pollutant."""
 
-    def __init__(self, name, pollutant_column, feature_names, forecast_horizon_hours):
+    def __init__(self, name, pollutant_column, variables, lag_hours, feature_names, forecast_horizon_hours):
         self.name = name
         self.pollutant_column = pollutant_column
+        self.variables = tuple(variables)
+        self.lag_hours = tuple(lag_hours)
         self.feature_names = tuple(feature_names)
         self.forecast_horizon_hours = forecast_horizon_hours
 
@@ -29,10 +21,13 @@ def _lag_name(variable, hours):
 
 def resolve_scenario(pollutant, scenario):
     """Resolve a concrete scenario without duplicating feature definitions."""
-    try:
-        pollutant_column = POLLUTANT_COLUMNS[pollutant.lower()]
-    except KeyError as exc:
-        raise ValueError(f"Unsupported pollutant: {pollutant}") from exc
+    p = pollutant.lower()
+    if p in ("co", "carbon_monoxide"):
+        pollutant_column = "carbon_monoxide"
+    elif p in ("co2", "carbon_dioxide"):
+        pollutant_column = "carbon_dioxide"
+    else:
+        raise ValueError(f"Unsupported pollutant: {pollutant}")
 
     config = load_yaml_config("features.yaml")
     scenarios = config.get("scenarios", {})
@@ -42,6 +37,7 @@ def resolve_scenario(pollutant, scenario):
     scenario_config = scenarios[scenario]
     lag_hours = tuple(int(value) for value in config["lag_hours"])
     variables = []
+
     if scenario_config.get("include_pollutant_lags"):
         variables.append(pollutant_column)
     if scenario_config.get("include_meteorological_lags"):
@@ -53,6 +49,8 @@ def resolve_scenario(pollutant, scenario):
     return ScenarioDefinition(
         name=scenario,
         pollutant_column=pollutant_column,
+        variables=variables,
+        lag_hours=lag_hours,
         feature_names=feature_names,
         forecast_horizon_hours=int(config["forecast_horizon_hours"]),
     )
