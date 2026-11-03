@@ -27,8 +27,8 @@ from src.models.experiments import (
     SUPPORTED_POLLUTANTS,
     SUPPORTED_SCENARIOS,
     build_experiment_matrix,
-    select_best_models,
 )
+from src.models.train_model import select_best_models
 from src.utils.identifiers import build_experiment_id, slugify_component
 
 logger = logging.getLogger(__name__)
@@ -223,20 +223,20 @@ class RegistryService:
 
         for spec in matrix:
             status = self.get_artifact_status(
-                spec.location,
-                spec.pollutant,
-                spec.scenario,
-                spec.algorithm,
+                spec["location"],
+                spec["pollutant"],
+                spec["scenario"],
+                spec["algorithm"],
             )
             if status.is_ready:
                 ready_count += 1
 
             models_list.append({
-                "experiment_id": spec.experiment_id,
-                "location": spec.location,
-                "pollutant": spec.pollutant,
-                "scenario": spec.scenario,
-                "algorithm": spec.algorithm,
+                "experiment_id": spec["experiment_id"],
+                "location": spec["location"],
+                "pollutant": spec["pollutant"],
+                "scenario": spec["scenario"],
+                "algorithm": spec["algorithm"],
                 "is_ready": status.is_ready,
                 "artifacts": status.model_dump(),
             })
@@ -257,7 +257,7 @@ class RegistryService:
             return self._best_models_cache
 
         if not self.best_models_file.is_file():
-            from src.models.experiments import select_best_models
+            from src.models.train_model import select_best_models
             registry_data = select_best_models(
                 registry_output_path=self.best_models_file,
                 primary_metric="mae",

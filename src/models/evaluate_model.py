@@ -27,7 +27,7 @@ def generate_summary_report(output_csv=None):
     records = []
 
     for spec in specs:
-        artifact_dir = spec.artifact_directory
+        artifact_dir = spec["artifact_dir"]
         metrics_path = artifact_dir / "metrics.json"
         params_path = artifact_dir / "best_params.json"
 
@@ -43,10 +43,10 @@ def generate_summary_report(output_csv=None):
                 best_params = json.load(f)
 
         records.append({
-            "location": spec.location,
-            "pollutant": spec.pollutant.upper(),
-            "scenario": spec.scenario,
-            "algorithm": spec.algorithm,
+            "location": spec["location"],
+            "pollutant": spec["pollutant"].upper(),
+            "scenario": spec["scenario"],
+            "algorithm": spec["algorithm"],
             "mae": metrics.get("mae"),
             "rmse": metrics.get("rmse"),
             "mape": metrics.get("mape"),
