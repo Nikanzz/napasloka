@@ -329,9 +329,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const badge = document.getElementById("res-assessment-badge");
     if (badge) {
-      badge.textContent = res.assessment.category;
-      badge.style.backgroundColor = res.assessment.color || "#10b981";
-      badge.style.color = "#ffffff";
+      if (res.assessment?.category) {
+        badge.textContent = res.assessment.category;
+        badge.style.backgroundColor = res.assessment.color || "#10b981";
+        badge.style.color = "#ffffff";
+        badge.style.display = "inline-block";
+      } else {
+        badge.textContent = "";
+        badge.style.display = "none";
+      }
     }
 
     const resHorizonBadge = document.getElementById("res-horizon-badge");
@@ -374,8 +380,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (icon) icon.innerHTML = res.trend === "naik" ? "&#9650;" : res.trend === "turun" ? "&#9660;" : "&#9679;";
     }
 
-    setElText("res-standard-ref", res.assessment.standard || "Baku Mutu ISPU");
-    setElText("res-assessment-desc", res.assessment.description);
+    if (res.assessment) {
+      setElText("res-standard-ref", res.assessment.standard || "");
+      setElText("res-assessment-desc", res.assessment.description || "");
+    } else {
+      setElText("res-standard-ref", "-");
+      setElText("res-assessment-desc", "");
+    }
 
     const meterFill = document.getElementById("res-meter-fill");
     const meterLabels = document.getElementById("res-meter-labels");
@@ -383,13 +394,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       let fillPct = 50;
       if (res.pollutant === "co") {
         fillPct = Math.min(100, Math.max(5, (res.predicted_value / 15000) * 100));
-        if (meterLabels) meterLabels.innerHTML = "<span>Baik (&le; 4.000)</span><span>Sedang (8.000)</span><span>Tidak Sehat (15.000+)</span>";
+        if (meterLabels) meterLabels.innerHTML = "<span>Rendah</span><span>Sedang</span><span>Tinggi</span>";
       } else {
         fillPct = Math.min(100, Math.max(5, ((res.predicted_value - 380) / (700 - 380)) * 100));
-        if (meterLabels) meterLabels.innerHTML = "<span>Normal (&le; 450)</span><span>Terakumulasi (600)</span><span>Tinggi (650+ ppm)</span>";
+        if (meterLabels) meterLabels.innerHTML = "<span>Rendah</span><span>Sedang</span><span>Tinggi</span>";
       }
       meterFill.style.width = `${fillPct.toFixed(1)}%`;
-      meterFill.style.backgroundColor = res.assessment.color || "#10b981";
+      meterFill.style.backgroundColor = res.assessment?.color || "#2563eb";
     }
 
     setElText("res-active-algo-name", `${res.algorithm_label} (${res.model_status})`);

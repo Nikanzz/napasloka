@@ -32,8 +32,6 @@ def test_post_prediction_endpoint_success():
     assert data["predicted_value"] > 0
     assert "target_time" in data
     assert "latest_observation_value" in data
-    assert "assessment" in data
-    assert data["assessment"]["category"] in ("Baik", "Sedang", "Tidak Sehat", "Sangat Tidak Sehat", "Berbahaya")
     assert "feature_inputs" in data
     assert len(data["feature_inputs"]) == 3
     assert data["counterpart_algorithm"] == "lightgbm"

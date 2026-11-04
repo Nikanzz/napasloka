@@ -6,13 +6,6 @@ ScenarioType = Literal["scenario_1", "scenario_2"]
 AlgorithmType = Literal["xgboost", "lightgbm"]
 
 
-class ExperimentIdentifier(BaseModel):
-    location: str
-    pollutant: PollutantType
-    scenario: ScenarioType
-    algorithm: AlgorithmType
-
-
 class ModelArtifactStatus(BaseModel):
     model_joblib: bool
     metrics_json: bool
@@ -57,14 +50,3 @@ class ModelDetailResponse(BaseModel):
     metrics: ModelMetrics
     counterpart: CounterpartModelInfo | None = None
     artifact_status: ModelArtifactStatus
-
-
-class RegistrySummary(BaseModel):
-    total_experiments: int
-    completed_experiments: int
-    ready_ratio: float
-    locations_count: int
-    pollutants: list[str]
-    scenarios: list[str]
-    algorithms: list[str]
-    models: list[dict[str, Any]]

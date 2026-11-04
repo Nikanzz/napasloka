@@ -23,13 +23,6 @@ class PredictionRequest(BaseModel):
     client_live_features: ClientLiveFeatures | None = None
 
 
-class AirQualityAssessment(BaseModel):
-    category: str
-    color: str
-    description: str
-    standard: str
-
-
 class FeatureInputItem(BaseModel):
     name: str
     label: str
@@ -63,7 +56,6 @@ class NextHourPredictionResponse(BaseModel):
     delta_percentage: float
     trend: str
 
-    assessment: AirQualityAssessment
     feature_inputs: list[FeatureInputItem]
 
     counterpart_algorithm: str

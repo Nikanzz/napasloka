@@ -11,7 +11,6 @@ from backend.app.core.config import (
 from backend.app.schemas.evaluation import (
     ComparisonMetrics,
     EvaluationChartSeries,
-    EvaluationRequest,
     EvaluationResponse,
     EvaluationTimeRange,
 )
@@ -170,7 +169,7 @@ class EvaluationService:
 
                 comparison = ComparisonMetrics(
                     primary_algorithm=request.algorithm,
-                    primary_label=algorithm_info.get("label", request.algorithm.upper()),
+                    primary_label=str(algorithm_info.get("label", request.algorithm.upper())),
                     primary_metrics=primary_metrics,
                     counterpart_algorithm=counterpart_algo,
                     counterpart_label=counterpart_info.get("label", counterpart_algo.upper()),

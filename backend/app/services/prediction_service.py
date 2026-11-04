@@ -9,10 +9,8 @@ from backend.app.core.config import (
     settings,
 )
 from backend.app.schemas.prediction import (
-    AirQualityAssessment,
     FeatureInputItem,
     NextHourPredictionResponse,
-    PredictionRequest,
 )
 from backend.app.services.data_service import data_service
 from backend.app.services.live_data_service import live_data_service
@@ -65,67 +63,6 @@ def get_feature_display_info(feature_name, pollutant_unit):
         "wind_speed_100m_lag_3h": ("Kecepatan Angin (t-3)", "m/s"),
     }
     return labels_map.get(feature_name, (feature_name, pollutant_unit))
-
-
-def assess_air_quality(pollutant, value):
-    if pollutant.lower() == "co":
-        if value <= 4000:
-            return AirQualityAssessment(
-                category="Baik",
-                color="#10b981",
-                description="Tingkat mutu udara sangat baik, tidak memberikan dampak negatif terhadap manusia, hewan, dan tumbuhan.",
-                standard="Baku Mutu ISPU / WHO 24-jam (4.000 µg/m³)",
-            )
-        elif value <= 8000:
-            return AirQualityAssessment(
-                category="Sedang",
-                color="#f59e0b",
-                description="Konsentrasi dapat diterima masyarakat umum, namun kelompok sensitif disarankan membatasi aktivitas fisik di luar ruangan.",
-                standard="Baku Mutu ISPU Permen LHK",
-            )
-        elif value <= 15000:
-            return AirQualityAssessment(
-                category="Tidak Sehat",
-                color="#ef4444",
-                description="Tingkat kualitas udara mulai merugikan kesehatan pada populasi rentan (penderita penyakit kardiovaskular/pernapasan).",
-                standard="Baku Mutu ISPU Permen LHK",
-            )
-        elif value <= 30000:
-            return AirQualityAssessment(
-                category="Sangat Tidak Sehat",
-                color="#8b5cf6",
-                description="Kualitas udara membahayakan kesehatan pada sejumlah segmen populasi. Hindari aktivitas luar ruangan yang berkepanjangan.",
-                standard="Baku Mutu ISPU Permen LHK",
-            )
-        else:
-            return AirQualityAssessment(
-                category="Berbahaya",
-                color="#b91c1c",
-                description="Tingkat kualitas udara berbahaya secara umum bagi seluruh populasi dan berpotensi memicu masalah kesehatan serius.",
-                standard="Baku Mutu ISPU Permen LHK",
-            )
-    else:
-        if value <= 450:
-            return AirQualityAssessment(
-                category="Normal Ambien",
-                color="#10b981",
-                description="Konsentrasi Karbon Dioksida berada pada tingkat normal ambien troposfer bumi (~415 - 430 ppm).",
-                standard="Baseline Global Troposfer Ambien",
-            )
-        elif value <= 600:
-            return AirQualityAssessment(
-                category="Terakumulasi Sedang",
-                color="#f59e0b",
-                description="Tingkat konsentrasi CO₂ sedikit terakumulasi akibat kepadatan aktivitas lalu lintas atau emisi lokal.",
-                standard="Indikator Emisi Urban",
-            )
-        else:
-            return AirQualityAssessment(
-                category="Tinggi",
-                color="#ef4444",
-                description="Akumulasi gas CO₂ tinggi di lapisan permukaan akibat emisi kendaraan dan pembakaran bahan bakar padat.",
-                standard="Indikator Emisi Urban",
-            )
 
 
 class PredictionService:
@@ -248,8 +185,6 @@ class PredictionService:
         else:
             trend = "stabil"
 
-        assessment = assess_air_quality(request.pollutant, pred_value)
-
         feature_inputs = []
         for col_name, val in meta["feature_values"].items():
             label, unit = get_feature_display_info(col_name, pollutant_info["unit"])
@@ -313,7 +248,6 @@ class PredictionService:
             delta_value=delta_val,
             delta_percentage=delta_pct,
             trend=trend,
-            assessment=assessment,
             feature_inputs=feature_inputs,
             counterpart_algorithm=counterpart_algo,
             counterpart_label=counterpart_meta.get("label", counterpart_algo.upper()),

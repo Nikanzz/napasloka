@@ -1,7 +1,5 @@
 import json
 import logging
-from pathlib import Path
-
 import joblib
 import pandas as pd
 
@@ -14,13 +12,10 @@ from backend.app.core.config import (
     settings,
 )
 from backend.app.schemas.registry import (
-    AlgorithmType,
     CounterpartModelInfo,
     ModelArtifactStatus,
     ModelDetailResponse,
     ModelMetrics,
-    PollutantType,
-    ScenarioType,
 )
 from src.models.experiments import (
     SUPPORTED_ALGORITHMS,
@@ -252,6 +247,7 @@ class RegistryService:
             "models": models_list,
         }
 
+    # Best Models Section
     def load_best_models_registry(self, force_reload=False):
         if self._best_models_cache is not None and not force_reload:
             return self._best_models_cache

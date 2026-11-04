@@ -1,48 +1,8 @@
-"""Unit tests for next-hour prediction service and air quality assessment."""
+"""Unit tests for next-hour prediction service."""
 
 import pytest
 from backend.app.schemas.prediction import PredictionRequest
-from backend.app.services.prediction_service import assess_air_quality, prediction_service
-
-
-def test_assess_air_quality_co():
-    """Verify ISPU air quality assessment categories for Carbon Monoxide."""
-    # Baik (<= 4000)
-    a1 = assess_air_quality("co", 1500.0)
-    assert a1.category == "Baik"
-    assert a1.color == "#10b981"
-
-    # Sedang (4001 - 8000)
-    a2 = assess_air_quality("co", 6000.0)
-    assert a2.category == "Sedang"
-    assert a2.color == "#f59e0b"
-
-    # Tidak Sehat (8001 - 15000)
-    a3 = assess_air_quality("co", 10000.0)
-    assert a3.category == "Tidak Sehat"
-
-    # Sangat Tidak Sehat (15001 - 30000)
-    a4 = assess_air_quality("co", 20000.0)
-    assert a4.category == "Sangat Tidak Sehat"
-
-    # Berbahaya (> 30000)
-    a5 = assess_air_quality("co", 35000.0)
-    assert a5.category == "Berbahaya"
-
-
-def test_assess_air_quality_co2():
-    """Verify ambient tropospheric assessment for Carbon Dioxide."""
-    # Normal (< 450 ppm)
-    a1 = assess_air_quality("co2", 420.0)
-    assert a1.category == "Normal Ambien"
-
-    # Terakumulasi sedang (450 - 600 ppm)
-    a2 = assess_air_quality("co2", 520.0)
-    assert a2.category == "Terakumulasi Sedang"
-
-    # Tinggi (> 600 ppm)
-    a3 = assess_air_quality("co2", 650.0)
-    assert a3.category == "Tinggi"
+from backend.app.services.prediction_service import prediction_service
 
 
 def test_predict_next_hour_co_scenario_1():
@@ -68,7 +28,6 @@ def test_predict_next_hour_co_scenario_1():
     # Reference comparison
     assert res.latest_observation_value > 0
     assert res.trend in ("naik", "turun", "stabil")
-    assert res.assessment.category in ("Baik", "Sedang", "Tidak Sehat", "Sangat Tidak Sehat", "Berbahaya")
 
     # Feature inputs (Scenario 1 has 3 features)
     assert len(res.feature_inputs) == 3
