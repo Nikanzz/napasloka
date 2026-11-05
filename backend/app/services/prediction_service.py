@@ -42,6 +42,7 @@ def format_indo_timestamp(ts):
 
 
 def get_feature_display_info(feature_name, pollutant_unit):
+    """Return human-readable label and measurement unit for a feature name."""
     labels_map = {
         "carbon_monoxide_lag_1h": ("CO (t-1: 1 Jam Lalu)", pollutant_unit),
         "carbon_monoxide_lag_2h": ("CO (t-2: 2 Jam Lalu)", pollutant_unit),
@@ -67,12 +68,14 @@ def get_feature_display_info(feature_name, pollutant_unit):
 
 class PredictionService:
     def __init__(self):
+        """Initialize prediction service with registry, historical, and live data services."""
         self.registry = registry_service
         self.data_service = data_service
         self.live_service = live_data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def predict_next_hour(self, request):
+        """Execute next-hour prediction using the best or specified model."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())

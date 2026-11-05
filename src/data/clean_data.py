@@ -14,7 +14,7 @@ from src.utils.config import DATA_DIR
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("clean_data")
 
-
+# Validate that all required raw data files exist
 def validate_raw_files_exist(raw_weather_path, raw_co_path, raw_co2_path):
     required_files = [
         (raw_weather_path, "Raw weather"),
@@ -26,7 +26,6 @@ def validate_raw_files_exist(raw_weather_path, raw_co_path, raw_co2_path):
             raise FileNotFoundError(
                 f"{description} file not found: {file_path}. Run 'python -m src.data.fetch_data' first."
             )
-
 
 def load_and_deduplicate_weather(raw_weather_path):
     weather_lookup = {}

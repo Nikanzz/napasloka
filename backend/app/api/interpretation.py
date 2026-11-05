@@ -11,6 +11,7 @@ router = APIRouter(prefix="/interpretation", tags=["interpretation"])
 
 @router.post("", response_model=InterpretationResponse)
 def interpret_model_prediction(request: InterpretationRequest):
+    """Calculate TreeSHAP local feature contributions for a specific prediction request."""
     try:
         return interpretation_service.interpret_prediction(request)
     except ValueError as e:

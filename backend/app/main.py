@@ -9,6 +9,7 @@ from backend.app.core.config import settings
 
 
 def create_app():
+    """Create and configure the FastAPI application instance."""
     application = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
@@ -36,6 +37,7 @@ def create_app():
 
     @application.middleware("http")
     async def add_cache_control_headers(request, call_next):
+        """Add cache control headers to prevent caching of service worker and HTML files."""
         response = await call_next(request)
         path = request.url.path
         if path == "/service-worker.js":
@@ -54,6 +56,7 @@ def create_app():
         @application.get("/app", include_in_schema=False)
         @application.get("/index.html", include_in_schema=False)
         def serve_app():
+            """Serve the main frontend application index page."""
             return FileResponse(
                 frontend_dir / "index.html",
                 headers={"Cache-Control": "no-cache, must-revalidate"}
@@ -61,6 +64,7 @@ def create_app():
 
         @application.get("/manifest.json", include_in_schema=False)
         def serve_manifest():
+            """Serve the PWA web app manifest file."""
             return FileResponse(
                 frontend_dir / "manifest.json",
                 headers={"Cache-Control": "no-cache, must-revalidate"}
@@ -68,6 +72,7 @@ def create_app():
 
         @application.get("/service-worker.js", include_in_schema=False)
         def serve_sw():
+            """Serve the PWA service worker script with no-cache headers."""
             return FileResponse(
                 frontend_dir / "service-worker.js",
                 headers={"Cache-Control": "no-cache, no-store, must-revalidate"}
@@ -75,6 +80,7 @@ def create_app():
 
     @application.get("/", tags=["root"])
     def root(request: Request):
+        """Return API status metadata or serve the index page for browser requests."""
         accept = request.headers.get("accept", "")
         if "text/html" in accept and frontend_dir.is_dir():
             return FileResponse(

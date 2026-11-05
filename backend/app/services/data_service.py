@@ -10,10 +10,12 @@ logger = logging.getLogger(__name__)
 
 class DataService:
     def __init__(self):
+        """Initialize data service with empty cache and location mappings."""
         self._cache = {}
         self.locations_map = {loc["id"]: loc for loc in settings.get_locations()}
 
     def get_coordinate_id(self, location_id):
+        """Format coordinate string identifier for a given location slug."""
         loc_slug = slugify_component(location_id)
         if loc_slug in self.locations_map:
             loc = self.locations_map[loc_slug]
@@ -23,6 +25,7 @@ class DataService:
         return location_id
 
     def load_dataset(self, pollutant):
+        """Load and cache processed historical air quality dataset for a pollutant."""
         file_name = "jabodetabek_co_dataset.csv" if pollutant.lower() == "co" else "jabodetabek_co2_dataset.csv"
         if file_name not in self._cache:
             data_path = settings.processed_data_dir / file_name
@@ -36,6 +39,7 @@ class DataService:
         return self._cache[file_name]
 
     def get_location_observations(self, location_id, pollutant):
+        """Filter historical observations for a specific station location."""
         df = self.load_dataset(pollutant)
         coord_id = self.get_coordinate_id(location_id)
         mask = (df["location"] == coord_id) | (df["location"] == location_id)
@@ -47,6 +51,7 @@ class DataService:
         return loc_df
 
     def build_next_hour_features(self, location_id, pollutant, scenario, reference_datetime=None):
+        """Construct lag input features from historical observations for next-hour prediction."""
         loc_df = self.get_location_observations(location_id, pollutant)
         ref_tz = loc_df["datetime"].dt.tz
 

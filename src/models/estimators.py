@@ -38,29 +38,7 @@ def create_estimator(algorithm, parameters=None):
         raise ValueError(f"Unsupported algorithm: {algorithm}") from exc
 
 
-# ==============================================================================
-# Timed Fitting and Prediction
-# ==============================================================================
-
-class TrainingResult:
-    """Fitted estimator and measured training duration in seconds."""
-
-    def __init__(self, model, training_time_seconds):
-        self.model = model
-        self.training_time_seconds = training_time_seconds
-
-    def __getitem__(self, item):
-        return getattr(self, item)
-
-
-def train_model(model, x_train, y_train):
-    """Fit an estimator and measure elapsed training time."""
-    start = time.time()
-    model.fit(x_train, y_train)
-    elapsed = time.time() - start
-    return TrainingResult(model, elapsed)
-
-
+# Timed Prediction Wrapper
 class PredictionResult:
     """Predictions array and measured inference duration in seconds."""
 

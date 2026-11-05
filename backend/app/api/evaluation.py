@@ -13,6 +13,7 @@ router = APIRouter(prefix="/evaluation", tags=["evaluation"])
 
 @router.post("", response_model=EvaluationResponse)
 def evaluate_model(request: EvaluationRequest):
+    """Evaluate regression performance and compare models over a specified test date range."""
     try:
         return evaluation_service.evaluate_test_range(request)
     except ValueError as e:
@@ -40,6 +41,7 @@ def get_evaluation_time_range(
     scenario="scenario_1",
     algorithm="xgboost",
 ):
+    """Return available test observation time range for a specific model configuration."""
     try:
         df = registry_service.load_test_predictions(location, pollutant, scenario, algorithm)
         return {

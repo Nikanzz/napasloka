@@ -59,3 +59,4 @@ def resolve_scenario(pollutant, scenario):
 def get_feature_names(pollutant, scenario):
     """Return ordered concrete feature names for an experiment."""
     return list(resolve_scenario(pollutant, scenario).feature_names)
+

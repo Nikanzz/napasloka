@@ -11,6 +11,7 @@ router = APIRouter(prefix="/predict", tags=["prediction"])
 
 @router.post("", response_model=NextHourPredictionResponse)
 def request_prediction(request: PredictionRequest):
+    """Generate next-hour pollutant concentration prediction and air quality assessment."""
     try:
         return prediction_service.predict_next_hour(request)
     except ValueError as e:

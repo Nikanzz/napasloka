@@ -19,10 +19,12 @@ _LIVE_CACHE = {}
 
 
 def _get_current_wib_hour():
+    """Return current Western Indonesia Time hour formatted as a cache key."""
     return datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d-%H")
 
 
 def fetch_open_meteo_live(lat, lon):
+    """Fetch and merge real-time weather and air quality observations from Open-Meteo API."""
     hour_key = (round(lat, 4), round(lon, 4), _get_current_wib_hour())
     if hour_key in _LIVE_CACHE:
         return _LIVE_CACHE[hour_key]
@@ -68,9 +70,11 @@ def fetch_open_meteo_live(lat, lon):
 
 class LiveDataService:
     def __init__(self):
+        """Initialize live data service with location coordinates mapping."""
         self.locations_map = {loc["id"]: loc for loc in settings.get_locations()}
 
     def build_live_features(self, location_id, pollutant, scenario):
+        """Extract latest observations and construct real-time lag features for inference."""
         loc_slug = slugify_component(location_id)
         if loc_slug not in self.locations_map:
             raise ValueError(f"Unknown location '{location_id}'.")

@@ -94,6 +94,7 @@ ALGORITHM_METADATA = {
 
 class Settings:
     def __init__(self):
+        """Initialize global configuration paths, metadata, and CORS settings."""
         self.app_name = "Sistem NapasLoka"
         self.app_version = "1.0.0"
         self.api_v1_prefix = "/api/v1"
@@ -123,6 +124,7 @@ class Settings:
         self.default_test_end = "2026-10-26T18:00:00+07:00"
 
     def get_locations(self):
+        """Load and enrich location metadata from configuration."""
         raw_locations = load_yaml_config("locations.yaml").get("locations", [])
         enriched = []
         for loc in raw_locations:
@@ -137,12 +139,15 @@ class Settings:
         return enriched
 
     def get_pollutants(self):
+        """Return metadata list of supported air pollutants."""
         return list(POLLUTANT_METADATA.values())
 
     def get_scenarios(self):
+        """Return metadata list of supported lag feature scenarios."""
         return list(SCENARIO_METADATA.values())
 
     def get_algorithms(self):
+        """Return metadata list of supported machine learning algorithms."""
         return list(ALGORITHM_METADATA.values())
 
 

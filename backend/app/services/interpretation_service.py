@@ -35,12 +35,14 @@ SCIENTIFIC_DISCLAIMER = (
 
 class InterpretationService:
     def __init__(self):
+        """Initialize interpretation service with registry, data, and live services."""
         self.registry = registry_service
         self.data_service = data_service
         self.live_service = live_data_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def interpret_prediction(self, request):
+        """Compute local TreeSHAP attributions and feature direction for a prediction."""
         loc_slug = slugify_component(request.location)
         if loc_slug not in self.supported_locations:
             valid_locs = ", ".join(self.supported_locations.keys())

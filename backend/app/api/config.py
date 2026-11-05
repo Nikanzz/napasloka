@@ -7,6 +7,7 @@ router = APIRouter(prefix="/config", tags=["configuration"])
 
 @router.get("/options")
 def configuration_options():
+    """Return available options for locations, pollutants, scenarios, and algorithms."""
     return {
         "locations": settings.get_locations(),
         "pollutants": settings.get_pollutants(),
@@ -22,9 +23,11 @@ def configuration_options():
 
 @router.get("/models")
 def get_all_models_summary():
+    """Return readiness summary and status for all experimental models."""
     return registry_service.get_all_models_summary()
 
 
 @router.get("/best-models")
 def get_best_models_registry():
+    """Return the complete registry of winning models per configuration."""
     return registry_service.get_all_best_models()

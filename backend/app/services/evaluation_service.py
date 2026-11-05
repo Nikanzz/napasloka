@@ -24,10 +24,12 @@ logger = logging.getLogger(__name__)
 
 class EvaluationService:
     def __init__(self):
+        """Initialize evaluation service with model registry and location mappings."""
         self.registry = registry_service
         self.supported_locations = {loc["id"]: loc for loc in settings.get_locations()}
 
     def _normalize_timestamp(self, ts_input, reference_tz):
+        """Normalize input timestamp string to match reference dataset timezone."""
         if ts_input is None:
             return None
         ts = pd.to_datetime(ts_input)
@@ -36,6 +38,7 @@ class EvaluationService:
         return ts.tz_convert(reference_tz)
 
     def evaluate_test_range(self, request):
+        """Calculate regression metrics and comparison series across a chosen test date range."""
         self.registry.validate_dimensions(
             request.location,
             request.pollutant,
@@ -172,7 +175,7 @@ class EvaluationService:
                     primary_label=str(algorithm_info.get("label", request.algorithm.upper())),
                     primary_metrics=primary_metrics,
                     counterpart_algorithm=counterpart_algo,
-                    counterpart_label=counterpart_info.get("label", counterpart_algo.upper()),
+                    counterpart_label=str(counterpart_info.get("label", counterpart_algo.upper())),
                     counterpart_metrics=cp_metrics,
                     mae_diff_pct=mae_diff_pct,
                     rmse_diff_pct=rmse_diff_pct,
