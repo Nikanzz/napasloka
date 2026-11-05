@@ -70,8 +70,8 @@ window.NapasLokaApi = {
 
   async fetchClientLiveFeatures(lat, lon, pollutant, scenario) {
     try {
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,rain,wind_speed_100m&past_days=2&forecast_days=1&timezone=Asia%2FJakarta`;
-      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=carbon_monoxide,carbon_dioxide&past_days=2&forecast_days=1&domains=cams_global&timezone=Asia%2FJakarta`;
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=temperature_2m,relative_humidity_2m,rain,wind_speed_100m&past_days=2&forecast_days=1&timezone=Asia%2FBangkok`;
+      const airUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${lat}&longitude=${lon}&hourly=carbon_monoxide,carbon_dioxide&past_days=2&forecast_days=1&domains=cams_global&timezone=Asia%2FBangkok`;
 
       const [wResp, aResp] = await Promise.all([
         fetch(weatherUrl),
