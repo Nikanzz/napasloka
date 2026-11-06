@@ -34,7 +34,7 @@ def run_pipeline():
         logger.info("Mengunduh data mentah cuaca dan polutan dari API...")
         fetch_raw_data()
     else:
-        logger.info("Data mentah sudah ada di data/raw/ -> SKIPPED (Ubah FETCH_RAW_DATA=True untuk unduh ulang).")
+        logger.info("Data mentah sudah ada di data/raw/ (Ubah FETCH_RAW_DATA=True untuk unduh ulang).")
 
     clean_and_integrate_data()
 
