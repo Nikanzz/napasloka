@@ -88,98 +88,13 @@
 
       <!-- Hero Actions -->
       <div class="home-hero-actions">
-        <button type="button" id="btn-hero-start" class="btn-hero-primary">
+        <a href="/pages/prediction.html" id="btn-hero-start" class="btn-hero-primary">
           Mulai prediksi
           <span aria-hidden="true">→</span>
-        </button>
+        </a>
         <a href="/pages/information.html" class="btn-hero-secondary">
           Pelajari sistem
         </a>
-      </div>
-
-      <!-- Quick Configuration Card -->
-      <div class="home-quick-config-wrap">
-        <div id="quick-config-card" class="home-quick-config-card">
-          <div class="home-quick-top-bar">
-            <span class="home-quick-pill-badge">
-              <span class="home-quick-pill-dot" aria-hidden="true"></span>
-              Mulai prediksi
-            </span>
-            <span class="home-quick-step-count">3 langkah</span>
-          </div>
-
-          <h2 class="home-quick-card-title">Konfigurasi singkat</h2>
-
-          <div class="home-quick-form-grid">
-            <!-- 01 Lokasi -->
-            <div class="home-form-field">
-              <label for="home-location-select" class="home-field-label">
-                <span class="home-field-step">01</span> Lokasi
-              </label>
-              <div class="home-input-wrap">
-                <span class="home-input-icon" aria-hidden="true" style="display: flex; align-items: center;">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                </span>
-                <select id="home-location-select" class="home-select-control" aria-label="Pilih lokasi pengamatan">
-                  <option value="petamburan-perkantoran-transjakarta" selected>Jakarta Pusat</option>
-                  <option value="taman-kamal">Taman Kamal (Jakarta Barat)</option>
-                  <option value="pelabuhan-muara-baru">Pelabuhan Muara Baru (Jakarta Utara)</option>
-                  <option value="daerah-pelabuhan-tanjung-priuk">Daerah Pelabuhan Tanjung Priuk (Jakarta Utara)</option>
-                  <option value="smpn-92-jakarta-timur">SMPN 92 Jakarta Timur (Jakarta Timur)</option>
-                  <option value="perumahan-dekat-tol-depok-antasari">Tol Depok-Antasari (Jakarta Selatan)</option>
-                  <option value="tmii">TMII (Jakarta Timur)</option>
-                  <option value="metland-cyberpuri">Metland Cyberpuri (Kota Tangerang)</option>
-                  <option value="tol-serpong-interchange">Tol Serpong Interchange (Tangerang Selatan)</option>
-                  <option value="pancoran-mas">Pancoran Mas (Kota Depok)</option>
-                  <option value="jl-tol-jagorawi">Jl. Tol Jagorawi (Kota Depok)</option>
-                  <option value="pantai-makmur">Pantai Makmur (Kabupaten Bekasi)</option>
-                  <option value="kaliabang-tengah">Kaliabang Tengah (Kota Bekasi)</option>
-                  <option value="mustikasari">Mustikasari (Kota Bekasi)</option>
-                  <option value="cibinong">Cibinong (Kabupaten Bogor)</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- 02 Polutan -->
-            <div class="home-form-field">
-              <label class="home-field-label">
-                <span class="home-field-step">02</span> Polutan
-              </label>
-              <div class="home-pollutant-segmented" role="radiogroup" aria-label="Target Polutan">
-                <button type="button" class="home-pollutant-btn active" data-pollutant="co" aria-pressed="true">CO</button>
-                <button type="button" class="home-pollutant-btn" data-pollutant="co2" aria-pressed="false">CO₂</button>
-              </div>
-              <input type="hidden" id="home-pollutant-select" value="co">
-            </div>
-
-            <!-- 03 Skenario fitur -->
-            <div class="home-form-field">
-              <label for="home-scenario-select" class="home-field-label">
-                <span class="home-field-step">03</span> Skenario fitur
-              </label>
-              <div class="home-input-wrap">
-                <span class="home-input-icon" aria-hidden="true">⚙️</span>
-                <select id="home-scenario-select" class="home-select-control" aria-label="Pilih skenario fitur">
-                  <option value="scenario_2" selected>S2 · Polutan + meteorol...</option>
-                  <option value="scenario_1">S1 · Historis polutan saja</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <button id="btn-quick-config" type="button" class="btn-home-quick-submit">
-            Lanjutkan konfigurasi
-            <span aria-hidden="true">→</span>
-          </button>
-
-          <div class="home-quick-note">
-            <svg class="home-note-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-            </svg>
-            <span>Pilihan dibatasi pada data dan model yang tersedia.</span>
-          </div>
-        </div>
       </div>
     </section>
 

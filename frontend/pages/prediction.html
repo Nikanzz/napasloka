@@ -237,27 +237,25 @@
           </div>
         </div>
 
-        <!-- Input Feature Vector (Collapsible Dropdown & Structured List) -->
-        <details class="pred-features-accordion">
-          <summary class="pred-features-summary">
-            <div class="pred-summary-content">
-              <svg class="pred-summary-chevron" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"></polyline>
-              </svg>
-              <span class="pred-summary-title">
-                Vektor Fitur Masukan Model (<span id="res-features-count">0</span> Fitur)
-              </span>
-              <span class="pred-summary-hint">Buka untuk melihat rincian nilai lag dan kondisi masukan</span>
+        <!-- Status Mutu & Interpretasi Konsentrasi Card -->
+        <div id="pred-status-card" class="pred-status-box" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 0.6rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.6rem;">
+              <span id="res-status-badge" style="display: none; padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.82rem; font-weight: 700; color: #ffffff; background: #10b981;"></span>
+              <span id="res-status-level-tag" style="font-size: 0.82rem; font-weight: 600; color: #475569;">Status Konsentrasi Proyeksi</span>
             </div>
-            <span class="pred-summary-pill">Rincian parameter</span>
-          </summary>
-          <div class="pred-features-body">
-            <div id="res-feature-chips" class="pred-feature-list-wrap"></div>
+            <span id="res-status-standard" style="font-size: 0.75rem; color: #64748b; background: #ffffff; padding: 0.25rem 0.65rem; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 500;">Rujukan: -</span>
           </div>
-        </details>
+          <p id="res-status-desc" style="margin: 0; font-size: 0.88rem; color: #334155; line-height: 1.5;">-</p>
+          <div id="res-status-disclaimer" style="display: none; font-size: 0.74rem; color: #64748b; line-height: 1.45; border-top: 1px dashed #cbd5e1; padding-top: 0.45rem; margin-top: 0.2rem;">
+            <strong>Catatan Metodologi:</strong> Kategori CO₂ bersifat relatif berdasarkan distribusi empiris data referensi Jabodetabek dan tidak merepresentasikan baku mutu resmi atau klasifikasi risiko kesehatan.
+          </div>
+        </div>
 
         <!-- Hidden compatibility elements for scripts and tests -->
         <div style="display: none;" aria-hidden="true">
+          <span id="res-features-count"></span>
+          <div id="res-feature-chips"></div>
           <span id="res-horizon-badge"></span>
           <span id="res-predicted-val"></span>
           <span id="res-unit"></span>

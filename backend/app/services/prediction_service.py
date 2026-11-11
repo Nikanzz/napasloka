@@ -11,6 +11,7 @@ from backend.app.core.config import (
 from backend.app.schemas.prediction import (
     FeatureInputItem,
     NextHourPredictionResponse,
+    PredictionStatus,
 )
 from backend.app.services.data_service import data_service
 from backend.app.services.live_data_service import live_data_service
@@ -64,6 +65,77 @@ def get_feature_display_info(feature_name, pollutant_unit):
         "wind_speed_100m_lag_3h": ("Kecepatan Angin (t-3)", "m/s"),
     }
     return labels_map.get(feature_name, (feature_name, pollutant_unit))
+
+
+# Threshold constants for prediction status evaluation
+# CO thresholds based on PP No. 22/2021 (1-Hour National Ambient Standard: 10,000 µg/m³)
+CO_THRESHOLD_HALF = 5000.0  # 50% threshold for visual categorization
+CO_THRESHOLD_LIMIT = 10000.0  # 1-hour national ambient standard
+
+# CO2 empirical quartile cutoffs derived from 262,980 Jabodetabek observations
+CO2_QUARTILE_1 = 449.0  # Q1 (lower 25%)
+CO2_QUARTILE_3 = 472.0  # Q3 (upper 25%)
+
+
+def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus:
+    """Evaluate concentration status using PP No. 22/2021 for CO and empirical quartiles for CO2."""
+    if pollutant.lower() == "co":
+        if value <= CO_THRESHOLD_HALF:
+            return PredictionStatus(
+                status_level="aman",
+                category_label="Memenuhi Baku Mutu",
+                color="#10b981",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi berada di bawah 50% dari baku mutu CO 1 jam nasional.",
+                is_official_standard=True,
+            )
+        elif value <= CO_THRESHOLD_LIMIT:
+            return PredictionStatus(
+                status_level="perhatian",
+                category_label="Mendekati Baku Mutu",
+                color="#f59e0b",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi masih memenuhi baku mutu CO 1 jam nasional.",
+                is_official_standard=True,
+            )
+        else:
+            return PredictionStatus(
+                status_level="waspada",
+                category_label="Melebihi Baku Mutu",
+                color="#ef4444",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi melebihi baku mutu CO 1 jam nasional sebesar 10.000 µg/m³.",
+                is_official_standard=True,
+            )
+    else:
+        # CO2 empirical quartile evaluation (Q1 = 449 ppm, Q3 = 472 ppm based on 262,980 Jabodetabek observations)
+        if value <= CO2_QUARTILE_1:
+            return PredictionStatus(
+                status_level="aman",
+                category_label="Rendah Relatif",
+                color="#10b981",
+                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Termasuk dalam 25% konsentrasi terendah berdasarkan distribusi empiris data referensi Jabodetabek.",
+                is_official_standard=False,
+            )
+        elif value <= CO2_QUARTILE_3:
+            return PredictionStatus(
+                status_level="perhatian",
+                category_label="Tipikal Relatif",
+                color="#3b82f6",
+                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Berada dalam rentang 50% nilai pusat distribusi historis Jabodetabek (Interquartile Range).",
+                is_official_standard=False,
+            )
+        else:
+            return PredictionStatus(
+                status_level="waspada",
+                category_label="Tinggi Relatif",
+                color="#ef4444",
+                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Termasuk dalam 25% konsentrasi tertinggi berdasarkan distribusi empiris data referensi Jabodetabek.",
+                is_official_standard=False,
+            )
 
 
 class PredictionService:
@@ -228,6 +300,8 @@ class PredictionService:
             effective_algo,
         )
 
+        pred_status = evaluate_prediction_status(request.pollutant, pred_value)
+
         return NextHourPredictionResponse(
             experiment_id=experiment_id,
             location=loc_slug,
@@ -251,6 +325,7 @@ class PredictionService:
             delta_value=delta_val,
             delta_percentage=delta_pct,
             trend=trend,
+            status=pred_status,
             feature_inputs=feature_inputs,
             counterpart_algorithm=counterpart_algo,
             counterpart_label=counterpart_meta.get("label", counterpart_algo.upper()),

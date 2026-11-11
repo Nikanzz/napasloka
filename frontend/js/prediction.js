@@ -322,22 +322,99 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // Configuration constants for status evaluation thresholds and reference standards
+  const STATUS_CONFIG = Object.freeze({
+    CO: {
+      HALF_THRESHOLD: 5000,
+      LIMIT_THRESHOLD: 10000,
+      STANDARD_NAME: "Rujukan: PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
+    },
+    CO2: {
+      Q1: 449,
+      Q3: 472,
+      STANDARD_NAME: "Rujukan: Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+    },
+  });
+
   function renderPredictionResult(res) {
     if (resultSection) resultSection.style.display = "block";
 
     setElText("res-pollutant-title", `Prediksi ${res.pollutant_label} di ${res.location_name}`);
 
+    // Direct if-else condition for concentration status
+    const pol = (res.pollutant || "co").toLowerCase();
+    const val = Number(res.predicted_value) || 0;
+
+    let catLabel = "";
+    let catColor = "#10b981";
+    let catStandard = "";
+    let catDesc = "";
+    let showDisclaimer = false;
+
+    if (pol === "co") {
+      catStandard = STATUS_CONFIG.CO.STANDARD_NAME;
+
+      if (val <= STATUS_CONFIG.CO.HALF_THRESHOLD) {
+        catLabel = "Memenuhi Baku Mutu";
+        catColor = "#10b981";
+        catDesc = "Konsentrasi berada di bawah 50% dari baku mutu CO 1 jam nasional.";
+      } else if (val <= STATUS_CONFIG.CO.LIMIT_THRESHOLD) {
+        catLabel = "Mendekati Baku Mutu";
+        catColor = "#f59e0b";
+        catDesc = "Konsentrasi masih memenuhi baku mutu CO 1 jam nasional.";
+      } else {
+        catLabel = "Melebihi Baku Mutu";
+        catColor = "#ef4444";
+        catDesc = "Konsentrasi melebihi baku mutu CO 1 jam nasional sebesar 10.000 µg/m³.";
+      }
+    } else {
+      catStandard = STATUS_CONFIG.CO2.STANDARD_NAME;
+      showDisclaimer = true;
+
+      if (val <= STATUS_CONFIG.CO2.Q1) {
+        catLabel = "Rendah Relatif";
+        catColor = "#10b981";
+        catDesc = "Termasuk dalam 25% konsentrasi terendah berdasarkan distribusi empiris data referensi Jabodetabek.";
+      } else if (val <= STATUS_CONFIG.CO2.Q3) {
+        catLabel = "Tipikal Relatif";
+        catColor = "#3b82f6";
+        catDesc = "Berada dalam rentang 50% nilai pusat distribusi historis Jabodetabek (Interquartile Range).";
+      } else {
+        catLabel = "Tinggi Relatif";
+        catColor = "#ef4444";
+        catDesc = "Termasuk dalam 25% konsentrasi tertinggi berdasarkan distribusi empiris data referensi Jabodetabek.";
+      }
+    }
+
+    const statusBadge = document.getElementById("res-status-badge");
+    if (statusBadge) {
+      statusBadge.textContent = catLabel;
+      statusBadge.style.backgroundColor = catColor;
+      statusBadge.style.color = "#ffffff";
+      statusBadge.style.display = "inline-block";
+    }
+
+    const statusStandard = document.getElementById("res-status-standard");
+    if (statusStandard) {
+      statusStandard.textContent = catStandard;
+    }
+
+    const statusDesc = document.getElementById("res-status-desc");
+    if (statusDesc) {
+      statusDesc.textContent = catDesc;
+    }
+
+    const statusDisclaimer = document.getElementById("res-status-disclaimer");
+    if (statusDisclaimer) {
+      statusDisclaimer.style.display = showDisclaimer ? "block" : "none";
+    }
+
     const badge = document.getElementById("res-assessment-badge");
     if (badge) {
-      if (res.assessment?.category) {
-        badge.textContent = res.assessment.category;
-        badge.style.backgroundColor = res.assessment.color || "#10b981";
-        badge.style.color = "#ffffff";
-        badge.style.display = "inline-block";
-      } else {
-        badge.textContent = "";
-        badge.style.display = "none";
-      }
+      badge.textContent = catLabel;
+      badge.style.backgroundColor = catColor;
+      badge.style.color = "#ffffff";
+      badge.style.display = "inline-block";
     }
 
     const resHorizonBadge = document.getElementById("res-horizon-badge");
@@ -380,27 +457,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (icon) icon.innerHTML = res.trend === "naik" ? "&#9650;" : res.trend === "turun" ? "&#9660;" : "&#9679;";
     }
 
-    if (res.assessment) {
-      setElText("res-standard-ref", res.assessment.standard || "");
-      setElText("res-assessment-desc", res.assessment.description || "");
-    } else {
-      setElText("res-standard-ref", "-");
-      setElText("res-assessment-desc", "");
-    }
+    setElText("res-standard-ref", catStandard);
+    setElText("res-assessment-desc", catDesc);
 
     const meterFill = document.getElementById("res-meter-fill");
     const meterLabels = document.getElementById("res-meter-labels");
     if (meterFill) {
       let fillPct = 50;
       if (res.pollutant === "co") {
-        fillPct = Math.min(100, Math.max(5, (res.predicted_value / 15000) * 100));
-        if (meterLabels) meterLabels.innerHTML = "<span>Rendah</span><span>Sedang</span><span>Tinggi</span>";
+        fillPct = Math.min(100, Math.max(5, (res.predicted_value / STATUS_CONFIG.CO.LIMIT_THRESHOLD) * 100));
+        if (meterLabels) meterLabels.innerHTML = "<span>Memenuhi (&le; 5k)</span><span>Mendekati (5k-10k)</span><span>Melebihi (> 10k µg/m³)</span>";
       } else {
-        fillPct = Math.min(100, Math.max(5, ((res.predicted_value - 380) / (700 - 380)) * 100));
-        if (meterLabels) meterLabels.innerHTML = "<span>Rendah</span><span>Sedang</span><span>Tinggi</span>";
+        fillPct = Math.min(100, Math.max(5, ((res.predicted_value - 420) / (520 - 420)) * 100));
+        if (meterLabels) meterLabels.innerHTML = "<span>Rendah (&le; 449)</span><span>Tipikal (449-472)</span><span>Tinggi (> 472 ppm)</span>";
       }
       meterFill.style.width = `${fillPct.toFixed(1)}%`;
-      meterFill.style.backgroundColor = res.assessment?.color || "#2563eb";
+      meterFill.style.backgroundColor = catColor;
     }
 
     setElText("res-active-algo-name", `${res.algorithm_label} (${res.model_status})`);

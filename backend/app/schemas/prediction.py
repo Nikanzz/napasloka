@@ -12,6 +12,15 @@ class ClientLiveFeatures(BaseModel):
     feature_values: dict[str, float]
 
 
+class PredictionStatus(BaseModel):
+    status_level: str
+    category_label: str
+    color: str
+    standard_name: str
+    description: str
+    is_official_standard: bool
+
+
 class PredictionRequest(BaseModel):
     location: str
     pollutant: PollutantType
@@ -56,6 +65,7 @@ class NextHourPredictionResponse(BaseModel):
     delta_percentage: float
     trend: str
 
+    status: PredictionStatus
     feature_inputs: list[FeatureInputItem]
 
     counterpart_algorithm: str

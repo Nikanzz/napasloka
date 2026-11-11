@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "napasloka-v1.1.3";
+const CACHE_NAME = "napasloka-v1.1.9";
 
 const APP_SHELL = [
   "/",
