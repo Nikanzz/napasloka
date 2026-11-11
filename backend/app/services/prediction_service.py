@@ -85,8 +85,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="aman",
                 category_label="Memenuhi Baku Mutu",
                 color="#10b981",
-                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
-                description="Konsentrasi berada di bawah 50% dari baku mutu CO 1 jam nasional.",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi rendah dan aman, berada jauh di bawah ambang batas baku mutu 1 jam nasional.",
                 is_official_standard=True,
             )
         elif value <= CO_THRESHOLD_LIMIT:
@@ -94,8 +94,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="perhatian",
                 category_label="Mendekati Baku Mutu",
                 color="#f59e0b",
-                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
-                description="Konsentrasi masih memenuhi baku mutu CO 1 jam nasional.",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi mulai meningkat, namun masih berada di dalam batas aman baku mutu 1 jam nasional.",
                 is_official_standard=True,
             )
         else:
@@ -103,8 +103,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="waspada",
                 category_label="Melebihi Baku Mutu",
                 color="#ef4444",
-                standard_name="PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
-                description="Konsentrasi melebihi baku mutu CO 1 jam nasional sebesar 10.000 µg/m³.",
+                standard_name="PP No. 22 Tahun 2021 (Baku Mutu 1 Jam: 10.000 µg/m³)",
+                description="Konsentrasi telah melewati ambang batas aman baku mutu 1 jam nasional (10.000 µg/m³).",
                 is_official_standard=True,
             )
     else:
@@ -114,8 +114,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="aman",
                 category_label="Rendah Relatif",
                 color="#10b981",
-                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
-                description="Termasuk dalam 25% konsentrasi terendah berdasarkan distribusi empiris data referensi Jabodetabek.",
+                standard_name="Data Historis Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Kadar tergolong rendah dan lebih bersih dibandingkan kondisi udara pada umumnya di Jabodetabek.",
                 is_official_standard=False,
             )
         elif value <= CO2_QUARTILE_3:
@@ -123,8 +123,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="perhatian",
                 category_label="Tipikal Relatif",
                 color="#3b82f6",
-                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
-                description="Berada dalam rentang 50% nilai pusat distribusi historis Jabodetabek (Interquartile Range).",
+                standard_name="Data Historis Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Kadar berada pada rentang wajar dan merupakan kondisi yang lazim terjadi di Jabodetabek.",
                 is_official_standard=False,
             )
         else:
@@ -132,8 +132,8 @@ def evaluate_prediction_status(pollutant: str, value: float) -> PredictionStatus
                 status_level="waspada",
                 category_label="Tinggi Relatif",
                 color="#ef4444",
-                standard_name="Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
-                description="Termasuk dalam 25% konsentrasi tertinggi berdasarkan distribusi empiris data referensi Jabodetabek.",
+                standard_name="Data Historis Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+                description="Kadar tergolong lebih pekat dan tinggi dibandingkan kondisi udara pada umumnya di Jabodetabek.",
                 is_official_standard=False,
             )
 

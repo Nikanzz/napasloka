@@ -327,12 +327,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     CO: {
       HALF_THRESHOLD: 5000,
       LIMIT_THRESHOLD: 10000,
-      STANDARD_NAME: "Rujukan: PP No. 22 Tahun 2021 (Baku Mutu CO 1 Jam: 10.000 µg/m³)",
+      STANDARD_NAME: "Rujukan: PP No. 22 Tahun 2021 (Baku Mutu 1 Jam: 10.000 µg/m³)",
     },
     CO2: {
       Q1: 449,
       Q3: 472,
-      STANDARD_NAME: "Rujukan: Distribusi empiris data referensi Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
+      STANDARD_NAME: "Rujukan: Data Historis Jabodetabek (Q1 = 449 ppm, Q3 = 472 ppm)",
     },
   });
 
@@ -357,15 +357,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (val <= STATUS_CONFIG.CO.HALF_THRESHOLD) {
         catLabel = "Memenuhi Baku Mutu";
         catColor = "#10b981";
-        catDesc = "Konsentrasi berada di bawah 50% dari baku mutu CO 1 jam nasional.";
+        catDesc = "Konsentrasi rendah dan aman, berada jauh di bawah ambang batas baku mutu 1 jam nasional.";
       } else if (val <= STATUS_CONFIG.CO.LIMIT_THRESHOLD) {
         catLabel = "Mendekati Baku Mutu";
         catColor = "#f59e0b";
-        catDesc = "Konsentrasi masih memenuhi baku mutu CO 1 jam nasional.";
+        catDesc = "Konsentrasi mulai meningkat, namun masih berada di dalam batas aman baku mutu 1 jam nasional.";
       } else {
         catLabel = "Melebihi Baku Mutu";
         catColor = "#ef4444";
-        catDesc = "Konsentrasi melebihi baku mutu CO 1 jam nasional sebesar 10.000 µg/m³.";
+        catDesc = "Konsentrasi telah melewati ambang batas aman baku mutu 1 jam nasional (10.000 µg/m³).";
       }
     } else {
       catStandard = STATUS_CONFIG.CO2.STANDARD_NAME;
@@ -374,15 +374,15 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (val <= STATUS_CONFIG.CO2.Q1) {
         catLabel = "Rendah Relatif";
         catColor = "#10b981";
-        catDesc = "Termasuk dalam 25% konsentrasi terendah berdasarkan distribusi empiris data referensi Jabodetabek.";
+        catDesc = "Kadar tergolong rendah dan lebih bersih dibandingkan kondisi udara pada umumnya di Jabodetabek.";
       } else if (val <= STATUS_CONFIG.CO2.Q3) {
         catLabel = "Tipikal Relatif";
         catColor = "#3b82f6";
-        catDesc = "Berada dalam rentang 50% nilai pusat distribusi historis Jabodetabek (Interquartile Range).";
+        catDesc = "Kadar berada pada rentang wajar dan merupakan kondisi yang lazim terjadi di Jabodetabek.";
       } else {
         catLabel = "Tinggi Relatif";
         catColor = "#ef4444";
-        catDesc = "Termasuk dalam 25% konsentrasi tertinggi berdasarkan distribusi empiris data referensi Jabodetabek.";
+        catDesc = "Kadar tergolong lebih pekat dan tinggi dibandingkan kondisi udara pada umumnya di Jabodetabek.";
       }
     }
 
