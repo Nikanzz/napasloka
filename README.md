@@ -1,6 +1,6 @@
 # NapasLoka
 
-Sistem prediksi konsentrasi polutan karbon monoksida (CO) dan karbon dioksida (CO2) satu jam ke depan untuk 15 lokasi stasiun pengamatan di wilayah Jabodetabek. Model menggunakan algoritma regresi XGBoost dan LightGBM dengan fitur lag temporal, dilengkapi atribusi kontribusi fitur berbasis TreeSHAP serta antarmuka Progressive Web App (PWA).
+Sistem prediksi konsentrasi polutan karbon monoksida (CO) dan karbon dioksida (CO2) satu jam ke depan untuk 15 lokasi di wilayah Jabodetabek. Model menggunakan algoritma regresi XGBoost dan LightGBM dengan fitur lag temporal, dilengkapi atribusi kontribusi fitur berbasis TreeSHAP serta antarmuka Progressive Web App (PWA).
 
 Repositori ini memuat seluruh alur kerja penelitian: pengambilan data dari API, pembersihan data terisolasi per lokasi, 120 pengujian eksperimen hyperparameter, pembuatan registri model juara, retraining model final pada data historis penuh, backend REST API berbasis FastAPI, dan frontend PWA.
 
