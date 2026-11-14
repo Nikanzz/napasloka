@@ -98,8 +98,9 @@ def verify_and_impute_missing_values(dataset_path, pollutant_name):
         logger.info(f"Missing value check for {pollutant_name}: Complete (0 missing values), imputation skipped.")
         return frame
 
-    logger.info(f"Found {missing_count} missing values in {pollutant_name}. Applying causal forward fill...")
-    frame[numeric_columns] = frame[numeric_columns].ffill()
+    logger.info(f"Found {missing_count} missing values in {pollutant_name}. Applying causal forward fill per location...")
+    frame = frame.sort_values(["location", "datetime"]).reset_index(drop=True)
+    frame[numeric_columns] = frame.groupby("location")[numeric_columns].ffill()
     frame.to_csv(dataset_path, index=False)
     return frame
 
