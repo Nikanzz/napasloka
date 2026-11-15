@@ -91,7 +91,7 @@ def integrate_pollutant_data(raw_pollutant_path, weather_lookup, pollutant_colum
 
 def verify_and_impute_missing_values(dataset_path, pollutant_name):
     frame = pd.read_csv(dataset_path)
-    numeric_columns = frame.select_dtypes(include="number").columns
+    numeric_columns = list(frame.select_dtypes(include="number").columns)
     missing_count = int(frame[numeric_columns].isna().sum().sum())
 
     if missing_count == 0:
